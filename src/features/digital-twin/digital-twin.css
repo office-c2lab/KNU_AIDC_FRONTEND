@@ -531,7 +531,7 @@ header .nav-item{font-size:12px}
 .panel .alarm-item{cursor:pointer}
 .panel .alarm-item:hover{background:#304f794d}
 #device-location{overflow-wrap:anywhere}
-.scene-caption{bottom:97px;max-width:calc(100% - var(--left-w) - var(--right-w) - 110px);line-height:1.6}
+.scene-caption{right:calc(var(--right-w) + 31px);left:calc(var(--left-w) + 31px);bottom:97px;max-width:none;transform:none;line-height:1.6}
 .scene-caption b{font-size:11px}
 .center-status{left:calc(var(--left-w) + 31px);right:calc(var(--right-w) + 31px);bottom:36px;display:flex;justify-content:center;z-index:18}
 .control-dock{width:max-content;max-width:100%;height:48px;padding:0 10px;gap:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;clip-path:polygon(13px 0,calc(100% - 13px) 0,100% 50%,calc(100% - 13px) 100%,13px 100%,0 50%)}
@@ -546,8 +546,6 @@ header .nav-item{font-size:12px}
 .dock-group-label{padding:0 7px;color:#6f89a6;font-size:9px;font-weight:650;letter-spacing:.45px;white-space:nowrap;flex:none}
 .v9-minor-dock{position:fixed;z-index:9;bottom:37px;left:calc(var(--left-w) + 41px);display:flex;gap:4px}
 .v9-minor-dock .chip{font-size:9px;padding:8px 7px}
-.v9-hud-status{position:fixed;z-index:7;left:calc(var(--left-w) + 40px);top:128px;font-size:10px;color:#94badc;text-shadow:0 1px 2px #020812;pointer-events:none;display:flex;gap:8px;align-items:center}
-.v9-hud-status #floor-state{font-weight:750;color:#dcefff}
 .v9-logic{display:none}
 .incident-overlay{position:fixed;top:135px;right:calc(var(--right-w) + 42px);z-index:9;max-width:205px}
 .panel-tabs{display:grid;grid-template-columns:1fr 1.3fr;border:1px solid #43628b;margin-bottom:8px;background:#0f1e36}
@@ -575,7 +573,7 @@ header .nav-item{font-size:12px}
 .v9-panel-details .inspection-tip[hidden]{display:none!important}
 @media(max-width:1370px){.dock-hint{display:none}.dock-button{padding:0 7px}.v9-minor-dock{bottom:95px;left:calc(var(--left-w) + 40px)}.scene-caption{bottom:144px}}
 @media(max-width:1250px){.center-status{left:calc(var(--left-w) + 20px);right:calc(var(--right-w) + 20px)}.v9-minor-dock{left:calc(var(--left-w) + 25px)}}
-@media(max-width:930px){.incident-overlay{display:none}.v9-hud-status{display:none}.scene-caption{display:none}.dock-button{font-size:9px}.center-status{bottom:70px}.v9-minor-dock{bottom:125px}}
+@media(max-width:930px){.incident-overlay{display:none}.scene-caption{display:none}.dock-button{font-size:9px}.center-status{bottom:70px}.v9-minor-dock{bottom:125px}}
 @media(max-width:700px){.panel.right-panel{display:none}.breadcrumbs{right:12px}.center-status{right:10px;bottom:45px}.v9-minor-dock{bottom:104px}.control-dock{justify-content:flex-start}.main-nav{gap:8px}.main-nav .nav-item{font-size:10px}}
 
 /* Keep both detached support facilities visible with the 4F list on standard 900px displays. */
@@ -600,6 +598,7 @@ header .nav-item{font-size:12px}
 }
 /* V17: AIDC instrument modules for power and cooling. */
 .right-panel .infra-section{position:relative;margin-top:2px}
+.right-panel .infra-section[hidden]{display:none!important}
 .right-panel .infra-title{margin:15px 0 8px}
 .right-panel .infra-title h2{font-size:10px}
 .right-panel .infra-state{font-size:9px;color:#73e1c0;letter-spacing:.35px}
@@ -659,7 +658,7 @@ header .nav-item{font-size:12px}
 
 
 /* V27 — immersive asset inspection modal, derived from the AIDC control room interface. */
-.panel .selected-card .device-grid,.panel .selected-card .trend{display:none!important}
+.panel .selected-card .trend{display:none!important}
 .panel .selected-card .device-head{padding-bottom:12px}
 #device-title{font-size:14px}
 #tab-asset{display:none!important}

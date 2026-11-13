@@ -4,7 +4,7 @@ const dockButton =
 export default function SceneControls() {
   return (
     <>
-      <div className="scene-caption pointer-events-none fixed bottom-[97px] left-1/2 z-[7] -translate-x-1/2 text-center text-[9px] leading-relaxed tracking-[2px] text-[#a1bad6]">
+      <div className="scene-caption pointer-events-none fixed right-[calc(var(--right-w)+31px)] bottom-[97px] left-[calc(var(--left-w)+31px)] z-[7] text-center text-[9px] leading-relaxed tracking-[2px] text-[#a1bad6]">
         <b id="view-title">데이터센터 전체 시설</b>
         <span id="view-subtitle">4개 층의 메인 건물과 2개 지원 시설</span>
       </div>
@@ -66,11 +66,6 @@ export default function SceneControls() {
             요원 ON
           </button>
         </div>
-      </div>
-      <div className="v9-hud-status fixed bottom-3 left-1/2 z-[18] flex -translate-x-1/2 items-center gap-2 font-mono text-[9px] text-[#8ca8c5]">
-        <span id="floor-state">전체 층</span>
-        <span className="dotline">·</span>
-        <span id="mode-hint">마우스 드래그 회전 · 휠 확대</span>
       </div>
       <div id="floor-separation-hint" hidden></div>
       <div className="v9-logic" aria-hidden="true">

@@ -95,16 +95,6 @@ export function createHumanModelLoader(context) {
       el.textContent = `AI 운영요원 ${humanAvatarStatus.loaded}/${humanAvatarStatus.total}명 · 순차 적용 중`;
   }
 
-  function waitForMainThreadIdle() {
-    return new Promise(resolve => {
-      if ('requestIdleCallback' in window) {
-        window.requestIdleCallback(() => resolve(), { timeout: 1200 });
-      } else {
-        window.setTimeout(resolve, 180);
-      }
-    });
-  }
-
   function mountRealHuman(agent, gltf, avatarKey) {
     if (!agent || !gltf?.scene) return false;
     let layout = humanLayoutCache.get(avatarKey);
@@ -198,50 +188,49 @@ export function createHumanModelLoader(context) {
     humanStatusText();
     const requiredModels = new Set(Object.values(AGENT_HUMAN_MAP));
     const all = Object.entries(REAL_HUMAN_LIBRARY).filter(([key]) => requiredModels.has(key));
-    // Load and parse one character at a time, between idle periods. Starting all
-    // four GLBs together caused large decode and GPU-upload spikes on first load.
-    for (const [key, entry] of all) {
-      await waitForMainThreadIdle();
-      if (isDisposed()) return;
-      // Version the public URL so browsers do not reuse the former 18–24 MB files.
-      const localUrl = `/digital-twin/assets/humans/${key}.glb?v=${localAssetVersion}`;
-      const sources = location.protocol === 'file:' ? [entry.url] : [localUrl, entry.url];
-      const next = async (index = 0) => {
-        if (index >= sources.length) throw new Error('외부 모델 파일 접근 실패: ' + key);
-        try {
-          return await humanGltfLoader.loadAsync(sources[index]);
-        } catch (e) {
-          if (index + 1 < sources.length) return next(index + 1);
-          throw e;
-        }
-      };
-      const promise = next();
-      humanTemplateCache.set(key, promise);
-      try {
-        const gltf = await promise;
+    // The optimized local models total only a few MB. Load all role templates in
+    // parallel so a detail modal never waits behind unrelated agent roles.
+    await Promise.all(
+      all.map(async ([key, entry]) => {
         if (isDisposed()) return;
-        for (const cfg of AI_AGENT_CONFIG) {
-          if (AGENT_HUMAN_MAP[cfg.id] !== key) continue;
-          const agent = aiAgents.get(cfg.id);
+        // Version the public URL so browsers do not reuse older, much larger files.
+        const localUrl = `/digital-twin/assets/humans/${key}.glb?v=${localAssetVersion}`;
+        const sources = location.protocol === 'file:' ? [entry.url] : [localUrl, entry.url];
+        const next = async (index = 0) => {
+          if (index >= sources.length) throw new Error('외부 모델 파일 접근 실패: ' + key);
           try {
-            if (mountRealHuman(agent, gltf, key)) humanAvatarStatus.loaded++;
-            else humanAvatarStatus.failed++;
-          } catch (err) {
-            console.warn('[KNU AIDC] 인체 모델 배치 실패', cfg.id, err);
-            humanAvatarStatus.failed++;
+            return await humanGltfLoader.loadAsync(sources[index]);
+          } catch (e) {
+            if (index + 1 < sources.length) return next(index + 1);
+            throw e;
           }
-          humanStatusText();
-          await waitForMainThreadIdle();
+        };
+        const promise = next();
+        humanTemplateCache.set(key, promise);
+        try {
+          const gltf = await promise;
           if (isDisposed()) return;
+          for (const cfg of AI_AGENT_CONFIG) {
+            if (AGENT_HUMAN_MAP[cfg.id] !== key) continue;
+            const agent = aiAgents.get(cfg.id);
+            try {
+              if (mountRealHuman(agent, gltf, key)) humanAvatarStatus.loaded++;
+              else humanAvatarStatus.failed++;
+            } catch (err) {
+              console.warn('[KNU AIDC] 인체 모델 배치 실패', cfg.id, err);
+              humanAvatarStatus.failed++;
+            }
+            humanStatusText();
+          }
+        } catch (error) {
+          console.warn('[KNU AIDC] 운영요원 GLB 로딩 실패; 해당 인체 모델 숨김', key, error);
+          humanAvatarStatus.failed += AI_AGENT_CONFIG.filter(
+            c => AGENT_HUMAN_MAP[c.id] === key
+          ).length;
+          humanStatusText();
         }
-      } catch (error) {
-        console.warn('[KNU AIDC] 운영요원 GLB 로딩 실패; 해당 인체 모델 숨김', key, error);
-        humanAvatarStatus.failed += AI_AGENT_CONFIG.filter(
-          c => AGENT_HUMAN_MAP[c.id] === key
-        ).length;
-        humanStatusText();
-      }
-    }
+      })
+    );
   }
 
   return { loadRealHumanLibrary };

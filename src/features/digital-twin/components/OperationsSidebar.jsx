@@ -1,39 +1,15 @@
-import {
-  instrumentCard,
-  moduleReadout,
-  panelBase,
-  panelScroll,
-  sectionTitle,
-  subTitle,
-} from './uiStyles.js';
+import { instrumentCard, moduleReadout, panelBase, panelScroll, subTitle } from './uiStyles.js';
 
 export default function OperationsSidebar() {
   return (
     <>
       <aside className={`${panelBase} right-panel right-[26px]`} aria-label="환경 및 설비 상태">
         <div className={panelScroll}>
-          <section aria-labelledby="environment-heading">
-            <div className={sectionTitle}>
-              <h2 id="environment-heading">Environmental Status</h2>
-              <span className="module-readout live">SIMULATED</span>
-            </div>
-            <table className={`${instrumentCard} env-table`} aria-label="층별 온습도">
-              <thead>
-                <tr>
-                  <th scope="col">Floor</th>
-                  <th scope="col">Temp.</th>
-                  <th scope="col">Humidity</th>
-                  <th scope="col">Load</th>
-                </tr>
-              </thead>
-              <tbody id="env-body"></tbody>
-            </table>
-          </section>
-
           <section
             className="infra-section"
             data-infra-panel="power"
             aria-labelledby="infra-power-heading"
+            hidden
           >
             <div className="sub-title infra-title">
               <h2 id="infra-power-heading">Power Infrastructure</h2>
@@ -46,16 +22,6 @@ export default function OperationsSidebar() {
               </span>
             </div>
             <div className="infra-card">
-              <button
-                type="button"
-                className="infra-jump"
-                data-infra-focus="power"
-                title="전력 설비동 3D 위치로 이동"
-              >
-                <span>전력 설비동</span>
-                <small>UPS · BATTERY · SWITCHGEAR</small>
-                <b aria-hidden="true">›</b>
-              </button>
               <div className="infra-metrics">
                 <div>
                   <small>UPS A / B</small>
@@ -99,6 +65,7 @@ export default function OperationsSidebar() {
             className="infra-section"
             data-infra-panel="cooling"
             aria-labelledby="infra-cooling-heading"
+            hidden
           >
             <div className="sub-title infra-title">
               <h2 id="infra-cooling-heading">Cooling Infrastructure</h2>
@@ -111,16 +78,6 @@ export default function OperationsSidebar() {
               </span>
             </div>
             <div className="infra-card">
-              <button
-                type="button"
-                className="infra-jump"
-                data-infra-focus="cooling"
-                title="냉각 설비동 3D 위치로 이동"
-              >
-                <span>냉각 설비동</span>
-                <small>CHILLER · PUMP · CDU</small>
-                <b aria-hidden="true">›</b>
-              </button>
               <div className="infra-metrics">
                 <div>
                   <small>냉수 출수 온도</small>
@@ -164,7 +121,7 @@ export default function OperationsSidebar() {
 
           <section aria-labelledby="equipment-heading">
             <div className={subTitle}>
-              <h2 id="equipment-heading">Selected Equipment</h2>
+              <h2 id="equipment-heading">Selection Detail</h2>
               <span className={moduleReadout} id="device-id-short">
                 ALL
               </span>

@@ -153,7 +153,7 @@ export default function FacilitySidebar() {
                 <span className={floorNumber}>4F</span>
                 <span className="floor-copy">
                   <strong>통합 관제층</strong>
-                  <small>NOC · SOC / OPERATIONS</small>
+                  <small id="summary-4F">22.4°C · 습도 47.5% · 부하 38%</small>
                 </span>
                 <span className={healthStatus} id="health-4F">
                   정상
@@ -163,7 +163,7 @@ export default function FacilitySidebar() {
                 <span className={floorNumber}>3F</span>
                 <span className="floor-copy">
                   <strong>AI / GPU 전산층</strong>
-                  <small>GPU / LIQUID COOLING</small>
+                  <small id="summary-3F">24.6°C · 습도 44.1% · 부하 86%</small>
                 </span>
                 <span className={healthStatus} id="health-3F">
                   정상
@@ -173,7 +173,7 @@ export default function FacilitySidebar() {
                 <span className={floorNumber}>2F</span>
                 <span className="floor-copy">
                   <strong>일반 서버 전산층</strong>
-                  <small>SERVER / STORAGE / CRAC</small>
+                  <small id="summary-2F">23.1°C · 습도 46.8% · 부하 71%</small>
                 </span>
                 <span className={healthStatus} id="health-2F">
                   정상
@@ -183,7 +183,7 @@ export default function FacilitySidebar() {
                 <span className={floorNumber}>1F</span>
                 <span className="floor-copy">
                   <strong>보안·통신·장비 반입</strong>
-                  <small>SECURITY / MDF / STAGING</small>
+                  <small id="summary-1F">22.8°C · 습도 48.2% · 부하 64%</small>
                 </span>
                 <span className={healthStatus} id="health-1F">
                   정상
@@ -201,7 +201,7 @@ export default function FacilitySidebar() {
                 <span className={floorNumber}>P</span>
                 <span className="floor-copy">
                   <strong>전력 설비동</strong>
-                  <small>UPS · BATTERY · GENERATOR</small>
+                  <small id="summary-power">부하 68% · 배터리 96%</small>
                 </span>
                 <span className={healthStatus} id="health-power">
                   정상
@@ -216,7 +216,7 @@ export default function FacilitySidebar() {
                 <span className={floorNumber}>C</span>
                 <span className="floor-copy">
                   <strong>냉각 설비동</strong>
-                  <small>CHILLER · PUMP · HEAT EXCHANGER</small>
+                  <small id="summary-cooling">출수 18.2°C · 부하 61%</small>
                 </span>
                 <span className={healthStatus} id="health-cooling">
                   정상

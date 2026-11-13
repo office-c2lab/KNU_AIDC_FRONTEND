@@ -2707,7 +2707,9 @@ export function initDigitalTwin(root) {
     $('#asset-modal-status').textContent = busy ? 'INSPECTING' : 'STANDBY';
     $('#asset-modal-status').classList.toggle('warning', busy);
     $('#asset-modal-door').hidden = true;
-    $('#asset-modal-view-note').textContent = '드래그로 회전 · 휠로 확대 · 대기·점검 동작';
+    $('#asset-modal-view-note').textContent = config.realLoaded
+      ? '드래그로 회전 · 휠로 확대 · 대기·점검 동작'
+      : 'AI 운영요원 3D 모델을 불러오는 중…';
   }
   function setAgentVisibility(show) {
     twinActions.setAgentsVisible(Boolean(show));
@@ -3802,11 +3804,40 @@ export function initDigitalTwin(root) {
       resizeAssetPreview();
       return;
     }
+    const agent = isRealHuman ? aiAgents.get(asset.id) : null;
+    // Keep the complete agent root while cloning so SkeletonUtils can preserve every
+    // skinned-bone relationship. Scene-only marker objects are removed immediately below.
     const device = isRealHuman ? cloneSkinnedModel(asset.root) : asset.root.clone(true);
+    if (isRealHuman) {
+      device.getObjectByName('agent-ground-ring')?.removeFromParent();
+      device.getObjectByName('agent-alert-beacon')?.removeFromParent();
+      const direction = device.getObjectByName('agent-direction');
+      if (direction) direction.rotation.y = 0;
+    }
     // Engineering details are distance-culled in the main scene. The close-up modal
     // must show them even when the source is far from the main camera.
     device.traverse(part => {
       if (part.name?.startsWith('internal-machinery:')) part.visible = true;
+      if (isRealHuman) {
+        part.visible = true;
+        // Skinned meshes inherit main-scene culling bounds that are unreliable after
+        // cloning and recentering into the isolated preview scene.
+        if (part.isSkinnedMesh) part.frustumCulled = false;
+        if (part.isMesh && part.material) {
+          const sourceMaterials = Array.isArray(part.material) ? part.material : [part.material];
+          const previewMaterials = sourceMaterials.map(material => {
+            const previewMaterial = material.clone();
+            const revealState = agent.revealMaterials?.find(entry => entry.material === material);
+            if (revealState) {
+              previewMaterial.opacity = revealState.opacity;
+              previewMaterial.transparent = revealState.transparent;
+              previewMaterial.depthWrite = revealState.depthWrite;
+            }
+            return previewMaterial;
+          });
+          part.material = Array.isArray(part.material) ? previewMaterials : previewMaterials[0];
+        }
+      }
     });
     modalPreviewMount.add(device);
     const bounds = new THREE.Box3().setFromObject(device, true);
@@ -3814,31 +3845,7 @@ export function initDigitalTwin(root) {
     const center = bounds.getCenter(new THREE.Vector3());
     // Recenter the equipment in its own inspection frame.
     device.position.sub(center);
-    const dimension = Math.max(size.x, size.y, size.z, 0.9);
-    const radius = Math.max(size.x, size.z, 1.1) * 0.78;
-    const deck = new THREE.Mesh(
-      new THREE.CylinderGeometry(radius, radius * 1.12, 0.1, 72),
-      new THREE.MeshStandardMaterial({
-        color: 0x173b65,
-        metalness: 0.45,
-        roughness: 0.43,
-        emissive: 0x123d77,
-        emissiveIntensity: 0.13,
-      })
-    );
-    if (!isRealHuman) {
-      deck.position.y = -size.y / 2 - 0.12;
-      modalPreviewMount.add(deck);
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(radius * 0.93, 0.018, 5, 80),
-        new THREE.MeshBasicMaterial({ color: 0x5bbcf7, transparent: true, opacity: 0.7 })
-      );
-      ring.rotation.x = Math.PI / 2;
-      ring.position.y = deck.position.y + 0.068;
-      modalPreviewMount.add(ring);
-    }
     if (isRealHuman) {
-      const agent = aiAgents.get(asset.id);
       const previewHuman = device.getObjectByName('agent-human-model');
       const model = previewHuman?.children[0];
       const idle =
@@ -3848,14 +3855,24 @@ export function initDigitalTwin(root) {
         modalPreviewHumanMixer.clipAction(idle).play();
       }
     }
-    const camDistance = dimension * 2.0 + 1.5;
-    modalPreviewCamera.position.set(camDistance * 0.5, camDistance * 0.48, camDistance * 0.85);
-    modalPreviewCamera.near = Math.max(0.015, camDistance / 1000);
-    modalPreviewCamera.far = camDistance * 15;
+    resizeAssetPreview();
+    const radius = Math.max(size.length() * 0.5, 0.35);
+    const verticalFov = THREE.MathUtils.degToRad(modalPreviewCamera.fov);
+    const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * modalPreviewCamera.aspect);
+    const fitFov = Math.max(0.25, Math.min(verticalFov, horizontalFov));
+    const camDistance = (radius / Math.sin(fitFov / 2)) * (isRealHuman ? 1.22 : 1.16);
+    const viewDirection = new THREE.Vector3(
+      isRealHuman ? 0 : 0.42,
+      isRealHuman ? 0.04 : 0.32,
+      1
+    ).normalize();
+    modalPreviewCamera.position.copy(viewDirection.multiplyScalar(camDistance));
+    modalPreviewCamera.near = Math.max(0.01, camDistance / 100);
+    modalPreviewCamera.far = Math.max(50, camDistance * 20);
     modalPreviewCamera.updateProjectionMatrix();
     modalPreviewControls.target.set(0, 0, 0);
-    modalPreviewControls.minDistance = dimension * 0.7 + 1;
-    modalPreviewControls.maxDistance = dimension * 6 + 10;
+    modalPreviewControls.minDistance = Math.max(0.2, radius * 0.65);
+    modalPreviewControls.maxDistance = Math.max(8, radius * 10);
     modalPreviewControls.update();
     const door = doors.find(d => d.id === asset.id);
     if (door) {
@@ -3868,7 +3885,6 @@ export function initDigitalTwin(root) {
         .filter(Boolean);
       if (modalPreviewDoor) modalPreviewDoor.rotation.y = door.hinge.rotation.y;
     }
-    resizeAssetPreview();
   }
   function resizeAssetPreview() {
     if (!modalPreviewRenderer || !assetModalId) return;
@@ -4118,10 +4134,6 @@ export function initDigitalTwin(root) {
     document
       .querySelectorAll('[data-floor]')
       .forEach(btn => btn.classList.toggle('active', btn.dataset.floor === (activeFloor || 'all')));
-    const splitNames = ['쌓아 보기', '분리 1단계', '분리 2단계'];
-    $('#floor-state').textContent = activeFloor
-      ? `${activeFloor} 단독 보기`
-      : splitNames[splitLevel];
     root.querySelectorAll('[data-split-level]').forEach(btn => {
       const isSelected = !activeFloor && Number(btn.dataset.splitLevel) === splitLevel;
       btn.classList.toggle('active', isSelected);
@@ -4201,15 +4213,6 @@ export function initDigitalTwin(root) {
       if (name === 'power' || name === 'coolant')
         b.textContent = `${name === 'power' ? '전력' : '냉각'} ${active ? 'ON' : 'OFF'}`;
     });
-    const overlays = [power ? '전력(노란색) ON' : null, cooling ? '냉각(하늘색) ON' : null].filter(
-      Boolean
-    );
-    $('#mode-hint').textContent =
-      currentMode === 'thermal'
-        ? '온도 분포 · 과열 설비 강조'
-        : overlays.length
-          ? overlays.join(' · ') + ' · 다시 누르면 OFF · 층 분리 시 자동 연결'
-          : '전력·냉각 OFF · 버튼을 눌러 계통 표시 · 설비 클릭: 선택/상세';
     for (const d of heatDisks) {
       const a = registry.get(d.entityId),
         t = getSensor(a).temp;
@@ -4580,6 +4583,7 @@ export function initDigitalTwin(root) {
         type === 'power'
           ? activeZone === 'power'
           : activeZone === 'cooling' || selectedId?.startsWith('CDU-');
+      sec.hidden = !chosen;
       sec.classList.toggle('is-focused', chosen);
     }
     const upsFault = activeIncidents.has('ups'),
@@ -4603,6 +4607,8 @@ export function initDigitalTwin(root) {
     document.getElementById('infra-cooling-load').innerHTML = coolingLoad + '<em>%</em>';
     document.getElementById('infra-cooling-pct').textContent = coolingLoad + '%';
     document.getElementById('infra-cooling-bar').style.width = coolingLoad + '%';
+    $('#summary-power').textContent = `부하 ${powerLoad}% · 배터리 ${battery}%`;
+    $('#summary-cooling').textContent = `출수 ${supply.toFixed(1)}°C · 부하 ${coolingLoad}%`;
     for (const [led, id] of [
       ['infra-led-ups', 'UPS-01'],
       ['infra-led-bat', 'BAT-01'],
@@ -4697,14 +4703,12 @@ export function initDigitalTwin(root) {
     const tempMap = { '4F': '22.4', '3F': '24.6', '2F': '23.1', '1F': '22.8' };
     const humMap = { '4F': '47.5', '3F': '44.1', '2F': '46.8', '1F': '48.2' };
     const loadMap = { '4F': '38', '3F': '86', '2F': '71', '1F': '64' };
-    $('#env-body').innerHTML = [...floorList]
-      .reverse()
-      .map(f => {
-        const count = incidentCountForFloor(f),
-          temp = (Number(tempMap[f]) + (f === '3F' && count ? 1.8 : 0)).toFixed(1);
-        return `<tr data-env-floor="${f}" class="${activeFloor === f ? 'selected' : ''}"><td class="${count ? 'attention' : ''}">${f}</td><td class="good">${temp}<small> °C</small></td><td>${humMap[f]}<small>%</small></td><td>${loadMap[f]}<small>%</small></td></tr>`;
-      })
-      .join('');
+    for (const floor of floorList) {
+      const count = incidentCountForFloor(floor);
+      const temp = (Number(tempMap[floor]) + (floor === '3F' && count ? 1.8 : 0)).toFixed(1);
+      $(`#summary-${floor}`).textContent =
+        `${temp}°C · 습도 ${humMap[floor]}% · 부하 ${loadMap[floor]}%`;
+    }
     const alarmIds = [...activeIncidents.values()].map(i => ({
       scenario: SCENARIO_BY_ID.get(i.id),
       incident: i,
@@ -4985,10 +4989,6 @@ export function initDigitalTwin(root) {
   $('#btn-view-reset').addEventListener('click', () => {
     if (activeFloor) setZone('f' + activeFloor[0]);
     else setZone('overview');
-  });
-  $('#env-body').addEventListener('click', e => {
-    const r = e.target.closest('[data-env-floor]');
-    if (r) setZone('f' + r.dataset.envFloor[0]);
   });
   root.querySelector('.right-panel').addEventListener('click', e => {
     const zoneButton = e.target.closest('[data-infra-focus]');
