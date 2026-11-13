@@ -274,7 +274,7 @@ export default function OperationsSidebar() {
             </summary>
             <div className="agent-shortcuts" id="agent-shortcuts" aria-label="AI 담당자 선택"></div>
             <div className="agent-human-loading" id="agent-human-loading" aria-live="polite">
-              실사형 인체 모델을 불러오는 중…
+              역할별 운영요원 모델을 구성하는 중…
             </div>
           </details>
           <section className="extras-section" aria-label="설비 상세와 장애 시뮬레이션">

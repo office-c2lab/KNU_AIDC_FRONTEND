@@ -2,6 +2,16 @@
   "license": "CC0 1.0",
   "provider": "Innerscene / MakeHuman",
   "models": {
+    "technician": {
+      "url": "https://files.innerscene.com/library/drew-3d-person-construction-worker-with-hard-hat-and-hi-vis-a4aa98af/f241b97e471bb3c1b95a/drew-3d-person-construction-worker-with-hard-hat-and-hi-vis.glb",
+      "page": "https://www.innerscene.com/tools/library/3d-parts/drew-3d-person-construction-worker-with-hard-hat-and-hi-vis-a4aa98af",
+      "size": "22.8 MB"
+    },
+    "security": {
+      "url": "https://files.innerscene.com/library/drew-3d-person-security-guard-in-unmarked-uniform-b3c77830/8bd52a033eabe4ee207d/drew-3d-person-security-guard-in-unmarked-uniform.glb",
+      "page": "https://www.innerscene.com/tools/library/3d-parts/drew-3d-person-security-guard-in-unmarked-uniform-b3c77830",
+      "size": "14.4 MB"
+    },
     "jordan": {
       "url": "https://files.innerscene.com/library/idle-standing-jordan-3d-person-animated-1721c58f/1eda105547d9d25895f3/idle-standing-jordan-3d-person-animated.glb",
       "page": "https://www.innerscene.com/tools/library/3d-parts/idle-standing-jordan-3d-person-animated-1721c58f",
@@ -24,12 +34,12 @@
     }
   },
   "assignments": {
-    "AI-SEC-01": "harper",
-    "AI-NET-01": "sam",
-    "AI-GPU-01": "maya",
+    "AI-SEC-01": "security",
+    "AI-NET-01": "technician",
+    "AI-GPU-01": "technician",
     "AI-NOC-01": "jordan",
     "AI-SOC-01": "harper",
-    "AI-PWR-01": "sam",
-    "AI-CLG-01": "maya"
+    "AI-PWR-01": "technician",
+    "AI-CLG-01": "technician"
   }
 }

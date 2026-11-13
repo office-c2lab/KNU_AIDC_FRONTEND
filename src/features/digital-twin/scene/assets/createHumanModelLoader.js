@@ -11,6 +11,7 @@ export function createHumanModelLoader(context) {
       'aiAgents',
       'AI_AGENT_CONFIG',
       'prepareEquipmentPickBounds',
+      'isDisposed',
       'mountAssetPreview',
       'registry',
       'updateAssetModal',
@@ -25,81 +26,131 @@ export function createHumanModelLoader(context) {
     aiAgents,
     AI_AGENT_CONFIG,
     prepareEquipmentPickBounds,
+    isDisposed,
     getAssetModalId,
     mountAssetPreview,
     registry,
     updateAssetModal,
   } = context;
   const $ = query;
-  // KNU AIDC V40: four distinct CC0 MakeHuman-derived humans, reused across seven roles.
-  // Models include skin/clothing textures and native idle skeletal animations.
-  // They are loaded from the official Innerscene public model library. Because the
-  // Human GLB assets remain external to keep the application bundle lightweight.
+  // Approved GLBs are shown for all seven roles. Until a GLB is ready (or when
+  // it fails), only the location marker remains — no procedural character.
   const REAL_HUMAN_LIBRARY = {
+    technician: {
+      url: 'https://files.innerscene.com/library/drew-3d-person-construction-worker-with-hard-hat-and-hi-vis-a4aa98af/f241b97e471bb3c1b95a/drew-3d-person-construction-worker-with-hard-hat-and-hi-vis.glb',
+      page: 'https://www.innerscene.com/tools/library/3d-parts/drew-3d-person-construction-worker-with-hard-hat-and-hi-vis-a4aa98af',
+      size: '22.8 MB',
+    },
+    security: {
+      url: 'https://files.innerscene.com/library/drew-3d-person-security-guard-in-unmarked-uniform-b3c77830/8bd52a033eabe4ee207d/drew-3d-person-security-guard-in-unmarked-uniform.glb',
+      page: 'https://www.innerscene.com/tools/library/3d-parts/drew-3d-person-security-guard-in-unmarked-uniform-b3c77830',
+      size: '14.4 MB',
+    },
     jordan: {
       url: 'https://files.innerscene.com/library/idle-standing-jordan-3d-person-animated-1721c58f/1eda105547d9d25895f3/idle-standing-jordan-3d-person-animated.glb',
       page: 'https://www.innerscene.com/tools/library/3d-parts/idle-standing-jordan-3d-person-animated-1721c58f',
       size: '22.6 MB',
-    },
-    maya: {
-      url: 'https://files.innerscene.com/library/idle-standing-maya-3d-person-animated-22b686d6/c3dbeb4f797ae0f00fce/idle-standing-maya-3d-person-animated.glb',
-      page: 'https://www.innerscene.com/tools/library/3d-parts/idle-standing-maya-3d-person-animated-22b686d6',
-      size: '19.6 MB',
     },
     harper: {
       url: 'https://files.innerscene.com/library/idle-standing-harper-3d-person-animated-ba9bc23f/a63c5f1eaa80d52e65c6/idle-standing-harper-3d-person-animated.glb',
       page: 'https://www.innerscene.com/tools/library/3d-parts/idle-standing-harper-3d-person-animated-ba9bc23f',
       size: '17.9 MB',
     },
-    sam: {
-      url: 'https://files.innerscene.com/library/idle-standing-sam-3d-person-animated-1f9f1217/4ca6054a9945f1c21da5/idle-standing-sam-3d-person-animated.glb',
-      page: 'https://www.innerscene.com/tools/library/3d-parts/idle-standing-sam-3d-person-animated-1f9f1217',
-      size: '20.1 MB',
-    },
   };
   const AGENT_HUMAN_MAP = {
-    'AI-SEC-01': 'harper',
-    'AI-NET-01': 'sam',
-    'AI-GPU-01': 'maya',
+    'AI-SEC-01': 'security',
+    'AI-NET-01': 'technician',
+    'AI-GPU-01': 'technician',
     'AI-NOC-01': 'jordan',
     'AI-SOC-01': 'harper',
-    'AI-PWR-01': 'sam',
-    'AI-CLG-01': 'maya',
+    'AI-PWR-01': 'technician',
+    'AI-CLG-01': 'technician',
   };
   const humanGltfLoader = new GLTFLoader();
   const humanTemplateCache = new Map();
-  const humanAvatarStatus = { loaded: 0, total: 7, failed: 0 };
+  const humanLayoutCache = new Map();
+  const localAssetVersion = 'runtime-20261113-dc2';
+  const humanAvatarStatus = {
+    loaded: 0,
+    total: Object.keys(AGENT_HUMAN_MAP).length,
+    failed: 0,
+  };
+  for (const cfg of AI_AGENT_CONFIG) {
+    const agent = aiAgents.get(cfg.id);
+    if (agent) {
+      agent.realExpected = Boolean(AGENT_HUMAN_MAP[cfg.id]);
+      if (agent.realExpected) agent.marker.visible = false;
+    }
+  }
   function humanStatusText() {
     const el = $('#agent-human-loading');
     if (!el) return;
-    el.classList.toggle('is-ready', humanAvatarStatus.loaded === 7);
+    el.classList.toggle('is-ready', humanAvatarStatus.loaded === humanAvatarStatus.total);
     el.classList.toggle('is-error', humanAvatarStatus.failed > 0);
-    if (humanAvatarStatus.loaded === 7) {
-      el.textContent = '실사형 3D 인체 모델 7명 적용 · 모의 관제';
+    if (humanAvatarStatus.loaded === humanAvatarStatus.total) {
+      el.textContent = '층별 AI 운영요원 7명 적용 · 대체 캐릭터 미사용';
     } else if (humanAvatarStatus.failed) {
-      el.textContent = `실사형 ${humanAvatarStatus.loaded}/7명 적용 · ${humanAvatarStatus.failed}명은 기존 모델로 대체 표시 (연결 확인)`;
+      el.textContent = `AI 운영요원 ${humanAvatarStatus.loaded}/${humanAvatarStatus.total}명 적용 · 실패 모델 숨김`;
     } else
-      el.textContent = `실사형 3D 인체 모델 로딩 ${humanAvatarStatus.loaded}/7명 · 첫 실행 시 대용량 다운로드`;
+      el.textContent = `AI 운영요원 ${humanAvatarStatus.loaded}/${humanAvatarStatus.total}명 · 순차 적용 중`;
   }
+
+  function waitForNextFrame() {
+    return new Promise(resolve => window.requestAnimationFrame(resolve));
+  }
+
+  let humanMountQueue = Promise.resolve();
+  function enqueueHumanMount(task) {
+    const queued = humanMountQueue.then(waitForNextFrame).then(task);
+    // Keep the queue usable even if an individual mount unexpectedly fails.
+    humanMountQueue = queued.catch(() => {});
+    return queued;
+  }
+
   function mountRealHuman(agent, gltf, avatarKey) {
     if (!agent || !gltf?.scene) return false;
+    let layout = humanLayoutCache.get(avatarKey);
+    if (!layout) {
+      const bounds = new THREE.Box3().setFromObject(gltf.scene, true);
+      const dimensions = bounds.getSize(new THREE.Vector3());
+      if (!Number.isFinite(dimensions.y) || dimensions.y < 0.1) return false;
+      const center = bounds.getCenter(new THREE.Vector3());
+      layout = { height: dimensions.y, center: center.clone(), minY: bounds.min.y };
+      humanLayoutCache.set(avatarKey, layout);
+    }
     // SkeletonUtils copies skinned bones correctly, unlike Object3D.clone(true).
     const human = cloneSkinnedModel(gltf.scene);
-    const bounds = new THREE.Box3().setFromObject(human, true);
-    const dimensions = bounds.getSize(new THREE.Vector3());
-    if (!Number.isFinite(dimensions.y) || dimensions.y < 0.1) return false;
     const pivot = new THREE.Group();
     pivot.name = 'agent-human-model';
-    const scale = 1.73 / dimensions.y;
-    const center = bounds.getCenter(new THREE.Vector3());
+    const scale = 1.73 / layout.height;
     human.scale.setScalar(scale);
-    human.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
+    human.position.set(-layout.center.x * scale, -layout.minY * scale, -layout.center.z * scale);
+    const revealMaterials = [];
     human.traverse(part => {
       if (part.isMesh) {
-        part.castShadow = true;
+        // Avoid drawing every skinned mesh again in the directional-light
+        // shadow pass. People still receive the building's scene lighting.
+        part.castShadow = false;
         part.receiveShadow = true;
+        const materials = Array.isArray(part.material) ? part.material : [part.material];
+        const cloned = materials.map(material => {
+          const nextMaterial = material.clone();
+          revealMaterials.push({
+            material: nextMaterial,
+            opacity: nextMaterial.opacity,
+            transparent: nextMaterial.transparent,
+            depthWrite: nextMaterial.depthWrite,
+          });
+          nextMaterial.transparent = true;
+          nextMaterial.depthWrite = false;
+          nextMaterial.opacity = 0;
+          return nextMaterial;
+        });
+        part.material = Array.isArray(part.material) ? cloned : cloned[0];
       }
-      if (part.isSkinnedMesh) part.frustumCulled = false; // skeletal animation modifies bounds.
+      // The models use compact idle poses, so their supplied bounds are safe
+      // and let Three.js skip people outside the camera frustum.
+      if (part.isSkinnedMesh) part.frustumCulled = true;
       if (part.material && part.material.side === THREE.DoubleSide)
         part.material.side = THREE.FrontSide;
     });
@@ -117,6 +168,11 @@ export function createHumanModelLoader(context) {
     agent.realClips = gltf.animations || [];
     agent.mixer = null;
     agent.mixerLastTime = 0;
+    agent.mixerAccumulator = 0;
+    agent.revealMaterials = revealMaterials;
+    // Leave one fully transparent frame for shader/texture preparation, then
+    // reveal without the abrupt first-frame pop seen during initial loading.
+    agent.revealStartedAt = performance.now() + 32;
     const idle = agent.realClips.find(c => /idle|stand|rest/i.test(c.name)) || agent.realClips[0];
     if (idle) {
       const mixer = new THREE.AnimationMixer(human);
@@ -133,19 +189,23 @@ export function createHumanModelLoader(context) {
       agent.mixer = mixer;
     }
     marker.visible = false; // no figurine pedestal; selected halo from the existing system still works.
-    prepareEquipmentPickBounds(); // refresh clickable dimensions for actual full-body geometry.
+    prepareEquipmentPickBounds(agent.id); // refresh only this operator's clickable bounds.
     if (getAssetModalId() === agent.id && !$('#asset-modal').hidden) {
       mountAssetPreview(registry.get(agent.id));
       updateAssetModal();
     }
     return true;
   }
-  function loadRealHumanLibrary() {
+  async function loadRealHumanLibrary() {
     humanStatusText();
-    const all = Object.entries(REAL_HUMAN_LIBRARY);
-    // A single network load per character, then independent skeletal clones per operator.
-    for (const [key, entry] of all) {
-      const localUrl = `/digital-twin/assets/humans/${key}.glb`;
+    const requiredModels = new Set(Object.values(AGENT_HUMAN_MAP));
+    const all = Object.entries(REAL_HUMAN_LIBRARY).filter(([key]) => requiredModels.has(key));
+    // The runtime assets are now small enough to fetch in parallel. Mounting is
+    // still serialized at one operator per animation frame to avoid a long task.
+    const loadAndMount = async ([key, entry]) => {
+      if (isDisposed()) return;
+      // Version the public URL so browsers do not reuse the former 18–24 MB files.
+      const localUrl = `/digital-twin/assets/humans/${key}.glb?v=${localAssetVersion}`;
       const sources = location.protocol === 'file:' ? [entry.url] : [localUrl, entry.url];
       const next = async (index = 0) => {
         if (index >= sources.length) throw new Error('외부 모델 파일 접근 실패: ' + key);
@@ -158,29 +218,35 @@ export function createHumanModelLoader(context) {
       };
       const promise = next();
       humanTemplateCache.set(key, promise);
-      promise
-        .then(gltf => {
-          for (const cfg of AI_AGENT_CONFIG) {
-            if (AGENT_HUMAN_MAP[cfg.id] !== key) continue;
-            const agent = aiAgents.get(cfg.id);
-            try {
-              if (mountRealHuman(agent, gltf, key)) humanAvatarStatus.loaded++;
-              else humanAvatarStatus.failed++;
-            } catch (err) {
-              console.warn('[KNU AIDC] 인체 모델 배치 실패', cfg.id, err);
-              humanAvatarStatus.failed++;
-            }
-            humanStatusText();
-          }
-        })
-        .catch(error => {
-          console.warn('[KNU AIDC] 실사형 3D 모델 로딩 실패; 대체 모델 사용', key, error);
-          humanAvatarStatus.failed += AI_AGENT_CONFIG.filter(
-            c => AGENT_HUMAN_MAP[c.id] === key
-          ).length;
-          humanStatusText();
-        });
-    }
+      try {
+        const gltf = await promise;
+        if (isDisposed()) return;
+        const configs = AI_AGENT_CONFIG.filter(cfg => AGENT_HUMAN_MAP[cfg.id] === key);
+        await Promise.all(
+          configs.map(cfg =>
+            enqueueHumanMount(() => {
+              if (isDisposed()) return;
+              const agent = aiAgents.get(cfg.id);
+              try {
+                if (mountRealHuman(agent, gltf, key)) humanAvatarStatus.loaded++;
+                else humanAvatarStatus.failed++;
+              } catch (err) {
+                console.warn('[KNU AIDC] 인체 모델 배치 실패', cfg.id, err);
+                humanAvatarStatus.failed++;
+              }
+              humanStatusText();
+            })
+          )
+        );
+      } catch (error) {
+        console.warn('[KNU AIDC] 운영요원 GLB 로딩 실패; 해당 인체 모델 숨김', key, error);
+        humanAvatarStatus.failed += AI_AGENT_CONFIG.filter(
+          c => AGENT_HUMAN_MAP[c.id] === key
+        ).length;
+        humanStatusText();
+      }
+    };
+    await Promise.all(all.map(loadAndMount));
   }
 
   return { loadRealHumanLibrary };

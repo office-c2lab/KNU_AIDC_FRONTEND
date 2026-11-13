@@ -18,9 +18,9 @@ export function createRenderingCore({ THREE, OrbitControls, host, root, zones, g
 
     const highQuality = getHighQuality();
     const nativeDpr = window.devicePixelRatio || 1;
-    const requestedDpr = highQuality
-      ? Math.min(2, Math.max(1.6, nativeDpr))
-      : Math.min(nativeDpr, 1.25);
+    // Avoid forced supersampling on standard 1x displays. A 1.6 minimum made
+    // the whole scene render 2.56x as many pixels without a useful visual gain.
+    const requestedDpr = highQuality ? Math.min(nativeDpr, 1.5) : Math.min(nativeDpr, 1);
     const budgetDpr = Math.sqrt(maxRenderPixels / (w * h));
     const chosenDpr = Math.max(0.75, Math.min(requestedDpr, budgetDpr));
 

@@ -25,6 +25,7 @@ export function initDigitalTwin(root) {
    * 디테일 지오메트리(랙 프레임, 도어, 팬, CDU, 냉각기, UPS 등)는 JS에서 생성합니다.
    */
   const $ = q => root.querySelector(q);
+  let disposed = false;
   const host = $('#render-host');
   const labelsHost = $('#world-labels');
   const clock = new THREE.Clock();
@@ -2406,9 +2407,8 @@ export function initDigitalTwin(root) {
     summary: '상용전원 장애 시 사용되는 비상 전력 공급 장치. 현재 대기 상태.',
   });
 
-  // V40 — seven simulated operators, replaced with textured, rigged CC0 full-body humans.
-  // Remote GLB loading is asynchronous; the prior procedural characters remain as a fallback
-  // only when an external file is unavailable. No surveillance / person tracking is implemented.
+  // Seven simulated roles use approved GLBs after loading. No procedural/fallback
+  // person is rendered during initial loading or after a failed model request.
   const AI_AGENT_CONFIG = [
     {
       id: 'AI-SEC-01',
@@ -2525,138 +2525,26 @@ export function initDigitalTwin(root) {
   ];
   const aiAgents = new Map();
   let agentsVisible = initialTwinState.agentsVisible;
-  const agentSkin = mat(0xcaa792, 0.0, 0.88),
-    agentHair = mat(0x182a3b, 0.05, 0.75);
-  const agentDeep = mat(0x192b40, 0.2, 0.72),
-    agentBoot = mat(0x111b2b, 0.2, 0.68);
-  const agentVisor = mat(0x0d1a31, 0.45, 0.2, 0x1b3b5a, 0.15);
-  const agentLens = new THREE.MeshBasicMaterial({
-    color: 0xa5eaff,
-    depthTest: true,
-    depthWrite: false,
-  });
-  function agentSphere(parent, r, x, y, z, material, segments = 16) {
-    const mesh = new THREE.Mesh(new THREE.SphereGeometry(r, segments, 12), material);
-    mesh.position.set(x, y, z);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    parent.add(mesh);
-    return mesh;
-  }
-  function makeOperatorModel(config) {
+  function makeOperatorAnchor(config) {
     const root = new THREE.Group();
     root.name = config.id + ' / AI OPERATOR';
     root.position.set(config.x, config.y, config.z);
     config.parent.add(root);
+
     const direction = new THREE.Group();
     direction.name = 'agent-direction';
     direction.rotation.y = config.angle;
     root.add(direction);
-    const accent = mat(config.tint, 0.34, 0.42),
-      accentDark = mat(config.tint, 0.55, 0.36),
-      suit = mat(0x22364a, 0.28, 0.55),
-      suitDark = mat(0x162433, 0.34, 0.48),
-      fabric = mat(0x2b4054, 0.14, 0.72),
-      trim = mat(0x8ba8c6, 0.55, 0.28),
-      glove = mat(0xd8e5f0, 0.15, 0.78),
-      visorGlow = mat(0x89d7ff, 0.18, 0.2, config.tint, 0.16),
-      visorFrame = mat(0x0c1726, 0.55, 0.24),
-      helmet = mat(0xe2edf6, 0.25, 0.78),
-      helmetDark = mat(0x92a6bb, 0.45, 0.45);
-    const spine = new THREE.Group();
-    spine.name = 'agent-body';
-    direction.add(spine);
-    // Higher-fidelity stylized operator: slimmer silhouette, helmet, visor and technical uniform.
-    for (const side of [-1, 1]) {
-      const x = side * 0.14;
-      const thigh = new THREE.Group();
-      thigh.position.set(x, 0.72, 0);
-      direction.add(thigh);
-      box(thigh, 0.18, 0.42, 0.2, 0, 0, 0, fabric, { rounded: true });
-      box(thigh, 0.17, 0.08, 0.21, 0, 0.18, 0, accent, { rounded: true });
-      const shin = new THREE.Group();
-      shin.position.set(0, -0.33, 0);
-      thigh.add(shin);
-      box(shin, 0.155, 0.35, 0.18, 0, 0, 0, suitDark, { rounded: true });
-      box(shin, 0.17, 0.1, 0.19, 0, -0.18, 0, trim, { rounded: true });
-      const boot = box(direction, 0.21, 0.17, 0.34, x, 0.12, 0.06, agentBoot, { rounded: true });
-      box(direction, 0.23, 0.05, 0.25, x, 0.23, 0.07, trim, { rounded: true });
-    }
-    const pelvis = box(spine, 0.34, 0.12, 0.23, 0, 0.9, 0, suitDark, { rounded: true });
-    box(spine, 0.43, 0.09, 0.25, 0, 0.96, 0, accent, { rounded: true });
-    box(spine, 0.55, 0.7, 0.31, 0, 1.25, 0, suit, { rounded: true });
-    box(spine, 0.47, 0.44, 0.1, 0, 1.28, 0.165, visorFrame, { rounded: true });
-    box(spine, 0.41, 0.38, 0.012, 0, 1.28, 0.222, visorGlow, { cast: false });
-    box(spine, 0.23, 0.07, 0.04, 0, 1.48, 0.182, accent, { rounded: true });
-    for (const side of [-1, 1]) {
-      box(spine, 0.11, 0.34, 0.05, side * 0.18, 1.21, 0.182, accentDark, { rounded: true });
-      box(spine, 0.08, 0.17, 0.035, side * 0.15, 1.03, 0.18, trim, { rounded: true });
-    }
-    box(spine, 0.58, 0.09, 0.27, 0, 1.63, 0, suitDark, { rounded: true });
-    box(spine, 0.28, 0.1, 0.21, 0, 0.83, 0.13, visorFrame, { rounded: true });
-    for (const side of [-1, 1]) {
-      box(spine, 0.09, 0.1, 0.06, side * 0.13, 0.83, 0.17, accent, { rounded: true });
-    }
-    // Utility pouches and belt hardware.
-    box(spine, 0.1, 0.12, 0.08, -0.18, 0.92, 0.12, suitDark, { rounded: true });
-    box(spine, 0.1, 0.12, 0.08, 0.18, 0.92, 0.12, suitDark, { rounded: true });
-    box(spine, 0.07, 0.07, 0.05, 0, 0.9, 0.15, accent, { rounded: true });
-    const head = new THREE.Group();
-    head.name = 'agent-head';
-    head.position.set(0, 1.63, 0);
-    spine.add(head);
-    box(head, 0.34, 0.24, 0.29, 0, 0.15, 0, helmet, { rounded: true });
-    box(head, 0.36, 0.11, 0.31, 0, 0.29, -0.01, helmet, { rounded: true });
-    box(head, 0.38, 0.03, 0.21, 0, 0.3, 0.08, helmetDark, { rounded: true });
-    box(head, 0.31, 0.15, 0.19, 0, 0.15, 0.115, visorFrame, { rounded: true });
-    box(head, 0.26, 0.1, 0.012, 0, 0.15, 0.208, visorGlow, { cast: false });
-    box(head, 0.18, 0.04, 0.025, 0, 0.02, 0.15, accent, { rounded: true });
-    box(head, 0.08, 0.08, 0.08, 0.19, 0.18, 0.03, helmetDark, { rounded: true });
-    const mic = box(head, 0.014, 0.14, 0.014, 0.235, 0.11, 0.085, helmetDark, { cast: false });
-    mic.rotation.z = 0.75;
-    box(head, 0.05, 0.018, 0.016, 0.265, 0.045, 0.13, accent, { cast: false });
-    box(head, 0.06, 0.03, 0.12, 0, -0.02, -0.005, agentSkin, { rounded: true });
-    box(head, 0.09, 0.04, 0.1, 0, -0.07, 0.03, agentSkin, { rounded: true });
-    for (const side of [-1, 1]) {
-      const shoulder = box(spine, 0.13, 0.12, 0.14, side * 0.33, 1.53, 0, suitDark, {
-        rounded: true,
-      });
-      box(spine, 0.1, 0.04, 0.13, side * 0.33, 1.58, 0.03, accent, { rounded: true });
-      const arm = new THREE.Group();
-      arm.name = side < 0 ? 'agent-arm-left' : 'agent-arm-right';
-      arm.position.set(side * 0.34, 1.45, 0);
-      spine.add(arm);
-      box(arm, 0.15, 0.32, 0.16, 0, -0.06, 0, suit, { rounded: true });
-      box(arm, 0.12, 0.05, 0.14, 0, -0.22, 0, accent, { rounded: true });
-      box(arm, 0.13, 0.28, 0.14, 0, -0.29, 0, fabric, { rounded: true });
-      box(arm, 0.11, 0.07, 0.13, 0, -0.44, 0, trim, { rounded: true });
-      box(arm, 0.11, 0.1, 0.12, 0, -0.54, 0.01, glove, { rounded: true });
-      arm.rotation.x = side === 1 ? -0.42 : 0.1;
-      arm.rotation.z = side === 1 ? -0.1 : 0.16;
-    }
-    // Inspection tablet with a slight holographic screen treatment.
-    const tab = new THREE.Group();
-    tab.name = 'agent-tablet';
-    tab.position.set(0.24, 1.1, 0.22);
-    direction.add(tab);
-    box(tab, 0.3, 0.39, 0.04, 0, 0, 0, visorFrame, { rounded: true });
-    box(tab, 0.24, 0.31, 0.01, 0, 0.01, 0.028, visorGlow, { cast: false });
-    for (let i = 0; i < 3; i++)
-      box(tab, 0.15, 0.012, 0.008, -0.01, 0.075 - i * 0.07, 0.034, i === 0 ? accent : agentLens, {
-        cast: false,
-      });
-    box(tab, 0.05, 0.05, 0.006, 0.09, -0.1, 0.034, accentDark, { cast: false });
-    tab.rotation.z = 0.12;
-    tab.rotation.x = -0.24;
-    tab.rotation.y = -0.1;
-    // Subtle floor-selection ring rather than a toy display pedestal.
+
+    // Location/status marker only. No procedural or fallback character is
+    // created while the approved GLB is waiting or unavailable.
     const marker = new THREE.Mesh(
-      new THREE.RingGeometry(0.28, 0.33, 48),
+      new THREE.RingGeometry(0.24, 0.3, 32),
       new THREE.MeshBasicMaterial({
         color: config.tint,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.26,
+        opacity: 0.2,
         depthTest: true,
         depthWrite: false,
       })
@@ -2665,38 +2553,37 @@ export function initDigitalTwin(root) {
     marker.rotation.x = -Math.PI / 2;
     marker.position.y = 0.026;
     direction.add(marker);
-    const beacon = agentSphere(
-      direction,
-      0.055,
-      0.4,
-      1.96,
-      0.02,
+
+    const beacon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.055, 10, 8),
       new THREE.MeshBasicMaterial({
         color: 0xffb86b,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0,
         depthTest: true,
         depthWrite: false,
-      }),
-      14
+      })
     );
     beacon.name = 'agent-alert-beacon';
+    beacon.position.set(0.4, 0.12, 0.02);
     beacon.visible = false;
+    direction.add(beacon);
+
     register(root, config.id, {
       zone: config.zone,
       type: 'AI AGENT',
       name: config.name,
       location: config.area,
       summary: config.intro,
-      markerLocal: [0, 0.86, 0],
+      markerLocal: [0, 0.08, 0],
       capacity: 100,
       temp: 0,
       power: 0,
       agentRole: config.role,
     });
-    aiAgents.set(config.id, { ...config, root, direction, spine, head, marker, beacon });
+    aiAgents.set(config.id, { ...config, root, direction, marker, beacon });
   }
-  AI_AGENT_CONFIG.forEach(makeOperatorModel);
+  AI_AGENT_CONFIG.forEach(makeOperatorAnchor);
 
   const { loadRealHumanLibrary } = createHumanModelLoader({
     THREE,
@@ -2706,6 +2593,7 @@ export function initDigitalTwin(root) {
     aiAgents,
     AI_AGENT_CONFIG,
     prepareEquipmentPickBounds,
+    isDisposed: () => disposed,
     getAssetModalId: () => assetModalId,
     mountAssetPreview,
     registry,
@@ -2726,12 +2614,34 @@ export function initDigitalTwin(root) {
   }
   function animateOperatorRig(root, config, t, busy) {
     if (config?.realLoaded && root === config.root) {
+      if (config.revealMaterials) {
+        const progress = clamp((performance.now() - config.revealStartedAt) / 220, 0, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        for (const entry of config.revealMaterials) {
+          entry.material.opacity = entry.opacity * eased;
+        }
+        if (progress >= 1) {
+          for (const entry of config.revealMaterials) {
+            entry.material.opacity = entry.opacity;
+            entry.material.transparent = entry.transparent;
+            entry.material.depthWrite = entry.depthWrite;
+          }
+          config.revealMaterials = null;
+        }
+      }
       if (config.mixer) {
         const delta = config.mixerLastTime
           ? Math.max(0, Math.min(0.08, t - config.mixerLastTime))
           : 0;
         config.mixerLastTime = t;
-        config.mixer.update(delta);
+        config.mixerAccumulator = (config.mixerAccumulator || 0) + delta;
+        // Idle poses do not need 60/120 Hz bone updates. Rendering stays at
+        // full frame rate while skeleton animation runs at 30 Hz (15 Hz low).
+        const mixerStep = 1 / (highQuality ? 30 : 15);
+        if (config.mixerAccumulator >= mixerStep) {
+          config.mixer.update(Math.min(config.mixerAccumulator, 0.08));
+          config.mixerAccumulator = 0;
+        }
       }
       // A subtle warning when a simulated event is active; no exaggerated bobbing.
       if (config.beacon) {
@@ -2740,23 +2650,9 @@ export function initDigitalTwin(root) {
       }
       return;
     }
-    const body = root.getObjectByName('agent-body');
-    const head = root.getObjectByName('agent-head');
-    const left = root.getObjectByName('agent-arm-left');
-    const right = root.getObjectByName('agent-arm-right');
-    const tab = root.getObjectByName('agent-tablet');
     const ring = root.getObjectByName('agent-ground-ring');
     const beacon = root.getObjectByName('agent-alert-beacon');
-    if (!body) return;
     const seed = AI_AGENT_CONFIG.findIndex(a => a.id === config.id) * 0.9;
-    const movement = t * (busy ? 1.95 : 1.07) + seed;
-    body.position.y = 0.013 * Math.sin(movement * 1.6);
-    body.rotation.y = 0.055 * Math.sin(movement * 0.5);
-    head.rotation.y = 0.1 * Math.sin(movement * 0.72);
-    head.rotation.x = busy ? -0.15 : -0.055 + 0.022 * Math.sin(movement * 0.86);
-    if (left) left.rotation.x = -0.26 + 0.14 * Math.sin(movement * 1.1);
-    if (right) right.rotation.x = -0.42 + 0.13 * Math.sin(movement * 0.95 + 1.7);
-    if (tab) tab.rotation.y = 0.045 * Math.sin(movement * 0.72);
     if (ring) {
       ring.material.opacity = busy
         ? 0.5 + (0.23 * (1 + Math.sin(t * 3.1))) / 2
@@ -3898,6 +3794,12 @@ export function initDigitalTwin(root) {
     modalPreviewHumanMixer = null;
     // Clone only this asset's model — NOT the floor, partitions or all other racks.
     const isRealHuman = asset.type === 'AI AGENT' && aiAgents.get(asset.id)?.realLoaded;
+    // Keep the preview empty for roles without an approved model. In particular,
+    // do not manufacture a procedural placeholder in the detail modal.
+    if (asset.type === 'AI AGENT' && !isRealHuman) {
+      resizeAssetPreview();
+      return;
+    }
     const device = isRealHuman ? cloneSkinnedModel(asset.root) : asset.root.clone(true);
     // Engineering details are distance-culled in the main scene. The close-up modal
     // must show them even when the source is far from the main camera.
@@ -4076,11 +3978,14 @@ export function initDigitalTwin(root) {
         '드래그: 회전 · 휠: 확대 · 더블클릭: 도어·서랍 ' + (door.open ? '닫기' : '열기');
     } else {
       doorButton.removeAttribute('aria-pressed');
+      const modalAgent = asset.type === 'AI AGENT' ? aiAgents.get(asset.id) : null;
       $('#asset-modal-view-note').textContent =
         asset.type === 'AI AGENT'
-          ? aiAgents.get(asset.id)?.realLoaded
+          ? modalAgent?.realLoaded
             ? '실사형 3D 인체 · 드래그 회전 · 휠 확대'
-            : '3D 대체 모델 · 실사형 모델 로딩 중 또는 다운로드 실패'
+            : modalAgent?.realExpected
+              ? 'AI 운영요원 모델 로딩 중 · 완료 전에는 인체 미표시'
+              : '현장 AI 역할 · 3D 인체 모델 미사용'
           : '드래그로 회전 · 휠로 확대';
     }
   }
@@ -4839,9 +4744,10 @@ export function initDigitalTwin(root) {
   const pickScratch = new THREE.Box3();
   const pickHit = new THREE.Vector3();
   const opaqueOccluders = new Set(architectureOccluders);
-  function prepareEquipmentPickBounds() {
+  function prepareEquipmentPickBounds(assetId = null) {
     scene.updateMatrixWorld(true);
-    for (const asset of registry.values()) {
+    const assets = assetId ? [registry.get(assetId)].filter(Boolean) : registry.values();
+    for (const asset of assets) {
       const bounds = new THREE.Box3().setFromObject(asset.root, true);
       if (bounds.isEmpty()) continue;
       const inverse = asset.root.matrixWorld.clone().invert();
@@ -5556,6 +5462,7 @@ export function initDigitalTwin(root) {
   });
 
   return () => {
+    disposed = true;
     window.cancelAnimationFrame(animationFrameId);
     window.clearInterval(clockInterval);
     window.removeEventListener('keydown', handleGlobalKeydown);
