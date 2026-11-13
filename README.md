@@ -10,13 +10,15 @@ Vite/React 애플리케이션에서 V40 Real Human Operators 3D 디지털 트윈
 npm run dev
 ```
 
-개발 서버의 루트 경로에서 디지털 트윈이 표시됩니다. 실제 앱 코드는
-`src/features/digital-twin`에 기능 단위로 분리되어 있습니다.
+개발 서버의 루트 경로에서 디지털 트윈이 표시됩니다. `AppLayout`이 공통 관제 UI를
+구성하고, 라우터의 `Outlet`에 실제 3D 뷰 페이지를 렌더링합니다.
 
-- `DigitalTwin.jsx`: React 진입 컴포넌트 및 씬 초기화
+- `layouts/AppLayout.jsx`: 헤더·좌우 패널·하단 컨트롤 및 `Outlet`
+- `pages/DigitalTwinPage.jsx`: `Outlet`에 표시되는 3D 뷰 페이지
+- `features/digital-twin/components`: 관제 UI 컴포넌트
+- `features/digital-twin/useDigitalTwinScene.js`: Three.js 생명주기 연결
 - `scene.js`: Three.js 장면, 설비, 상호작용 로직
-- `digital-twin.css`: 디지털 트윈 전용 스타일
-- `DigitalTwinMarkup.jsx`: React 기반 HUD·패널 마크업
+- `digital-twin.css`: 3D 오버레이와 Three.js가 토글하는 동적 상태 스타일
 
 압축에서 해제한 독립 실행 원본은 비교·참고를 위해 `public/digital-twin`에 보존되어
 있지만 앱 실행에는 사용하지 않습니다.

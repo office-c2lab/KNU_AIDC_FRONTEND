@@ -1,8 +1,6 @@
 import { useEffect, useRef } from 'react';
-import DigitalTwinMarkup from './DigitalTwinMarkup.jsx';
-import './digital-twin.css';
 
-export default function DigitalTwin() {
+export default function useDigitalTwinScene() {
   const rootRef = useRef(null);
 
   useEffect(() => {
@@ -30,9 +28,5 @@ export default function DigitalTwin() {
     };
   }, []);
 
-  return (
-    <main ref={rootRef} className="digital-twin-root">
-      <DigitalTwinMarkup />
-    </main>
-  );
+  return rootRef;
 }
