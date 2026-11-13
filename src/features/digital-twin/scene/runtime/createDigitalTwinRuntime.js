@@ -2710,8 +2710,10 @@ export function initDigitalTwin(root) {
     $('#asset-modal-view-note').textContent = '드래그로 회전 · 휠로 확대 · 대기·점검 동작';
   }
   function setAgentVisibility(show) {
+    twinActions.setAgentsVisible(Boolean(show));
+  }
+  function applyAgentVisibility(show) {
     agentsVisible = Boolean(show);
-    twinActions.setPreferences({ agentsVisible });
     for (const agent of aiAgents.values()) agent.root.visible = agentsVisible;
     const btn = $('#btn-agent-visibility');
     btn.classList.toggle('active', agentsVisible);
@@ -4148,11 +4150,7 @@ export function initDigitalTwin(root) {
     if (activeFloor) return;
     const level = clamp(Math.trunc(nextLevel), 0, 2);
     if (activeZone !== 'overview' || selectedId) setZone('overview', null, false);
-    splitLevel = level;
-    twinActions.setNavigation({ splitLevel });
-    // Utility risers telescope between live floor heights, so keep power/cooling mode active.
-    updateFloorLayout();
-    moveTo('overview');
+    twinActions.setSplitLevel(level);
   }
   function setZone(zone, assetId = null, move = true) {
     if (!zones[zone]) return;
@@ -4178,10 +4176,8 @@ export function initDigitalTwin(root) {
         ? FLOOR_INFO[asset.floor].sub
         : zones[zone].sub
       : zones[zone].sub;
-    autoRotate = false;
-    twinActions.setNavigation({ activeZone, activeFloor, selectedId, autoRotate });
-    controls.autoRotate = false;
-    $('#btn-auto').classList.remove('is-on');
+    twinActions.setNavigation({ activeZone, activeFloor, selectedId });
+    twinActions.setAutoRotate(false);
     updateFloorLayout();
     if (move) moveTo(zone);
     updateInspector();
@@ -4225,21 +4221,34 @@ export function initDigitalTwin(root) {
     updateUtilityRisers(clock.elapsedTime); // Hide all unused physical routes immediately.
   }
   function setMode(mode, forceOn = false) {
-    if (mode === 'normal') {
-      currentMode = 'normal';
-      utilityEnabled.power = false;
-      utilityEnabled.coolant = false;
-    } else if (mode === 'thermal') {
-      currentMode = forceOn ? 'thermal' : currentMode === 'thermal' ? 'normal' : 'thermal';
-      utilityEnabled.power = false;
-      utilityEnabled.coolant = false;
-    } else if (mode === 'power' || mode === 'coolant') {
-      utilityEnabled[mode] = forceOn ? true : !utilityEnabled[mode];
-      currentMode = 'normal';
-    } else return;
-    twinActions.setViewMode(currentMode, utilityEnabled);
-    syncModeControls();
+    twinActions.selectVisualization(mode, forceOn);
   }
+
+  const unsubscribeTwinStore = digitalTwinStore.subscribe((state, previous) => {
+    if (state.splitLevel !== previous.splitLevel) {
+      splitLevel = state.splitLevel;
+      // Utility risers telescope between live floor heights, so keep active layers connected.
+      updateFloorLayout();
+      moveTo('overview');
+    }
+    if (state.viewMode !== previous.viewMode || state.utilities !== previous.utilities) {
+      currentMode = state.viewMode;
+      utilityEnabled.power = state.utilities.power;
+      utilityEnabled.coolant = state.utilities.coolant;
+      syncModeControls();
+    }
+    if (state.agentsVisible !== previous.agentsVisible) applyAgentVisibility(state.agentsVisible);
+    if (state.autoRotate !== previous.autoRotate) {
+      autoRotate = state.autoRotate;
+      controls.autoRotate = autoRotate;
+      $('#btn-auto').classList.toggle('is-on', autoRotate);
+    }
+    if (state.highQuality !== previous.highQuality) {
+      highQuality = state.highQuality;
+      applyRenderQuality();
+      updateDistanceDetails();
+    }
+  });
   function toggleDoor(id) {
     const door = doors.find(d => d.id === id);
     if (door) door.open = !door.open;
@@ -4934,7 +4943,7 @@ export function initDigitalTwin(root) {
       setInspectorTab('scenario');
     }
   });
-  $('#btn-agent-visibility').addEventListener('click', () => setAgentVisibility(!agentsVisible));
+  $('#btn-agent-visibility').addEventListener('click', twinActions.toggleAgentsVisible);
   $('#agent-shortcuts').addEventListener('click', e => {
     const item = e.target.closest('[data-agent-id]');
     if (item) {
@@ -4944,17 +4953,11 @@ export function initDigitalTwin(root) {
   });
   $('#btn-fit').addEventListener('click', () => setZone('overview'));
   $('#btn-auto').addEventListener('click', () => {
-    autoRotate = !autoRotate;
-    twinActions.setPreferences({ autoRotate });
-    controls.autoRotate = autoRotate;
-    $('#btn-auto').classList.toggle('is-on', autoRotate);
+    twinActions.toggleAutoRotate();
   });
   root.querySelectorAll('[data-quality]').forEach(button =>
     button.addEventListener('click', () => {
-      highQuality = button.dataset.quality === 'high';
-      twinActions.setPreferences({ highQuality });
-      applyRenderQuality();
-      updateDistanceDetails();
+      twinActions.setHighQuality(button.dataset.quality === 'high');
     })
   );
   // AIDC v4 navigation and header buttons, backed by the real v8 3D interactions.
@@ -5435,7 +5438,10 @@ export function initDigitalTwin(root) {
   updateInspector();
   updateSummary();
   updateAgentShortcuts();
-  setMode('normal');
+  syncModeControls();
+  applyAgentVisibility(agentsVisible);
+  controls.autoRotate = autoRotate;
+  $('#btn-auto').classList.toggle('is-on', autoRotate);
   renderScenarioPanel();
   renderIncidentOverlay();
   updateNocWall();
@@ -5458,6 +5464,7 @@ export function initDigitalTwin(root) {
     window.removeEventListener('resize', resize);
     window.removeEventListener('resize', resizeAssetPreview);
     resizeObserver.disconnect();
+    unsubscribeTwinStore();
     controls.dispose();
     renderer.dispose();
     modalPreviewControls?.dispose();

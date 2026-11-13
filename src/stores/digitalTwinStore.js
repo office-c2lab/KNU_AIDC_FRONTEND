@@ -19,8 +19,35 @@ export const useDigitalTwinStore = create(set => ({
   ...initialState,
 
   setNavigation: navigation => set(navigation),
-  setViewMode: (viewMode, utilities) => set({ viewMode, utilities: { ...utilities } }),
-  setPreferences: preferences => set(preferences),
+  setSplitLevel: splitLevel =>
+    set({ splitLevel: Math.max(0, Math.min(2, Math.trunc(splitLevel))) }),
+  selectVisualization: (mode, forceOn = false) =>
+    set(state => {
+      const utilities = { ...state.utilities };
+      let viewMode;
+
+      if (mode === 'normal') {
+        viewMode = 'normal';
+        utilities.power = false;
+        utilities.coolant = false;
+      } else if (mode === 'thermal') {
+        viewMode = forceOn ? 'thermal' : state.viewMode === 'thermal' ? 'normal' : 'thermal';
+        utilities.power = false;
+        utilities.coolant = false;
+      } else if (mode === 'power' || mode === 'coolant') {
+        viewMode = 'normal';
+        utilities[mode] = forceOn ? true : !utilities[mode];
+      } else {
+        return state;
+      }
+
+      return { viewMode, utilities };
+    }),
+  setHighQuality: highQuality => set({ highQuality }),
+  setAgentsVisible: agentsVisible => set({ agentsVisible }),
+  toggleAgentsVisible: () => set(state => ({ agentsVisible: !state.agentsVisible })),
+  setAutoRotate: autoRotate => set({ autoRotate }),
+  toggleAutoRotate: () => set(state => ({ autoRotate: !state.autoRotate })),
   setScenarioState: scenario => set(scenario),
   setIncidents: incidents => set({ incidents: incidents.map(incident => ({ ...incident })) }),
   resetTwinState: () => set({ ...initialState, utilities: { ...initialState.utilities } }),
