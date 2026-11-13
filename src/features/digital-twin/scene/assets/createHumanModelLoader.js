@@ -95,16 +95,14 @@ export function createHumanModelLoader(context) {
       el.textContent = `AI 운영요원 ${humanAvatarStatus.loaded}/${humanAvatarStatus.total}명 · 순차 적용 중`;
   }
 
-  function waitForNextFrame() {
-    return new Promise(resolve => window.requestAnimationFrame(resolve));
-  }
-
-  let humanMountQueue = Promise.resolve();
-  function enqueueHumanMount(task) {
-    const queued = humanMountQueue.then(waitForNextFrame).then(task);
-    // Keep the queue usable even if an individual mount unexpectedly fails.
-    humanMountQueue = queued.catch(() => {});
-    return queued;
+  function waitForMainThreadIdle() {
+    return new Promise(resolve => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(() => resolve(), { timeout: 1200 });
+      } else {
+        window.setTimeout(resolve, 180);
+      }
+    });
   }
 
   function mountRealHuman(agent, gltf, avatarKey) {
@@ -172,7 +170,7 @@ export function createHumanModelLoader(context) {
     agent.revealMaterials = revealMaterials;
     // Leave one fully transparent frame for shader/texture preparation, then
     // reveal without the abrupt first-frame pop seen during initial loading.
-    agent.revealStartedAt = performance.now() + 32;
+    agent.revealStartedAt = performance.now() + 80;
     const idle = agent.realClips.find(c => /idle|stand|rest/i.test(c.name)) || agent.realClips[0];
     if (idle) {
       const mixer = new THREE.AnimationMixer(human);
@@ -200,9 +198,10 @@ export function createHumanModelLoader(context) {
     humanStatusText();
     const requiredModels = new Set(Object.values(AGENT_HUMAN_MAP));
     const all = Object.entries(REAL_HUMAN_LIBRARY).filter(([key]) => requiredModels.has(key));
-    // The runtime assets are now small enough to fetch in parallel. Mounting is
-    // still serialized at one operator per animation frame to avoid a long task.
-    const loadAndMount = async ([key, entry]) => {
+    // Load and parse one character at a time, between idle periods. Starting all
+    // four GLBs together caused large decode and GPU-upload spikes on first load.
+    for (const [key, entry] of all) {
+      await waitForMainThreadIdle();
       if (isDisposed()) return;
       // Version the public URL so browsers do not reuse the former 18–24 MB files.
       const localUrl = `/digital-twin/assets/humans/${key}.glb?v=${localAssetVersion}`;
@@ -221,23 +220,20 @@ export function createHumanModelLoader(context) {
       try {
         const gltf = await promise;
         if (isDisposed()) return;
-        const configs = AI_AGENT_CONFIG.filter(cfg => AGENT_HUMAN_MAP[cfg.id] === key);
-        await Promise.all(
-          configs.map(cfg =>
-            enqueueHumanMount(() => {
-              if (isDisposed()) return;
-              const agent = aiAgents.get(cfg.id);
-              try {
-                if (mountRealHuman(agent, gltf, key)) humanAvatarStatus.loaded++;
-                else humanAvatarStatus.failed++;
-              } catch (err) {
-                console.warn('[KNU AIDC] 인체 모델 배치 실패', cfg.id, err);
-                humanAvatarStatus.failed++;
-              }
-              humanStatusText();
-            })
-          )
-        );
+        for (const cfg of AI_AGENT_CONFIG) {
+          if (AGENT_HUMAN_MAP[cfg.id] !== key) continue;
+          const agent = aiAgents.get(cfg.id);
+          try {
+            if (mountRealHuman(agent, gltf, key)) humanAvatarStatus.loaded++;
+            else humanAvatarStatus.failed++;
+          } catch (err) {
+            console.warn('[KNU AIDC] 인체 모델 배치 실패', cfg.id, err);
+            humanAvatarStatus.failed++;
+          }
+          humanStatusText();
+          await waitForMainThreadIdle();
+          if (isDisposed()) return;
+        }
       } catch (error) {
         console.warn('[KNU AIDC] 운영요원 GLB 로딩 실패; 해당 인체 모델 숨김', key, error);
         humanAvatarStatus.failed += AI_AGENT_CONFIG.filter(
@@ -245,8 +241,7 @@ export function createHumanModelLoader(context) {
         ).length;
         humanStatusText();
       }
-    };
-    await Promise.all(all.map(loadAndMount));
+    }
   }
 
   return { loadRealHumanLibrary };
