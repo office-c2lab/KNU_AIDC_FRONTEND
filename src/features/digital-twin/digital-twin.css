@@ -543,6 +543,7 @@ header .nav-item{font-size:12px}
 .dock-divider{height:22px;width:1px;background:#36577d;margin:0 4px;flex:none}
 .dock-hint{padding:0 9px 0 12px}
 .dock-zoom{padding:0 10px;font-size:17px}
+.dock-group-label{padding:0 7px;color:#6f89a6;font-size:9px;font-weight:650;letter-spacing:.45px;white-space:nowrap;flex:none}
 .v9-minor-dock{position:fixed;z-index:9;bottom:37px;left:calc(var(--left-w) + 41px);display:flex;gap:4px}
 .v9-minor-dock .chip{font-size:9px;padding:8px 7px}
 .v9-hud-status{position:fixed;z-index:7;left:calc(var(--left-w) + 40px);top:128px;font-size:10px;color:#94badc;text-shadow:0 1px 2px #020812;pointer-events:none;display:flex;gap:8px;align-items:center}
@@ -640,8 +641,12 @@ header .nav-item{font-size:12px}
 /* V25: top-right = floor arrangement / camera perspective, bottom = render / visual tools. */
 .breadcrumbs .view-actions{align-items:center;gap:5px;flex:none}
 .breadcrumbs .view-actions .chip{min-width:45px;white-space:nowrap;font-size:10px;font-weight:650;padding:7px 10px}
+.breadcrumbs .view-actions .chip svg{width:12px;height:12px;flex:none}
+.breadcrumbs .view-actions .chip:has(svg){display:inline-flex;align-items:center;justify-content:center;gap:5px}
+.breadcrumbs .view-actions .chip.is-on{background:linear-gradient(#426da4,#23486f);border-color:#8bc4ff;color:#fff;box-shadow:inset 0 1px #c8e5ff65}
+.view-actions-label{color:#7189a5;font-size:9px;font-weight:650;letter-spacing:.45px;white-space:nowrap}
 .view-actions-divider{height:19px;width:1px;margin:0 4px;background:#4f6f98a0;flex:none}
-@media(max-width:1150px){.breadcrumbs .view-actions .chip{padding:6px 7px;font-size:9px}.breadcrumbs .crumb-path{gap:5px;font-size:10px}}
+@media(max-width:1300px){.view-actions-label{display:none}.breadcrumbs .view-actions .chip{padding:6px 7px;font-size:9px}.breadcrumbs .crumb-path{gap:5px;font-size:10px}}
 @media(max-width:760px){.breadcrumbs .crumb-path span:not(:first-child){display:none}.breadcrumbs .crumb-path b{display:none}.breadcrumbs .view-actions{gap:3px}.breadcrumbs .view-actions .chip{padding:6px 5px;font-size:9px}.view-actions-divider{margin:0 2px}}
 /* V25: separate, explicit low/high quality modes in the upper-right controls. */
 .breadcrumbs{gap:10px}
@@ -758,3 +763,4 @@ header .nav-item{font-size:12px}
 /* V40 — full-body textured human models loaded asynchronously from CC0 GLB assets. */
 .agent-human-loading{font-size:10px;line-height:1.5;color:#9abbd5;padding:8px 10px;margin:0 6px 6px;border-top:1px solid #39577873}
 .agent-human-loading.is-ready{color:#7ad8ba}.agent-human-loading.is-error{color:#e6bd88}
+

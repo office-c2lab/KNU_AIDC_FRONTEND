@@ -4943,17 +4943,6 @@ export function initDigitalTwin(root) {
     }
   });
   $('#btn-fit').addEventListener('click', () => setZone('overview'));
-  $('#btn-zoom-in').addEventListener('click', () => {
-    focusTween = null;
-    camera.position.lerp(controls.target, 0.18);
-    controls.update();
-  });
-  $('#btn-zoom-out').addEventListener('click', () => {
-    focusTween = null;
-    const direction = camera.position.clone().sub(controls.target);
-    camera.position.addScaledVector(direction, 0.2);
-    controls.update();
-  });
   $('#btn-auto').addEventListener('click', () => {
     autoRotate = !autoRotate;
     twinActions.setPreferences({ autoRotate });

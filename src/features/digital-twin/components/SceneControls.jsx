@@ -15,9 +15,6 @@ export default function SceneControls() {
           role="toolbar"
           aria-label="데이터센터 3D 관제 도구"
         >
-          <span className="dock-hint">
-            <b>Mouse</b> Rotate / Zoom
-          </span>
           <button type="button" className={dockButton} id="btn-fit" title="전체 시설 보기">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
               <path d="M3 10.5 12 3l9 7.5V21H6v-8h12v8" />
@@ -25,6 +22,7 @@ export default function SceneControls() {
             <span>전체 시설</span>
           </button>
           <span className="dock-divider"></span>
+          <span className="dock-group-label">분석 모드</span>
           <button
             type="button"
             className={`${dockButton} active`}
@@ -36,6 +34,8 @@ export default function SceneControls() {
           <button type="button" className={dockButton} data-mode="thermal" title="온도 분포 보기">
             온도
           </button>
+          <span className="dock-divider"></span>
+          <span className="dock-group-label">표시 레이어</span>
           <button
             type="button"
             className={dockButton}
@@ -56,7 +56,6 @@ export default function SceneControls() {
           >
             냉각 OFF
           </button>
-          <span className="dock-divider"></span>
           <button
             type="button"
             className={`${dockButton} dock-agent active`}
@@ -65,30 +64,6 @@ export default function SceneControls() {
             aria-pressed="true"
           >
             요원 ON
-          </button>
-          <span className="dock-divider"></span>
-          <button type="button" className={dockButton} id="btn-auto" title="자동 회전">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-              <path d="M20 7V3m0 0h-4m4 0-3 3a8 8 0 1 0 2 8" />
-            </svg>
-            <span>자동 회전</span>
-          </button>
-          <button type="button" className={dockButton} id="btn-view-reset" title="시점 초기화">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-              <path d="M4 12a8 8 0 1 0 3-6.2L4 8m0-5v5h5" />
-            </svg>
-            <span>시점 초기화</span>
-          </button>
-          <button type="button" className={`${dockButton} dock-zoom`} id="btn-zoom-in" title="확대">
-            ＋
-          </button>
-          <button
-            type="button"
-            className={`${dockButton} dock-zoom`}
-            id="btn-zoom-out"
-            title="축소"
-          >
-            －
           </button>
         </div>
       </div>
