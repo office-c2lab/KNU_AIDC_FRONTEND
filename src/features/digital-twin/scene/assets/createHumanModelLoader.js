@@ -145,9 +145,8 @@ export function createHumanModelLoader(context) {
     const all = Object.entries(REAL_HUMAN_LIBRARY);
     // A single network load per character, then independent skeletal clones per operator.
     for (const [key, entry] of all) {
-      const sources = [entry.url];
-      if (location.protocol !== 'file:' && location.search.includes('localModels=1'))
-        sources.unshift('/digital-twin/assets/humans/' + key + '.glb');
+      const localUrl = `/digital-twin/assets/humans/${key}.glb`;
+      const sources = location.protocol === 'file:' ? [entry.url] : [localUrl, entry.url];
       const next = async (index = 0) => {
         if (index >= sources.length) throw new Error('외부 모델 파일 접근 실패: ' + key);
         try {

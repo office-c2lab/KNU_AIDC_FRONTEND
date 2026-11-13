@@ -31,9 +31,9 @@ npm run dev
 압축에서 해제한 독립 실행 원본은 비교·참고를 위해 `public/digital-twin`에 보존되어
 있지만 앱 실행에는 사용하지 않습니다.
 
-Three.js는 프로젝트 번들에 포함됩니다. 기본 인체 GLB 모델만 외부 주소에서 로드되므로
-첫 실행에는 인터넷 연결이 필요합니다. 모델까지 자체 호스팅하려면
-`public/digital-twin/README.md`의 안내를 따르세요.
+Three.js는 프로젝트 번들에 포함됩니다. 인체 GLB 모델도
+`public/digital-twin/assets/humans`에서 자체 호스팅하며, 로컬 파일이 없을 때만 원본
+외부 주소를 fallback으로 시도합니다.
 
 ## Vite 참고
 

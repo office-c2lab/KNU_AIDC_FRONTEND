@@ -11,7 +11,16 @@ for name, item in assets.items():
         continue
     print('Downloading', name, item['url'])
     try:
-        urllib.request.urlretrieve(item['url'], dest)
+        request = urllib.request.Request(
+            item['url'],
+            headers={
+                'User-Agent': 'Mozilla/5.0',
+                'Referer': 'https://www.innerscene.com/',
+            },
+        )
+        with urllib.request.urlopen(request) as response, dest.open('wb') as output:
+            while chunk := response.read(1024 * 1024):
+                output.write(chunk)
         print('Saved:', dest.name, dest.stat().st_size, 'bytes')
     except Exception as exc:
         print('FAILED:', name, exc)

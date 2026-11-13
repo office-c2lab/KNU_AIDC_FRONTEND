@@ -14,7 +14,9 @@
 ## 독립 호스팅(권장)
 
 별도의 자산을 서버에 보관하고 싶다면 `download_human_models.py`를 실행해 4종 GLB를 `assets/humans`에 다운로드하세요.
-그다음 `http://localhost:8000/index.html?localModels=1` 로 열면 로컬 자산을 우선 사용합니다.
+프로젝트 앱은 `assets/humans`의 로컬 자산을 기본으로 사용하고, 파일이 없을 때만 공개
+다운로드 링크를 fallback으로 사용합니다. 독립 HTML 원본은
+`http://localhost:8000/index.html?localModels=1`로 열면 로컬 자산을 우선 사용합니다.
 브라우저 보안 제약 때문에 `file://`에서는 로컬 자산 대신 공개 다운로드 링크가 사용됩니다.
 
 ## 모델 라이선스
