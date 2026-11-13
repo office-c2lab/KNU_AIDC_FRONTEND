@@ -17,7 +17,15 @@ npm run dev
 - `pages/DigitalTwinPage.jsx`: `Outlet`에 표시되는 3D 뷰 페이지
 - `features/digital-twin/components`: 관제 UI 컴포넌트
 - `features/digital-twin/useDigitalTwinScene.js`: Three.js 생명주기 연결
-- `scene.js`: Three.js 장면, 설비, 상호작용 로직
+- `features/digital-twin/scene/floors`: 1F~4F 층별 배치 모듈
+- `features/digital-twin/scene/zones`: 전력동·냉각동 구역 모듈
+- `features/digital-twin/scene/core`: 공용 지오메트리·재질·효과 생성 도구
+- `features/digital-twin/scene/assets`: 랙·CDU·UPS·냉동기 등 설비 팩토리
+- `features/digital-twin/scene/config`: 층·구역·장애 시나리오 설정
+- `features/digital-twin/scene/systems`: 장애 상태 계산 등 독립 실행 시스템
+- `features/digital-twin/scene/runtime`: 분리된 코어·설비·시스템의 생명주기 조립
+- `features/digital-twin/scene.js`: 런타임을 노출하는 최소 진입점
+- `stores/digitalTwinStore.js`: Zustand 기반 선택·뷰·화질·요원·장애 상태
 - `digital-twin.css`: 3D 오버레이와 Three.js가 토글하는 동적 상태 스타일
 
 압축에서 해제한 독립 실행 원본은 비교·참고를 위해 `public/digital-twin`에 보존되어
