@@ -1,4 +1,31 @@
-# React + Vite
+# KNU AIDC 3D Digital Twin
+
+Vite/React 애플리케이션에서 V40 Real Human Operators 3D 디지털 트윈을
+전체 화면으로 제공합니다. Three.js는 npm 패키지로 번들링되며 React 화면에서 직접
+초기화됩니다.
+
+## 실행
+
+```bash
+npm run dev
+```
+
+개발 서버의 루트 경로에서 디지털 트윈이 표시됩니다. 실제 앱 코드는
+`src/features/digital-twin`에 기능 단위로 분리되어 있습니다.
+
+- `DigitalTwin.jsx`: React 진입 컴포넌트 및 씬 초기화
+- `scene.js`: Three.js 장면, 설비, 상호작용 로직
+- `digital-twin.css`: 디지털 트윈 전용 스타일
+- `DigitalTwinMarkup.jsx`: React 기반 HUD·패널 마크업
+
+압축에서 해제한 독립 실행 원본은 비교·참고를 위해 `public/digital-twin`에 보존되어
+있지만 앱 실행에는 사용하지 않습니다.
+
+Three.js는 프로젝트 번들에 포함됩니다. 기본 인체 GLB 모델만 외부 주소에서 로드되므로
+첫 실행에는 인터넷 연결이 필요합니다. 모델까지 자체 호스팅하려면
+`public/digital-twin/README.md`의 안내를 따르세요.
+
+## Vite 참고
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

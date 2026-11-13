@@ -1,0 +1,35 @@
+{
+  "license": "CC0 1.0",
+  "provider": "Innerscene / MakeHuman",
+  "models": {
+    "jordan": {
+      "url": "https://files.innerscene.com/library/idle-standing-jordan-3d-person-animated-1721c58f/1eda105547d9d25895f3/idle-standing-jordan-3d-person-animated.glb",
+      "page": "https://www.innerscene.com/tools/library/3d-parts/idle-standing-jordan-3d-person-animated-1721c58f",
+      "size": "22.6 MB"
+    },
+    "maya": {
+      "url": "https://files.innerscene.com/library/idle-standing-maya-3d-person-animated-22b686d6/c3dbeb4f797ae0f00fce/idle-standing-maya-3d-person-animated.glb",
+      "page": "https://www.innerscene.com/tools/library/3d-parts/idle-standing-maya-3d-person-animated-22b686d6",
+      "size": "19.6 MB"
+    },
+    "harper": {
+      "url": "https://files.innerscene.com/library/idle-standing-harper-3d-person-animated-ba9bc23f/a63c5f1eaa80d52e65c6/idle-standing-harper-3d-person-animated.glb",
+      "page": "https://www.innerscene.com/tools/library/3d-parts/idle-standing-harper-3d-person-animated-ba9bc23f",
+      "size": "17.9 MB"
+    },
+    "sam": {
+      "url": "https://files.innerscene.com/library/idle-standing-sam-3d-person-animated-1f9f1217/4ca6054a9945f1c21da5/idle-standing-sam-3d-person-animated.glb",
+      "page": "https://www.innerscene.com/tools/library/3d-parts/idle-standing-sam-3d-person-animated-1f9f1217",
+      "size": "20.1 MB"
+    }
+  },
+  "assignments": {
+    "AI-SEC-01": "harper",
+    "AI-NET-01": "sam",
+    "AI-GPU-01": "maya",
+    "AI-NOC-01": "jordan",
+    "AI-SOC-01": "harper",
+    "AI-PWR-01": "sam",
+    "AI-CLG-01": "maya"
+  }
+}

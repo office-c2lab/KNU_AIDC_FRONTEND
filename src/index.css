@@ -1,1 +1,19 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: #071024;
+}
+
+.digital-twin-root {
+  width: 100%;
+  height: 100%;
+}
