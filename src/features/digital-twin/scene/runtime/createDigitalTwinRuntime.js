@@ -2289,20 +2289,6 @@ export function initDigitalTwin(root) {
     box(fg, 1.0, 2.67, 0.08, -11.07, 1.9, 8.72, glazing, { cast: false });
     glowStrip(fg, 0.06, 2.4, 0.06, -11.0, 1.85, 8.74, 0x6cc9e5);
   }
-  // World anchors are calculated from animated floor positions, rather than fixed Y.
-  for (const key of floorList) {
-    const n = Number(key[0]);
-    labelAnchors.push(
-      labelAnchor(
-        key,
-        key + ' · ' + FLOOR_INFO[key].name,
-        FLOOR_INFO[key].sub,
-        () => new THREE.Vector3(-12.1, floorGroups[key].position.y + 2.43, 7.25),
-        'f' + n,
-        key
-      )
-    );
-  }
   labelAnchors.push(
     labelAnchor(
       'mdf',
@@ -3419,13 +3405,6 @@ export function initDigitalTwin(root) {
   // Old pre-V29 decorative particle groups stay hidden; only opt-in physical utility overlays render.
   powerFlow.visible = false;
   coolingFlow.visible = false;
-  // Fixed labels for independent support buildings.
-  labelAnchors.push(
-    labelAnchor('power', '전력 설비동', 'UPS · BATTERY', [-18, 3.8, -1.5], 'power')
-  );
-  labelAnchors.push(
-    labelAnchor('cooling', '냉각 설비동', 'CHILLER · PUMP', [18, 3.8, -4.5], 'cooling')
-  );
   labelAnchors.push(
     labelAnchor(
       'noc',
