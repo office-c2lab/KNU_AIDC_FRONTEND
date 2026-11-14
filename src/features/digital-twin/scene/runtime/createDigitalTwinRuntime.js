@@ -302,7 +302,7 @@ export function initDigitalTwin(root) {
     // Visible floor-section identifier at the front/right corner.
     floorDecal(
       parent,
-      `${key}  /  ${key === '4F' ? 'OPERATIONS' : key === '3F' ? 'AI COMPUTE' : key === '2F' ? 'DATA HALL' : 'ACCESS'}`,
+      `${key}  /  ${key === '4F' ? '운영 관제' : key === '3F' ? 'AI 연산' : key === '2F' ? '서버실' : '출입'}`,
       8.9,
       8.15,
       4.6,
@@ -1587,7 +1587,7 @@ export function initDigitalTwin(root) {
         });
     return group;
   }
-  function portal(g, x, z, dir = 'h', label = 'ACCESS', tone = 0x82d4f1) {
+  function portal(g, x, z, dir = 'h', label = '출입', tone = 0x82d4f1) {
     const p = new THREE.Group();
     p.name = label + ' / OPEN DOOR';
     p.position.set(x, 0.4, z);
@@ -1614,7 +1614,7 @@ export function initDigitalTwin(root) {
     doorWidth,
     dir = 'h',
     style = 'glass',
-    caption = 'ACCESS'
+    caption = '출입'
   ) {
     const start = opening - doorWidth / 2,
       end = opening + doorWidth / 2;
@@ -2654,7 +2654,7 @@ export function initDigitalTwin(root) {
     const el = $('#agent-shortcuts');
     if (!el) return;
     const busyCount = AI_AGENT_CONFIG.filter(agentIsBusy).length;
-    $('#agent-quick-count').textContent = busyCount ? `07 / 점검 ${busyCount}명` : '07 / 정상 감시';
+    $('#agent-quick-count').textContent = busyCount ? `${busyCount}명 점검 중` : '대기 중';
     el.innerHTML = AI_AGENT_CONFIG.map(a => {
       const busy = agentIsBusy(a);
       return `<button type="button" class="agent-shortcut ${selectedId === a.id ? 'active' : ''}" data-agent-id="${a.id}"><span><strong>${esc(a.name)}</strong><small>${esc(a.area)}</small></span><i class="agent-dot ${busy ? 'busy' : ''}"></i></button>`;
@@ -2685,12 +2685,12 @@ export function initDigitalTwin(root) {
           .join('')
       : `<div class="agent-modal-empty">담당 구역에 진행 중인 모의 장애가 없습니다.<br>현재는 점검 대기 및 설비 상태 모니터링 동작을 수행하고 있습니다.</div>`;
     $('#asset-modal-title').textContent = `${config.name} · ${asset.id}`;
-    $('#asset-modal-device-id').textContent = asset.id + ' · AI OPERATOR';
+    $('#asset-modal-device-id').textContent = asset.id + ' · AI 운영 요원';
     $('#asset-modal-name').textContent = config.name;
     $('#asset-modal-summary').textContent = config.intro;
     $('#asset-modal-location').textContent = config.area;
     $('#asset-modal-type').textContent = config.role;
-    $('#asset-modal-status').textContent = busy ? 'INSPECTING' : 'STANDBY';
+    $('#asset-modal-status').textContent = busy ? '점검 중' : '대기';
     $('#asset-modal-status').classList.toggle('warning', busy);
     $('#asset-modal-door').hidden = true;
     $('#asset-modal-view-note').textContent = config.realLoaded
@@ -2706,7 +2706,7 @@ export function initDigitalTwin(root) {
     const btn = $('#btn-agent-visibility');
     btn.classList.toggle('active', agentsVisible);
     btn.setAttribute('aria-pressed', String(agentsVisible));
-    btn.textContent = agentsVisible ? '요원 ON' : '요원 OFF';
+    btn.textContent = agentsVisible ? '요원 켜짐' : '요원 꺼짐';
     if (!agentsVisible && selectedId && aiAgents.has(selectedId)) setZone(activeZone, null, false);
   }
 
@@ -3449,22 +3449,8 @@ export function initDigitalTwin(root) {
   const incidentActions = ['경보 확인', '원인 분석 완료', '복구 조치 완료', '정상 확인 및 종료'];
   function setInspectorTab(tab) {
     inspectorTab = tab;
-    $('#detail-view').hidden = tab !== 'asset';
-    $('#scenario-view').hidden = tab !== 'scenario';
-    $('.inspection-tip').hidden = tab !== 'asset';
-    root.querySelectorAll('[data-inspector-tab]').forEach(b => {
-      const active = b.dataset.inspectorTab === tab;
-      b.classList.toggle('active', active);
-      b.setAttribute('aria-selected', String(active));
-    });
-    $('#v9-panel-details').open = true;
-    $('#v9-detail-toggle').textContent =
-      tab === 'scenario' ? '장애 시뮬레이션 접기' : '설비 상세 접기';
-    if (tab === 'scenario') renderScenarioPanel();
-    else updateInspector();
-    requestAnimationFrame(() =>
-      $('#v9-panel-details').scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    );
+    if (tab === 'asset') updateInspector();
+    else $('#alarm-list').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   function runScenario(id) {
     const s = SCENARIO_BY_ID.get(id);
@@ -3563,6 +3549,34 @@ export function initDigitalTwin(root) {
   function infoRow(a, b) {
     return `<div class="info-row"><span>${a}</span><strong>${b}</strong></div>`;
   }
+  function assetTypeLabel(type) {
+    return (
+      {
+        'AI AGENT': 'AI 운영 요원',
+        CHILLER: '냉동기',
+        'COOLANT DISTRIBUTION UNIT': '냉각 분배 장치',
+        'COOLING PUMP': '냉각 펌프',
+        'NETWORK EQUIPMENT': '네트워크 장비',
+        'PRECISION AIR COOLING': '정밀 공조기',
+        'INCIDENT RESPONSE': '상황 대응 설비',
+        'OPERATIONS SUPPORT': '운영 지원 설비',
+        'BACKUP GENERATOR': '비상 발전기',
+        'CCTV CAMERA': '감시 카메라',
+        'SECURITY ACCESS': '보안 출입 설비',
+        'SPARE PARTS': '예비 부품',
+        'STORAGE RACK': '저장장치 랙',
+        'HEAT EXCHANGER': '열교환기',
+        TRANSFORMER: '변압기',
+        'GPU SERVER RACK': 'GPU 서버 랙',
+        'SERVER RACK': '서버 랙',
+        'SECURITY WORKSTATION': '보안 검색 장비',
+        'ASSET STAGING': '장비 검수 설비',
+        'MAINTENANCE BENCH': '정비 작업대',
+        'BATTERY BANK': '축전지',
+        SWITCHGEAR: '배전반',
+      }[type] || type
+    );
+  }
   function roomList(floor) {
     return FLOOR_INFO[floor]?.spaces || [];
   }
@@ -3570,7 +3584,7 @@ export function initDigitalTwin(root) {
     if (asset.type === 'AI AGENT') {
       const agent = aiAgents.get(asset.id),
         busy = agentIsBusy(agent);
-      return `<div class="section-overline">AI OPERATOR / ${esc(asset.id)}</div><h3 class="detail-title">${esc(asset.name)}</h3><p class="detail-summary">${esc(agent.intro)}</p>
+      return `<div class="section-overline">AI 운영 요원 / ${esc(asset.id)}</div><h3 class="detail-title">${esc(asset.name)}</h3><p class="detail-summary">${esc(agent.intro)}</p>
   ${infoRow('담당 구역', esc(agent.area))}${infoRow('업무 상태', esc(agentWorkTitle(agent)))}${infoRow('관련 경보', agentRelatedIncidents(agent).length + '건')}
   <div class="section-label">에이전트 운영</div><button class="inspect-back" data-open-agent-modal="${asset.id}">AI 에이전트 상세 보기 →</button>`;
     }
@@ -3589,7 +3603,7 @@ export function initDigitalTwin(root) {
         ['호스트 상태', '서비스 확인'],
       ],
       network: [
-        ['코어 업링크', 'LINK DOWN'],
+        ['코어 업링크', '연결 끊김'],
         ['경로 상태', '우회 점검'],
       ],
       ups: [
@@ -3626,9 +3640,9 @@ export function initDigitalTwin(root) {
           ['시설 상태 확인', '센서 범위 정상', ''],
           ['정기 점검', '예정된 작업 없음', ''],
         ];
-    return `<div class="inspect-media"><span class="media-code">${asset.type.includes('GPU') ? 'GPU' : asset.type.includes('COOL') ? 'CDU' : 'DC'}</span><span class="media-text">KNU AIDC / ASSET INSPECTION</span></div>
+    return `<div class="inspect-media"><span class="media-code">${asset.type.includes('GPU') ? 'GPU' : asset.type.includes('COOL') ? 'CDU' : 'DC'}</span><span class="media-text">KNU AIDC / 설비 점검</span></div>
  <button class="inspect-back" data-focus-zone="${asset.floor ? 'f' + asset.floor[0] : asset.zone}">← ${asset.floor ? asset.floor + ' 층별 정보' : '시설 정보'}로 돌아가기</button>
- <div class="section-overline">${asset.type} / ${asset.id}</div><h3 class="detail-title">${asset.name}</h3><p class="detail-summary">${asset.summary || ''}</p>${statusHtml(state)}
+ <div class="section-overline">${assetTypeLabel(asset.type)} / ${asset.id}</div><h3 class="detail-title">${asset.name}</h3><p class="detail-summary">${asset.summary || ''}</p>${statusHtml(state)}
  <div class="section-label">장비 정보</div>
  ${infoRow('자산 ID', asset.id)}${infoRow('설치 층', asset.floor || '별도 지원 시설')}${infoRow('설치 위치', asset.location)}${infoRow('운영 상태', state)}
  <div class="section-label">센서 모니터링 <small>모의 수치</small></div><div class="metric-grid">
@@ -3661,7 +3675,7 @@ export function initDigitalTwin(root) {
       zone === 'overview'
         ? `<div class="section-label">메인 데이터센터 <small>4개 층</small></div><div class="quick-rooms">${floorList.map(key => `<button class="room-btn" data-focus-zone="f${key[0]}"><strong>${key} · ${FLOOR_INFO[key].name}</strong><small>${FLOOR_INFO[key].sub}</small></button>`).join('')}</div>`
         : data.floor
-          ? `<div class="section-label">${data.floor} 내부 구역 <small>SPACE ZONING</small></div><div class="room-list">${roomList(
+          ? `<div class="section-label">${data.floor} 내부 구역 <small>공간 구성</small></div><div class="room-list">${roomList(
               data.floor
             )
               .map(
@@ -3686,9 +3700,9 @@ export function initDigitalTwin(root) {
           )
           .join('')}</div>`
       : '';
-    return `<div class="inspect-media"><span class="media-code">${data.code}</span><span class="media-text">KNU AIDC / DIGITAL TWIN V40</span></div>
+    return `<div class="inspect-media"><span class="media-code">${data.code}</span><span class="media-text">KNU AIDC / 디지털 트윈</span></div>
  <div class="section-overline">${data.code} / ${data.level}</div><h3 class="detail-title">${data.name}</h3><p class="detail-summary">${data.desc}</p>${statusHtml(faultCount ? (ids.some(a => severityRank(getAssetStatus(a)) === 3) ? '장애' : '주의') : '정상')}
- <div class="section-label">시설 정보 <small>OVERVIEW</small></div>${infoRow('구역', data.level)}${infoRow('등록된 설비', `${ids.length}개`)}${infoRow('주의 / 장애', `${faultCount}건`)}
+ <div class="section-label">시설 정보 <small>전체 현황</small></div>${infoRow('구역', data.level)}${infoRow('등록된 설비', `${ids.length}개`)}${infoRow('주의 / 장애', `${faultCount}건`)}
  ${floorMarkup}
  ${data.floor ? '<div class="section-label">공간 구획 <small>출입구 · 파티션 · 설비 배치</small></div><p class="detail-summary">' + ({ '1F': '보안·반입·예비품 분리 / 후면 MDF·유지보수 출입구', '2F': '서버홀 A/B 차폐 / 전면 점검 공간과 출입 갤러리', '3F': '공랭·액체냉각·CDU 3구역 / 별도 CDU 출입구', '4F': 'NOC·SOC 방음 구획 / 중앙 복도와 독립 지원실' }[data.floor] || '층별 출입구와 설비 구획') + '</p>' : ''}
  ${zone === 'f4' ? '<button class="inspect-back" data-focus-zone="noc">4F 통합 관제실 상세 보기 →</button>' : ''}
@@ -3900,7 +3914,7 @@ export function initDigitalTwin(root) {
     return `<defs><linearGradient id="${guid}Fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="${color}" stop-opacity=".30"/><stop offset="1" stop-color="${color}" stop-opacity=".01"/></linearGradient></defs>
  <g>${[16, 55, 95, 135].map(y => `<path class="chart-grid" d="M28 ${y} H339"/>`).join('')}${[28, 104, 180, 256, 332].map(x => `<path class="chart-grid" d="M${x} 9 V144"/>`).join('')}</g>
  <path d="M${points.join(' L')} L332 143 L28 143Z" fill="url(#${guid}Fill)"/><polyline points="${points.join(' ')}" fill="none" stroke="${color}" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="332" cy="${scaleY(base).toFixed(1)}" r="3.4" fill="#ecfaff" stroke="${color}" stroke-width="1.5"/>
- <text x="3" y="18">${textValue(upper)}</text><text x="3" y="137">${textValue(lower)}</text><text x="27" y="164">−60m</text><text x="173" y="164">−30m</text><text x="310" y="164">NOW</text>`;
+ <text x="3" y="18">${textValue(upper)}</text><text x="3" y="137">${textValue(lower)}</text><text x="27" y="164">−60분</text><text x="173" y="164">−30분</text><text x="310" y="164">현재</text>`;
   }
   function updateAssetModal() {
     if (!assetModalId) return;
@@ -3910,8 +3924,8 @@ export function initDigitalTwin(root) {
     $('#agent-modal-report').hidden = !isAgent;
     $('#equipment-modal-report').hidden = isAgent;
     $('.asset-modal-sub').textContent = isAgent
-      ? 'KNU AIDC / AI OPERATOR'
-      : 'KNU AIDC / EQUIPMENT INSPECTION';
+      ? 'KNU AIDC / AI 운영 요원'
+      : 'KNU AIDC / 설비 점검';
     if (isAgent) {
       updateAgentModal(asset);
       return;
@@ -3922,21 +3936,21 @@ export function initDigitalTwin(root) {
       util = clamp(asset.capacity ?? 68, 0, 100);
     $('#asset-modal-title').textContent =
       `${asset.floor ? asset.floor + ' · ' : ''}${asset.name} / ${asset.id}`;
-    $('#asset-modal-device-id').textContent = asset.id + ' · ' + asset.type;
+    $('#asset-modal-device-id').textContent = asset.id + ' · ' + assetTypeLabel(asset.type);
     $('#asset-modal-name').textContent = asset.name;
     $('#asset-modal-summary').textContent =
       asset.summary || '선택 설비의 상태와 시뮬레이션 지표를 표시합니다.';
     $('#asset-modal-location').textContent = asset.location || 'KNU AIDC';
-    $('#asset-modal-type').textContent = asset.type;
+    $('#asset-modal-type').textContent = assetTypeLabel(asset.type);
     const state = $('#asset-modal-status');
     state.textContent =
       status === '정상'
-        ? 'NORMAL'
+        ? '정상'
         : status === '주의'
-          ? 'WARNING'
+          ? '주의'
           : status === '보안 경보'
-            ? 'SECURITY ALERT'
-            : 'ALARM';
+            ? '보안 경보'
+            : '장애';
     state.classList.toggle('is-warning', status === '주의');
     state.classList.toggle('is-critical', severityRank(status) >= 3);
     $('#asset-modal-state').textContent = status;
@@ -4180,7 +4194,7 @@ export function initDigitalTwin(root) {
       b.classList.toggle('active', active);
       b.setAttribute('aria-pressed', String(active));
       if (name === 'power' || name === 'coolant')
-        b.textContent = `${name === 'power' ? '전력' : '냉각'} ${active ? 'ON' : 'OFF'}`;
+        b.textContent = `${name === 'power' ? '전력' : '냉각'} ${active ? '켜짐' : '꺼짐'}`;
     });
     for (const d of heatDisks) {
       const a = registry.get(d.entityId),
@@ -4527,7 +4541,7 @@ export function initDigitalTwin(root) {
   function updateInfrastructurePanel() {
     const idState = id => getAssetStatus(registry.get(id));
     const rank = id => severityRank(idState(id));
-    const formatState = r => (r >= 3 ? 'ALARM' : r === 2 ? 'WARNING' : 'NORMAL');
+    const formatState = r => (r >= 3 ? '장애' : r === 2 ? '주의' : '정상');
     const updateLed = (el, id) => {
       const r = rank(id);
       el.classList.toggle('fault', r >= 3);
@@ -4613,10 +4627,10 @@ export function initDigitalTwin(root) {
           ? '주의'
           : '정상';
     $('#device-kicker').textContent = !hasSelection
-      ? 'SELECTION REQUIRED'
+      ? '대상 선택'
       : activeAsset
-        ? activeAsset.type + ' / ' + activeAsset.id
-        : (zone.code || 'CAMPUS') + ' / ' + (activeFloor || 'SITE');
+        ? assetTypeLabel(activeAsset.type) + ' / ' + activeAsset.id
+        : (zone.code || '캠퍼스') + ' / ' + (activeFloor || '시설');
     $('#device-title').textContent = !hasSelection
       ? '층 또는 설비를 선택하세요'
       : activeAsset
@@ -4631,29 +4645,28 @@ export function initDigitalTwin(root) {
       ? '—'
       : activeAsset
         ? activeAsset.id
-        : activeFloor || zone.code || 'SITE';
+        : activeFloor || zone.code || '시설';
     const state = $('#device-state');
     state.hidden = !hasSelection;
     state.classList.toggle('warning', status === '주의');
     state.classList.toggle('alert-state', severityRank(status) === 3);
-    state.textContent =
-      status === '정상' ? '● NORMAL' : status === '주의' ? '● WARNING' : '● ALARM';
+    state.textContent = status === '정상' ? '● 정상' : status === '주의' ? '● 주의' : '● 장애';
     const sensor = activeAsset ? getSensor(activeAsset) : null;
     const sum = group.reduce((v, a) => v + getSensor(a).power, 0);
     const metrics = !hasSelection
       ? []
       : activeAsset
         ? [
-            ['Equipment Temp.', sensor.temp.toFixed(1), '°C'],
-            ['Power Draw', sensor.power.toFixed(1), 'kW'],
-            ['Operating Load', String(activeAsset.capacity ?? 68), '%'],
-            ['Status', status, ''],
+            ['장비 온도', sensor.temp.toFixed(1), '°C'],
+            ['소비 전력', sensor.power.toFixed(1), 'kW'],
+            ['가동 부하', String(activeAsset.capacity ?? 68), '%'],
+            ['상태', status, ''],
           ]
         : [
-            ['Devices', String(group.length), ''],
-            ['Normal', String(group.length - bad), ''],
-            ['Alerts', String(bad), ''],
-            ['Power', sum.toFixed(1), 'kW'],
+            ['설비 수', String(group.length), ''],
+            ['정상', String(group.length - bad), ''],
+            ['이상 설비', String(bad), ''],
+            ['소비 전력', sum.toFixed(1), 'kW'],
           ];
     $('#device-grid').innerHTML = metrics
       .map(
@@ -4699,25 +4712,27 @@ export function initDigitalTwin(root) {
       scenario: SCENARIO_BY_ID.get(i.id),
       incident: i,
     }));
-    $('#alarm-count').textContent = String(alarmIds.length).padStart(2, '0');
+    $('#alarm-count').textContent = `최근 ${Math.min(alarmIds.length, 3)}건`;
     $('#header-alarm-count').textContent = alarmIds.length;
     $('#header-alarm-count').style.display = alarmIds.length ? 'inline-block' : 'none';
     $('#alarm-list').innerHTML = alarmIds.length
       ? alarmIds
+          .sort((a, b) => b.incident.started - a.incident.started)
+          .slice(0, 3)
           .map(
             ({ scenario: s, incident: i }) =>
-              `<li class="alarm-item" data-level="critical" data-scenario-focus="${s.id}"><span class="alarm-level"></span><div class="alarm-copy"><b>${esc(s.title)}</b><small>${esc(s.asset)} · ${esc(incidentSteps[i.stage])}</small></div><div class="alarm-meta"><time class="alarm-time">${new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(i.started)}</time><span class="alarm-severity">ALARM</span></div></li>`
+              `<li class="alarm-item" data-level="critical" data-scenario-focus="${s.id}"><span class="alarm-level"></span><div class="alarm-copy"><b>${esc(s.title)}</b><small>${esc(s.asset)} · ${esc(incidentSteps[i.stage])}</small></div><div class="alarm-meta"><time class="alarm-time">${new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(i.started)}</time><span class="alarm-severity">장애</span></div></li>`
           )
           .join('')
-      : '<li class="alarm-item" data-level="resolved"><span class="alarm-level"></span><div class="alarm-copy"><b>전체 설비 모니터링 정상</b><small>실제 연동이 아닌 시뮬레이션 데이터입니다.</small></div><div class="alarm-meta"><span class="alarm-severity">NORMAL</span></div></li>';
+      : '<li class="alarm-item" data-level="resolved"><span class="alarm-level"></span><div class="alarm-copy"><b>전체 설비 모니터링 정상</b><small>실제 연동이 아닌 시뮬레이션 데이터입니다.</small></div><div class="alarm-meta"><span class="alarm-severity">정상</span></div></li>';
     if (activeAsset?.type === 'AI AGENT') {
       const agent = aiAgents.get(activeAsset.id),
         busy = agentIsBusy(agent);
-      $('#device-kicker').textContent = 'AI OPERATOR / ' + agent.id;
+      $('#device-kicker').textContent = 'AI 운영 요원 / ' + agent.id;
       $('#device-title').textContent = agent.name;
       $('#device-location').textContent = agent.area;
       $('#device-id-short').textContent = agent.id;
-      $('#device-state').textContent = busy ? '● INSPECTING' : '● STANDBY';
+      $('#device-state').textContent = busy ? '● 점검 중' : '● 대기';
       $('#device-state').classList.toggle('warning', busy);
       $('#device-state').classList.remove('alert-state');
       $('#device-grid').innerHTML = [
@@ -4950,23 +4965,6 @@ export function initDigitalTwin(root) {
       twinActions.setHighQuality(button.dataset.quality === 'high');
     })
   );
-  // AIDC v4 navigation and header buttons, backed by the real v8 3D interactions.
-  root.querySelectorAll('[data-topnav]').forEach(b =>
-    b.addEventListener('click', () => {
-      root.querySelectorAll('[data-topnav]').forEach(x => x.classList.toggle('active', x === b));
-      const mode = b.dataset.topnav;
-      if (mode === 'facility') {
-        setZone('overview');
-        setMode('normal');
-      } else if (mode === 'power') {
-        setMode('power', true);
-        setZone('power');
-      } else {
-        setZone('f3');
-        setMode('thermal');
-      }
-    })
-  );
   $('#header-alarm').addEventListener('click', () => setInspectorTab('scenario'));
   $('#topChip').addEventListener('click', () => {
     const target = activeFloor ? [0, FLOOR_Y[activeFloor] + 1, 0] : [0, 8, 0];
@@ -4993,12 +4991,6 @@ export function initDigitalTwin(root) {
       focusAsset(SCENARIO_BY_ID.get(chosenScenarioId).asset);
     }
   });
-  $('#v9-panel-details').addEventListener('toggle', () => {
-    if (!$('#v9-panel-details').open) $('#v9-detail-toggle').textContent = '운영 상세 펼치기';
-  });
-
-  $('#btn-alarm').addEventListener('click', () => runScenario(chosenScenarioId));
-  $('#btn-reset').addEventListener('click', resetAllIncidents);
   root
     .querySelectorAll('[data-inspector-tab]')
     .forEach(btn => btn.addEventListener('click', () => setInspectorTab(btn.dataset.inspectorTab)));
@@ -5409,17 +5401,6 @@ export function initDigitalTwin(root) {
     renderer.render(scene, camera);
     renderAssetPreview(dt);
   }
-  function refreshClock() {
-    const d = new Date();
-    $('#clock').textContent = new Intl.DateTimeFormat('ko-KR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    }).format(d);
-  }
-  refreshClock();
-  const clockInterval = window.setInterval(refreshClock, 1000);
   updateFloorLayout();
   updateInspector();
   updateSummary();
@@ -5445,7 +5426,6 @@ export function initDigitalTwin(root) {
   return () => {
     disposed = true;
     window.cancelAnimationFrame(animationFrameId);
-    window.clearInterval(clockInterval);
     window.removeEventListener('keydown', handleGlobalKeydown);
     window.removeEventListener('resize', resize);
     window.removeEventListener('resize', resizeAssetPreview);

@@ -16,7 +16,7 @@ export default function AssetModal() {
         <div className="asset-modal-window relative flex h-[min(870px,calc(100dvh-40px))] min-h-[430px] w-[min(1510px,100%)] flex-col overflow-hidden border border-[#507aaac7] bg-[#071126] shadow-[0_24px_90px_#000b,0_0_0_1px_#9bcaff18]">
           <div className="asset-modal-top flex h-[70px] min-h-[70px] items-center justify-between gap-2.5 border-b border-[#466d9a7a] bg-[#132746] px-6">
             <div>
-              <div className="asset-modal-sub">KNU AIDC / EQUIPMENT INSPECTION</div>
+              <div className="asset-modal-sub">KNU AIDC / 설비 점검</div>
               <h2 id="asset-modal-title">설비 상세</h2>
             </div>
             <div className="asset-modal-actions flex shrink-0 items-center gap-2.5">
@@ -37,8 +37,8 @@ export default function AssetModal() {
           <div className="asset-modal-body grid min-h-0 flex-1 grid-cols-[minmax(300px,36%)_minmax(0,1fr)] gap-2.5 overflow-hidden p-3">
             <section className="asset-modal-card asset-model-pane" aria-label="선택 설비 3D 모델">
               <div className="asset-pane-heading">
-                <span id="asset-modal-device-id">EQUIPMENT</span>
-                <small>INTERACTIVE 3D</small>
+                <span id="asset-modal-device-id">설비</span>
+                <small>3D 모델 탐색</small>
               </div>
               <div className="asset-modal-stage" id="asset-modal-stage">
                 <canvas
@@ -76,7 +76,7 @@ export default function AssetModal() {
               aria-label="AI 에이전트 운영 정보"
             >
               <div className="asset-modal-card agent-modal-header">
-                <div className="agent-modal-kicker">DIGITAL TWIN / AI OPERATIONS</div>
+                <div className="agent-modal-kicker">디지털 트윈 / AI 운영</div>
                 <h3 id="agent-modal-role">운영 에이전트</h3>
                 <p id="agent-modal-description"></p>
                 <div className="agent-status-line">

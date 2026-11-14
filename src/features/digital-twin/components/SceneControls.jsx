@@ -40,7 +40,7 @@ export default function SceneControls() {
             aria-label="전력 계통"
             aria-pressed="false"
           >
-            전력 OFF
+            전력 꺼짐
           </button>
           <button
             type="button"
@@ -50,7 +50,7 @@ export default function SceneControls() {
             aria-label="냉각 계통"
             aria-pressed="false"
           >
-            냉각 OFF
+            냉각 꺼짐
           </button>
           <button
             type="button"
@@ -59,7 +59,7 @@ export default function SceneControls() {
             title="AI 운영 요원 표시 / 숨기기"
             aria-pressed="true"
           >
-            요원 ON
+            요원 켜짐
           </button>
         </div>
       </div>

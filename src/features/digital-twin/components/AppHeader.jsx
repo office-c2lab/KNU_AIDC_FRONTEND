@@ -6,15 +6,9 @@ export default function AppHeader() {
     <>
       <header className="fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833ed] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959] max-[1250px]:grid-cols-[1fr_420px_1fr] max-[930px]:grid-cols-[1fr_330px_1fr] max-[700px]:grid-cols-[1fr_220px_1fr]">
         <nav className="main-nav flex h-16 items-center gap-[30px] pl-7" aria-label="주 메뉴">
-          <button className={`${navItem} active`} data-topnav="facility">
-            Facility Monitoring
-          </button>
-          <button className={navItem} data-topnav="power">
-            Power Distribution
-          </button>
-          <button className={navItem} data-topnav="ai">
-            AI Operations
-          </button>
+          <span className={`${navItem} active flex items-center`} aria-current="page">
+            디지털 트윈
+          </span>
         </nav>
         <div className="system-title relative grid h-[66px] place-items-center text-center">
           <span className="title-ticks left" aria-hidden="true"></span>
@@ -108,11 +102,9 @@ export default function AppHeader() {
           </div>
           <span className="title-ticks right" aria-hidden="true"></span>
         </div>
+        
         <div className="header-tools flex h-16 items-center justify-end gap-[18px] pr-7 text-[#9dafc4]">
-          <div className="live-pill flex items-center gap-2 rounded-sm border border-[#3f6287] bg-[#162943] px-2.5 py-2 text-[#c5dcec] shadow-[inset_0_1px_#9dccfa25]">
-            <i className="live-dot h-[7px] w-[7px] rounded-full bg-[#73e1c0] shadow-[0_0_10px_#73e1c0]"></i>
-            <span>SIM MONITORING</span>
-          </div>
+         <span className="operator-name text-[#b4c6de]">USER</span>
           <button
             type="button"
             className="tool-icon relative grid h-[29px] w-[29px] place-items-center rounded-sm border border-[#3a5279] bg-[#16243d] text-[#bdd3ed]"
@@ -134,13 +126,7 @@ export default function AppHeader() {
               0
             </span>
           </button>
-          <span className="operator-name text-[#b4c6de]">Admin</span>
-          <span
-            className="clock min-w-[78px] text-right font-mono text-xs font-semibold text-[#d5e5fc]"
-            id="clock"
-          >
-            --:--:--
-          </span>
+          
         </div>
       </header>
     </>

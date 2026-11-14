@@ -7,7 +7,6 @@ import {
   moduleReadout,
   panelBase,
   panelScroll,
-  sectionTitle,
   subTitle,
 } from './uiStyles.js';
 
@@ -17,10 +16,11 @@ export default function FacilitySidebar() {
       <aside className={`${panelBase} left-panel left-[26px]`} aria-label="시설 현황 및 층 탐색">
         <div className={panelScroll}>
           <section className="facility-section" aria-labelledby="facility-heading">
-            <div className={sectionTitle}>
-              <h2 id="facility-heading">Facility Overview</h2>
-              <span className={moduleReadout}>KNU AIDC</span>
+            <div className={subTitle}>
+              <h2 id="facility-heading">전력 사용 효율</h2>
+              
             </div>
+           
             <div className={`${instrumentCard} pue-card`}>
               <div className="pue-gauge">
                 <svg viewBox="0 0 130 130" aria-hidden="true">
@@ -81,14 +81,15 @@ export default function FacilitySidebar() {
                 </div>
               </div>
               <div className="pue-meta">
-                <span className="status-tag stable">정상</span>
+                <span className="status-tag stable">효율 양호</span>
+                <span className="pue-guidance">1.0에 가까울수록 효율적</span>
               </div>
             </div>
           </section>
 
           <section className="power-section" aria-labelledby="power-heading">
             <div className={subTitle}>
-              <h2 id="power-heading">Power Flow</h2>
+              <h2 id="power-heading">전력 사용 현황</h2>
               <span className={moduleReadout}>
                 <span className="power-total-label">총 전력</span>
                 <strong>5.84</strong>
@@ -137,10 +138,8 @@ export default function FacilitySidebar() {
 
           <section aria-labelledby="floor-heading">
             <div className={subTitle}>
-              <h2 id="floor-heading">Floor Navigation</h2>
-              <span className={moduleReadout} id="floor-count">
-                4F
-              </span>
+              <h2 id="floor-heading">층별 현황</h2>
+              
             </div>
             <div className={floorList} id="floor-list">
               <button type="button" className={floorButton} data-floor="4F">
@@ -187,8 +186,8 @@ export default function FacilitySidebar() {
           </section>
           <section className="support-section" aria-labelledby="support-heading">
             <div className={subTitle}>
-              <h2 id="support-heading">Support Facilities</h2>
-              <span className={moduleReadout}>SITE 02</span>
+              <h2 id="support-heading">지원 시설</h2>
+              
             </div>
             <div className="floor-list facility-support" aria-label="전력·냉각 외부 지원 시설">
               <button type="button" className={floorButton} data-zone="power" aria-pressed="false">

@@ -3,8 +3,38 @@ import { instrumentCard, moduleReadout, panelBase, panelScroll, subTitle } from 
 export default function OperationsSidebar() {
   return (
     <>
-      <aside className={`${panelBase} right-panel right-[26px]`} aria-label="환경 및 설비 상태">
+      <aside
+        className={`${panelBase} right-panel right-[26px]`}
+        aria-label="시설 상세 및 운영 안내"
+      >
         <div className={panelScroll}>
+          <section aria-labelledby="equipment-heading">
+            <div className={subTitle}>
+              <h2 id="equipment-heading">선택 대상 상세</h2>
+              <span className={moduleReadout} id="device-id-short">
+                —
+              </span>
+            </div>
+            <div className={`${instrumentCard} selected-card`}>
+              <div className="device-head">
+                <div className="device-context">
+                  <span className="device-kicker" id="device-kicker">
+                    대상 선택
+                  </span>
+                  <span className="status-tag state-tag" id="device-state" hidden>
+                    ● 정상
+                  </span>
+                </div>
+                <h3 id="device-title">층 또는 설비를 선택하세요</h3>
+                <p id="device-location">왼쪽 시설 목록이나 3D 모델에서 선택할 수 있습니다.</p>
+              </div>
+              <div className="device-grid" id="device-grid"></div>
+              <button className="asset-detail-trigger" id="open-asset-modal" type="button" disabled>
+                <span>설비를 선택하면 상세 보기</span>
+                <span>↗</span>
+              </button>
+            </div>
+          </section>
           <section
             className="infra-section"
             data-infra-panel="power"
@@ -12,13 +42,13 @@ export default function OperationsSidebar() {
             hidden
           >
             <div className="sub-title infra-title">
-              <h2 id="infra-power-heading">Power Infrastructure</h2>
+              <h2 id="infra-power-heading">전력 설비 상세</h2>
               <span
                 className="module-readout infra-state"
                 id="infra-power-state"
                 aria-live="polite"
               >
-                NORMAL
+                정상
               </span>
             </div>
             <div className="infra-card">
@@ -68,13 +98,13 @@ export default function OperationsSidebar() {
             hidden
           >
             <div className="sub-title infra-title">
-              <h2 id="infra-cooling-heading">Cooling Infrastructure</h2>
+              <h2 id="infra-cooling-heading">냉각 설비 상세</h2>
               <span
                 className="module-readout infra-state"
                 id="infra-cooling-state"
                 aria-live="polite"
               >
-                NORMAL
+                정상
               </span>
             </div>
             <div className="infra-card">
@@ -119,71 +149,9 @@ export default function OperationsSidebar() {
             </div>
           </section>
 
-          <section aria-labelledby="equipment-heading">
-            <div className={subTitle}>
-              <h2 id="equipment-heading">Selection Detail</h2>
-              <span className={moduleReadout} id="device-id-short">
-                —
-              </span>
-            </div>
-            <div className={`${instrumentCard} selected-card`}>
-              <div className="device-head">
-                <div className="device-context">
-                  <span className="device-kicker" id="device-kicker">
-                    SELECTION REQUIRED
-                  </span>
-                  <span className="status-tag state-tag" id="device-state" hidden>
-                    ● NORMAL
-                  </span>
-                </div>
-                <h3 id="device-title">층 또는 설비를 선택하세요</h3>
-                <p id="device-location">왼쪽 시설 목록이나 3D 모델에서 선택할 수 있습니다.</p>
-              </div>
-              <div className="device-grid" id="device-grid"></div>
-              <button className="asset-detail-trigger" id="open-asset-modal" type="button" disabled>
-                <span>설비를 선택하면 상세 보기</span>
-                <span>↗</span>
-              </button>
-              <div className="trend">
-                <h3>1H TREND</h3>
-                <svg
-                  viewBox="-3 0 266 55"
-                  preserveAspectRatio="none"
-                  role="img"
-                  aria-label="최근 1시간 추세 그래프"
-                >
-                  <defs>
-                    <linearGradient id="trend-fill" x2="0" y2="1">
-                      <stop stopColor="#489cdb" stopOpacity=".35" />
-                      <stop offset="1" stopColor="#489cdb" stopOpacity=".05" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    className="gridline"
-                    d="M0 13.5H260M0 27.5H260M0 41.5H260M65 0V55M130 0V55M195 0V55"
-                  />
-                  <path
-                    fill="url(#trend-fill)"
-                    d="M0 43 L20 38 L40 41 L60 28 L80 31 L100 23 L120 27 L140 17 L160 22 L180 14 L200 21 L220 12 L240 17 L260 10 L260 55 L0 55Z"
-                  />
-                  <path
-                    className="line"
-                    d="M0 43 L20 38 L40 41 L60 28 L80 31 L100 23 L120 27 L140 17 L160 22 L180 14 L200 21 L220 12 L240 17 L260 10"
-                  />
-                  <circle cx="260" cy="10" r="2.5" fill="#d9f4ff" />
-                </svg>
-                <div className="trend-scale" aria-hidden="true">
-                  <span>−60m</span>
-                  <span>−30m</span>
-                  <span>NOW</span>
-                </div>
-              </div>
-            </div>
-          </section>
-
           <section aria-labelledby="alarm-heading">
             <div className={subTitle}>
-              <h2 id="alarm-heading">Alarm &amp; Event</h2>
+              <h2 id="alarm-heading">알림 및 이벤트</h2>
               <span className={moduleReadout} id="alarm-count">
                 00
               </span>
@@ -192,34 +160,34 @@ export default function OperationsSidebar() {
               <li className="alarm-item" data-level="warning">
                 <span className="alarm-level" aria-hidden="true"></span>
                 <div className="alarm-copy">
-                  <b>GPU Zone B temperature rise</b>
-                  <small>3F · Cold aisle sensor T-31</small>
+                  <b>GPU B구역 온도 상승</b>
+                  <small>3층 · 냉기 통로 센서 T-31</small>
                 </div>
                 <div className="alarm-meta">
                   <time className="alarm-time">11:42</time>
-                  <span className="alarm-severity">WARNING</span>
+                  <span className="alarm-severity">주의</span>
                 </div>
               </li>
               <li className="alarm-item" data-level="info">
                 <span className="alarm-level" aria-hidden="true"></span>
                 <div className="alarm-copy">
-                  <b>UPS battery inspection due</b>
-                  <small>1F · UPS-B maintenance</small>
+                  <b>UPS 배터리 점검 예정</b>
+                  <small>1층 · UPS-B 유지보수</small>
                 </div>
                 <div className="alarm-meta">
                   <time className="alarm-time">10:18</time>
-                  <span className="alarm-severity">INFO</span>
+                  <span className="alarm-severity">안내</span>
                 </div>
               </li>
               <li className="alarm-item" data-level="resolved">
                 <span className="alarm-level" aria-hidden="true"></span>
                 <div className="alarm-copy">
-                  <b>Cooling profile optimized</b>
-                  <small>AI control sequence complete</small>
+                  <b>냉각 설정 최적화 완료</b>
+                  <small>AI 제어 절차 완료</small>
                 </div>
                 <div className="alarm-meta">
                   <time className="alarm-time">09:54</time>
-                  <span className="alarm-severity">RESOLVED</span>
+                  <span className="alarm-severity">해결</span>
                 </div>
               </li>
             </ul>
@@ -227,59 +195,21 @@ export default function OperationsSidebar() {
 
           <details className="agent-quicklist" id="agent-quicklist">
             <summary>
-              AI 운영 요원 <span id="agent-quick-count">07 / 정상 감시</span>
+              <span className="agent-summary-copy">
+                AI 운영 요원<small>시설 및 운영 정보 안내</small>
+              </span>
+              <span id="agent-quick-count">대기 중</span>
             </summary>
             <div className="agent-shortcuts" id="agent-shortcuts" aria-label="AI 담당자 선택"></div>
-            <div className="agent-human-loading" id="agent-human-loading" aria-live="polite">
+            <div className="agent-human-loading" id="agent-human-loading" hidden aria-live="polite">
               역할별 운영요원 모델을 구성하는 중…
             </div>
           </details>
-          <section className="extras-section" aria-label="설비 상세와 장애 시뮬레이션">
-            <div className={subTitle}>
-              <h2>Operations &amp; Simulation</h2>
-            </div>
-            <div className="panel-tabs" role="tablist" aria-label="운영 상세 정보">
-              <button
-                type="button"
-                id="tab-asset"
-                data-inspector-tab="asset"
-                className="active"
-                aria-selected="true"
-                role="tab"
-              >
-                설비 상세
-              </button>
-              <button
-                type="button"
-                id="tab-scenario"
-                data-inspector-tab="scenario"
-                aria-selected="false"
-                role="tab"
-              >
-                장애 시뮬레이션 <b id="scenario-count">0</b>
-              </button>
-            </div>
-            <details id="v9-panel-details" className="v9-panel-details">
-              <summary id="v9-detail-toggle">운영 상세 펼치기</summary>
-              <div id="detail-view" role="tabpanel"></div>
-              <div id="scenario-view" role="tabpanel" hidden></div>
-              <div className="inspection-tip" hidden>
-                <span className="tip-title">조작 안내</span>
-                <p>
-                  설비를 선택하면 상세 데이터가 표시됩니다. 장애 시뮬레이션에서는 이벤트를 실행하고
-                  복구 단계를 진행할 수 있습니다.
-                </p>
-              </div>
-              <div className="v9-sim-actions">
-                <button id="btn-alarm" type="button">
-                  선택 시나리오 실행
-                </button>
-                <button id="btn-reset" type="button">
-                  전체 초기화
-                </button>
-              </div>
-            </details>
-          </section>
+          <div hidden aria-hidden="true">
+            <span id="scenario-count"></span>
+            <div id="detail-view"></div>
+            <div id="scenario-view"></div>
+          </div>
         </div>
       </aside>
     </>

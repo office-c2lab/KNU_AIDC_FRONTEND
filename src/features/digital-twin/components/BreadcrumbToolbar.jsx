@@ -10,7 +10,7 @@ export default function BreadcrumbToolbar() {
           <span className="sep">›</span>
           <span>KNU AIDC</span>
           <span className="sep">›</span>
-          <b id="crumb-current">Building Overview</b>
+          <b id="crumb-current">시설 전체</b>
         </div>
         <div
           className="view-actions pointer-events-auto flex shrink-0 items-center gap-1"
@@ -48,7 +48,7 @@ export default function BreadcrumbToolbar() {
           <span className="view-actions-divider" role="separator" aria-hidden="true"></span>
           <span className="view-actions-label">시점</span>
           <button type="button" className={chip} id="topChip" title="위에서 내려다보는 시점">
-            TOP
+            위에서 보기
           </button>
           <button type="button" className={chip} id="btn-auto" title="자동 회전">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
