@@ -14,8 +14,8 @@
   width: auto;
   height: 100dvh;
   min-height: 720px;
-  margin: 0 clamp(18px, 1.8vw, 32px);
-  padding: 106px 0 24px;
+  margin: 0 26px;
+  padding: 92px 0 34px;
   overflow: hidden;
 }
 
@@ -53,6 +53,7 @@
   padding: 12px 10px;
   border: 1px solid #2c4768;
   background: #101d34d9;
+  border-radius: 9px;
 }
 
 .status-card > svg {
@@ -67,8 +68,8 @@
 
 .status-card span,
 .status-card small {
-  color: #9db2ca;
-  font-size: 11px;
+  color: #c2d1e2;
+  font-size: 13px;
 }
 
 .status-card strong {
@@ -94,7 +95,7 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr) clamp(250px, 20vw, 300px);
+  grid-template-columns: var(--left-w, 286px) minmax(0, 1fr) clamp(250px, 20vw, 300px);
   grid-template-rows: minmax(0, 1fr);
   gap: 14px;
   flex: 1;
@@ -110,7 +111,8 @@
 .dashboard-panel {
   min-width: 0;
   border: 1px solid #324f72;
-  background: #0d192fdd;
+  background: #101e32;
+  border-radius: 12px;
   box-shadow: 0 12px 32px #0207144d;
 }
 
@@ -128,7 +130,7 @@
 .dashboard-panel-heading h2 {
   margin: 2px 0 0;
   color: #ecf4ff;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -222,27 +224,30 @@
 
 .scenario-facility-assets button {
   display: grid;
-  grid-template-columns: 7px minmax(0, 1fr) auto;
+  grid-template-columns: 7px minmax(0, 1fr);
   align-items: center;
-  gap: 9px;
+  gap: 12px;
   width: 100%;
-  min-height: 48px;
-  padding: 8px 9px;
-  border: 1px solid transparent;
-  background: #101f36;
-  color: #58718d;
+  min-height: 58px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  border: 0;
+  background: transparent;
+  color: #73e1c0;
   text-align: left;
+  transition: background-color 0.16s ease;
 }
 
 .scenario-facility-assets button:hover {
-  border-color: #426487;
-  background: #172b46;
+  background: #9bcaff12;
 }
 
 .scenario-facility-assets button.selected {
-  border-color: #6797c8;
-  background: #21476f;
-  color: #9fd2ff;
+  background: #7cbaff24;
+}
+
+.scenario-facility-assets button.selected:hover {
+  background: #7cbaff30;
 }
 
 .scenario-facility-assets button.running {
@@ -250,6 +255,7 @@
 }
 .scenario-facility-assets button span {
   min-width: 0;
+  text-align: left;
 }
 .scenario-facility-assets strong,
 .scenario-facility-assets small {
@@ -257,14 +263,14 @@
 }
 .scenario-facility-assets strong {
   color: #dceafa;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 .scenario-facility-assets small {
   margin-top: 3px;
   overflow: hidden;
-  color: #91a9c2;
-  font-size: 11px;
+  color: #b4c5d8;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -283,7 +289,7 @@
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  padding: 18px;
+  padding: 24px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #41658c transparent;
@@ -297,20 +303,22 @@
 }
 
 .selected-scenario-title small {
-  color: #8fb0d2;
-  font-size: 11px;
+  color: #b4c8df;
+  font-size: 14px;
 }
 .selected-scenario-title h3 {
   margin: 5px 0 0;
   color: #f1f7ff;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 650;
 }
 .selected-scenario-title > span {
-  padding: 4px 7px;
-  border: 1px solid #806c46;
-  color: #eac476;
-  font-size: 10px;
+  padding: 6px 10px;
+  border: 1px solid #3d766c;
+  background: #183c37;
+  border-radius: 6px;
+  color: #99edd0;
+  font-size: 12px;
 }
 .selected-scenario-title > span.critical {
   border-color: #8d4b59;
@@ -319,39 +327,41 @@
 .selected-scenario > p {
   margin: 16px 0;
   color: #b7cae0;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.6;
 }
 .selected-scenario dl {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-  margin: 0 0 14px;
+  gap: 10px;
+  margin: 0 0 22px;
 }
 .selected-scenario dl > div {
   min-width: 0;
-  padding: 9px;
-  background: #12243d;
+  padding: 13px 14px;
+  border-radius: 8px;
+  background: #192c44;
 }
 .selected-scenario dt {
-  color: #88a6c5;
-  font-size: 11px;
+  color: #b0c4dd;
+  font-size: 12px;
 }
 .selected-scenario dd {
   margin: 5px 0 0;
-  color: #d1e0f0;
-  font-size: 11px;
+  color: #f0f6ff;
+  font-size: 15px;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
 .scenario-action {
   width: 100%;
-  min-height: 38px;
+  min-height: 46px;
+  border-radius: 7px;
   margin-top: auto;
   border: 1px solid #6c9dce;
   background: #24527e;
   color: #fff;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
 }
 .scenario-action:hover {
@@ -365,16 +375,17 @@
 
 .asset-control-scenario {
   display: grid;
-  gap: 7px;
+  gap: 12px;
   margin-top: 0;
-  padding: 12px;
+  padding: 18px;
+  border-radius: 10px;
   border: 1px solid #365778;
   background: #122640;
 }
 
 .asset-control-scenario small {
-  color: #86a7c8;
-  font-size: 10px;
+  color: #b0c8df;
+  font-size: 12px;
 }
 
 .asset-scenario-heading {
@@ -392,7 +403,7 @@
 .asset-scenario-heading strong {
   margin-top: 4px;
   color: #e5f2ff;
-  font-size: 13px;
+  font-size: 18px;
 }
 
 .asset-scenario-heading > span {
@@ -411,7 +422,7 @@
 .asset-control-scenario > p {
   margin: 0 0 4px;
   color: #aabfd5;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.55;
 }
 
@@ -433,7 +444,7 @@
 .selected-scenario .scenario-brief dd {
   margin: 0;
   color: #adc1d6;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .scenario-checks {
@@ -444,11 +455,11 @@
 
 .scenario-checks ol {
   display: grid;
-  gap: 4px;
+  gap: 8px;
   margin: 6px 0 0;
   padding-left: 18px;
   color: #b8cce0;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.45;
 }
 
@@ -464,7 +475,7 @@
 
 .dashboard-side-stack {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: 14px;
   min-height: 0;
 }
@@ -569,12 +580,12 @@
 }
 .active-scenario-list strong {
   color: #e7f0fb;
-  font-size: 11px;
+  font-size: 13px;
 }
 .active-scenario-list small {
   margin-top: 3px;
   color: #96aac1;
-  font-size: 10px;
+  font-size: 12px;
 }
 .active-scenario-list button {
   display: grid;
@@ -594,19 +605,20 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 36px;
+  min-height: 42px;
+  border-radius: 6px;
   margin: auto 10px 10px;
   border: 1px solid #3e6082;
   background: #152c49;
   color: #c6dcf0;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .dashboard-empty {
   margin: 0;
   padding: 18px 12px;
-  color: #8198b1;
-  font-size: 11px;
+  color: #b2c3d7;
+  font-size: 13px;
   text-align: center;
 }
 

@@ -1,5 +1,7 @@
-export const panelBase =
-  'panel fixed top-[92px] bottom-[34px] z-[15] overflow-hidden border border-[#5274a2a6] bg-[#0a1328f5] shadow-[0_10px_36px_#01061369] backdrop-blur-xl';
+export const panelSurface =
+  'overflow-hidden border border-[#5274a2a6] bg-[#0a1328f5] shadow-[0_10px_36px_#01061369] backdrop-blur-xl';
+
+export const panelBase = `panel fixed top-[92px] bottom-[34px] z-[15] ${panelSurface}`;
 
 export const panelScroll =
   'panel-scroll relative z-[3] h-full overflow-y-auto px-4 pb-5 overscroll-contain';

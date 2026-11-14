@@ -1,56 +1,136 @@
 import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Search, X } from 'lucide-react';
 import { SCENARIOS } from '../digital-twin/scene/config/scenarioConfig.js';
+import {
+  floorButton,
+  floorNumber,
+  panelBase,
+  panelScroll,
+  subTitle,
+} from '../digital-twin/components/uiStyles.js';
 
 export default function ScenarioFacilitySidebar({
   facilityGroups,
   assetCatalog,
+  summary,
   selectedAssetId,
   runningIds,
   onSelectAsset,
 }) {
   const [expandedFacilityId, setExpandedFacilityId] = useState('3F');
+  const [search, setSearch] = useState('');
+  const query = search.trim().toLocaleLowerCase();
+  const groups = facilityGroups
+    .map(group => ({
+      ...group,
+      assets: assetCatalog.filter(
+        asset =>
+          group.matches(asset) &&
+          (!query ||
+            [asset.id, asset.name, asset.type].some(value =>
+              String(value ?? '')
+                .toLocaleLowerCase()
+                .includes(query)
+            ))
+      ),
+    }))
+    .filter(group => !query || group.assets.length);
+  const resultCount = groups.reduce((count, group) => count + group.assets.length, 0);
   return (
     <aside
-      className="flex min-h-0 flex-col overflow-hidden border border-[#324f72] bg-[#0a1629]"
+      className={`${panelBase} flex min-h-0 flex-col`}
+      style={{ position: 'relative', top: 'auto', bottom: 'auto', zIndex: 'auto' }}
       aria-label="시설 및 설비 탐색"
     >
-      <header className="shrink-0 border-b border-[#2c4666] bg-[#142641] px-3.5 py-3">
-        <h2 className="mt-1 text-[13px] font-semibold text-[#ecf4ff]">
-          시설·설비 탐색{' '}
-          <small className="ml-2 text-[10px] text-[#89a9c9]">{assetCatalog.length}개</small>
-        </h2>
-      </header>
+      <div
+        className="relative z-[3] flex shrink-0 items-center justify-between gap-1 border-b border-[#45678d68] px-4 py-3.5 text-xs tabular-nums"
+        aria-label="전체 설비 운영 현황"
+      >
+        <span className="whitespace-nowrap text-[#dce9f8]">
+          전체 <strong>{summary.total}</strong>
+        </span>
+        <span className="whitespace-nowrap text-[#73e1c0]">
+          정상 <strong>{summary.normal}</strong>
+        </span>
+        <span className="whitespace-nowrap text-[#eac476]">
+          주의 <strong>{summary.warning}</strong>
+        </span>
+        <span className="whitespace-nowrap text-[#ff8188]">
+          장애 <strong>{summary.fault}</strong>
+        </span>
+      </div>
+      <div className="relative z-[3] shrink-0 border-b border-[#45678d68] px-4 pt-4 pb-3">
+        <label className="flex h-10 items-center gap-2 border border-[#43628b] bg-[#0a162b] px-3 focus-within:border-[#8fc3ff]">
+          <Search size={16} className="shrink-0 text-[#a7bfdc]" aria-hidden="true" />
+          <span className="sr-only">설비명 또는 ID 검색</span>
+          <input
+            type="text"
+            value={search}
+            onChange={event => setSearch(event.target.value)}
+            onKeyDown={event => {
+              if (event.key === 'Escape') setSearch('');
+            }}
+            placeholder="설비명 또는 ID 검색"
+            className="min-w-0 flex-1 border-0 bg-transparent text-[13px] text-[#e9f2ff] outline-none placeholder:text-[#93accb]"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              aria-label="검색 지우기"
+              className="flex h-6 w-6 shrink-0 items-center justify-center text-[#b9cce6] hover:text-white"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </label>
+        {query && (
+          <p role="status" className="mt-2 mb-0 text-xs text-[#b9cce6]">
+            검색 결과 {resultCount}개 설비
+          </p>
+        )}
+      </div>
       <nav
-        className="grid min-h-0 grid-cols-1 gap-1 overflow-y-auto p-2 [scrollbar-width:thin] [scrollbar-color:#41658c_transparent]"
+        className={`${panelScroll} grid min-h-0 grid-cols-1 content-start gap-1.5`}
         aria-label="층 및 지원 시설"
       >
-        {facilityGroups.map(group => {
-          const assets = assetCatalog.filter(asset => group.matches(asset));
-          const expanded = expandedFacilityId === group.id;
+        {groups.map(group => {
+          const assets = group.assets;
+          const expanded = query ? true : expandedFacilityId === group.id;
           return (
             <div key={group.id}>
+              {!query && (group.id === '4F' || group.id === 'P') && (
+                <div className={subTitle}>
+                  <h3 className="m-0 text-[13px] font-semibold">
+                    {group.id === '4F' ? '층별 현황' : '지원 시설'}
+                  </h3>
+                </div>
+              )}
               <button
                 type="button"
-                className={`grid min-h-10 w-full min-w-0 grid-cols-[30px_1fr_auto_12px] items-center gap-[5px] border px-2.5 py-2 text-left hover:border-[#4e7298] hover:bg-[#182d49] ${expanded ? 'border-[#365d82] bg-[#193953] text-white' : 'border-transparent bg-transparent text-[#8da7c2]'}`}
+                className={`${floorButton}${expanded ? ' active' : ''}`}
                 aria-expanded={expanded}
                 aria-controls={`facility-assets-${group.id}`}
-                onClick={() => setExpandedFacilityId(expanded ? null : group.id)}
+                onClick={() => {
+                  if (!query) setExpandedFacilityId(expanded ? null : group.id);
+                }}
               >
-                <b className="text-[11px] text-[#9fd2ff]">{group.id}</b>
-                <span className="truncate text-[10px]">{group.name}</span>
-                <small className="text-[10px] text-[#89a9c9]">{assets.length}</small>
-                <ChevronDown
-                  size={12}
-                  aria-hidden="true"
-                  className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
-                />
+                <span className={floorNumber}>{group.id}</span>
+                <span className="floor-copy min-w-0">
+                  <strong>{group.name}</strong>
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="whitespace-nowrap text-xs tabular-nums text-[#b9cce6]">
+                    {assets.length}개
+                  </span>
+                  <ChevronDown
+                    size={16}
+                    aria-hidden="true"
+                    className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
+                  />
+                </span>
               </button>
-              <div
-                id={`facility-assets-${group.id}`}
-                hidden={!expanded}
-                className="ml-3.5 border-l border-[#294463] pt-[5px] pb-[9px] pl-3"
-              >
+              <div id={`facility-assets-${group.id}`} hidden={!expanded} className="pt-1 pb-2">
                 <div className="scenario-facility-assets">
                   {assets.length ? (
                     assets.map(asset => {
@@ -66,12 +146,11 @@ export default function ScenarioFacilitySidebar({
                             onSelectAsset(group.id, asset);
                           }}
                         >
-                          <i />
+                          <i aria-label={running ? '시나리오 발생' : '정상'} />
                           <span>
                             <strong>{asset.id}</strong>
                             <small>{asset.name || asset.type}</small>
                           </span>
-                          <em>{running ? '장애' : scenario ? '제어 가능' : '정상'}</em>
                         </button>
                       );
                     })
@@ -83,6 +162,13 @@ export default function ScenarioFacilitySidebar({
             </div>
           );
         })}
+        {query && !resultCount && (
+          <p className="py-6 text-center text-[13px] leading-6 text-[#b9cce6]">
+            일치하는 설비가 없습니다.
+            <br />
+            설비명이나 ID를 다시 확인해주세요.
+          </p>
+        )}
       </nav>
     </aside>
   );

@@ -1,6 +1,6 @@
 import ScenarioFacilitySidebar from '../features/dashboard/ScenarioFacilitySidebar.jsx';
 import { useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle2, CircleGauge, RotateCcw, Server, X } from 'lucide-react';
+import { RotateCcw, X } from 'lucide-react';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import '../features/dashboard/dashboard.css';
@@ -98,6 +98,7 @@ export default function DashboardPage() {
         <ScenarioFacilitySidebar
           facilityGroups={facilityGroups}
           assetCatalog={assetCatalog}
+          summary={liveSummary}
           selectedAssetId={selectedAsset?.id}
           runningIds={runningIds}
           onSelectAsset={(facilityId, asset) => {
@@ -112,7 +113,7 @@ export default function DashboardPage() {
           <div className="selected-scenario">
             <div className="selected-scenario-title">
               <div>
-                <small>{selectedAsset?.type ?? '설비를 선택하세요'}</small>
+                <small>{selectedAsset?.name ?? '설비를 선택하세요'}</small>
                 <h3>{selectedAsset?.id ?? '설비 연동 대기'}</h3>
               </div>
               <span className={selectedAssetState !== '정상' ? 'critical' : ''}>
@@ -207,44 +208,6 @@ export default function DashboardPage() {
         </section>
 
         <div className="dashboard-side-stack">
-          <section className="status-overview" aria-labelledby="overview-heading">
-            <h2 id="overview-heading" className="sr-only">
-              전체 운영 현황
-            </h2>
-            <article className="status-card total">
-              <Server aria-hidden="true" />
-              <div>
-                <span>전체 설비</span>
-                <strong>{liveSummary.total || '—'}</strong>
-              </div>
-              <small>{liveSummary.total ? 'Three.js 설비 연동' : '설비 데이터 로딩 전'}</small>
-            </article>
-            <article className="status-card normal">
-              <CheckCircle2 aria-hidden="true" />
-              <div>
-                <span>정상</span>
-                <strong>{liveSummary.total ? liveSummary.normal : '—'}</strong>
-              </div>
-              <small>정상 운영 설비</small>
-            </article>
-            <article className="status-card warning">
-              <AlertTriangle aria-hidden="true" />
-              <div>
-                <span>주의</span>
-                <strong>{liveSummary.warning}</strong>
-              </div>
-              <small>연관 영향 설비</small>
-            </article>
-            <article className="status-card fault">
-              <CircleGauge aria-hidden="true" />
-              <div>
-                <span>장애</span>
-                <strong>{liveSummary.fault}</strong>
-              </div>
-              <small>{incidents.length}건 진행 중</small>
-            </article>
-          </section>
-
           <section className="dashboard-panel active-scenarios" aria-labelledby="active-heading">
             <header className="dashboard-panel-heading">
               <div>
