@@ -41,7 +41,7 @@ export default function AssetModal() {
             <section className="asset-modal-card asset-model-pane" aria-label="선택 설비 3D 모델">
               <div className="asset-pane-heading">
                 <span id="asset-modal-device-id">설비</span>
-                <small>3D 모델 탐색</small>
+                
               </div>
               <div className="asset-modal-stage" id="asset-modal-stage">
                 <canvas
@@ -161,11 +161,7 @@ export default function AssetModal() {
               </div>
             </div>
           </div>
-          <div className="asset-modal-footer flex min-h-[38px] items-center justify-between gap-4 border-t border-[#35587b] bg-[#0a1a32] px-[18px] py-2.5 text-[10px] text-[#91acc8]">
-            <button type="button" data-asset-modal-close>
-              닫기
-            </button>
-          </div>
+          
         </div>
       </div>
     </>
