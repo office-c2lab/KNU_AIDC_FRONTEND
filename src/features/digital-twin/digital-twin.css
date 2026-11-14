@@ -346,7 +346,7 @@
     .floor-button.active {
       border-color:#7ca6d8;
       background:#244b74;
-      box-shadow:inset 2px 0 #a6daff;
+      box-shadow:none;
     }
     .floor-button:focus-visible {outline-offset:-2px}
     .floor-no {
@@ -378,7 +378,7 @@
     .env-table tbody tr {cursor:pointer}
     .env-table tbody tr:nth-child(even) {background:#304f793b}
     .env-table tbody tr:hover {background:#355a8373}
-    .env-table tbody tr.selected {background:#2a5079bd; box-shadow:inset 2px 0 #a6daff}
+    .env-table tbody tr.selected {background:#2a5079bd; box-shadow:none}
 
     .device-head {
       padding:12px; border-bottom:1px solid #2d4665;
@@ -507,7 +507,7 @@ header .nav-item{font-size:12px}
 .panel{top:92px;bottom:34px}
 .panel .panel-scroll{position:relative;z-index:3}
 .panel .floor-list{gap:6px}
-.support-section{margin-top:5px;padding-bottom:18px}.support-section .facility-support{padding-top:2px}.support-section .floor-button{min-height:52px}.support-section .floor-no{color:#b8d5f3}.support-section .floor-button.active{border-color:#7ca6d8;background:#244b74;box-shadow:inset 2px 0 #a6daff}
+.support-section{margin-top:5px;padding-bottom:18px}.support-section .facility-support{padding-top:2px}.support-section .floor-button{min-height:52px}.support-section .floor-no{color:#b8d5f3}.support-section .floor-button.active{border-color:#7ca6d8;background:#244b74;box-shadow:none}
 .panel .floor-button.active{border-color:#7ca6d8}
 .panel .floor-button .health{font-size:11px}
 .panel .floor-button .health.warn{color:#ffbc78}
@@ -593,7 +593,7 @@ header .nav-item{font-size:12px}
 .right-panel .infra-state.warning{color:#eac476}
 .right-panel .infra-state.fault{color:#ff8188}
 .right-panel .infra-card{border:1px solid #2b4566a6;background:#101d34bf;box-shadow:none;transition:border-color .18s,box-shadow .18s}
-.right-panel .infra-section.is-focused .infra-card{border-color:#89b8ea;box-shadow:inset 2px 0 #8cc6ff,inset 0 1px #9dbfeb24}
+.right-panel .infra-section.is-focused .infra-card{border-color:#89b8ea;box-shadow:none}
 .right-panel .infra-section.is-fault .infra-card{border-color:#945364}
 .right-panel .infra-jump{position:relative;display:grid;grid-template-columns:1fr auto;gap:3px;width:100%;text-align:left;padding:8px 9px;border:0;border-bottom:1px solid #45678d65;background:linear-gradient(110deg,#35598244,transparent 80%);color:#ddebfb;cursor:pointer}
 .right-panel .infra-jump:hover{background:#30527b54}
