@@ -26,7 +26,7 @@ export function initDigitalTwin(root) {
    * 기존 KNU AIDC 시설 분류/자산 개념 참조, 수치 및 장애는 100% 프론트엔드 시뮬레이션.
    * 디테일 지오메트리(랙 프레임, 도어, 팬, CDU, 냉각기, UPS 등)는 JS에서 생성합니다.
    */
-  const $ = q => root.querySelector(q);
+  const $ = q => root.querySelector(q) ?? document.querySelector(q);
   let disposed = false;
   const host = $('#render-host');
   const labelsHost = $('#world-labels');
@@ -4052,10 +4052,19 @@ export function initDigitalTwin(root) {
   }
   function updateSummary() {
     const values = [...registry.values()].filter(a => a.type !== 'AI AGENT');
-    const errors = values.filter(x => getAssetStatus(x) !== '정상').length;
+    const statuses = values.map(getAssetStatus);
+    const warning = statuses.filter(status => status === '주의').length;
+    const fault = statuses.filter(status => status === '장애' || status === '보안 경보').length;
+    const errors = warning + fault;
     $('#stat-assets').textContent = String(values.length).padStart(2, '0');
     $('#stat-healthy').textContent = String(values.length - errors).padStart(2, '0');
     $('#stat-alerts').textContent = String(errors).padStart(2, '0');
+    twinActions.setAssetSummary({
+      total: values.length,
+      normal: values.length - errors,
+      warning,
+      fault,
+    });
     $('#scenario-count').textContent = String(activeIncidents.size);
     updateAIDCPanel();
   }

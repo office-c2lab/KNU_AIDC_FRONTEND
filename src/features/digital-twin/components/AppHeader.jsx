@@ -1,4 +1,5 @@
 import { Bell } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 
 const navItem =
@@ -7,13 +8,24 @@ const navItem =
 export default function AppHeader() {
   const notificationsOpen = useDigitalTwinStore(state => state.notificationsOpen);
   const setNotificationsOpen = useDigitalTwinStore(state => state.setNotificationsOpen);
+  const incidentCount = useDigitalTwinStore(state => state.incidents.length);
   return (
     <>
-      <header className="fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833ed] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959] max-[1250px]:grid-cols-[1fr_420px_1fr] max-[930px]:grid-cols-[1fr_330px_1fr] max-[700px]:grid-cols-[1fr_220px_1fr]">
+      <header className="app-header fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959] max-[1250px]:grid-cols-[1fr_420px_1fr] max-[930px]:grid-cols-[1fr_330px_1fr] max-[700px]:grid-cols-[1fr_220px_1fr]">
         <nav className="main-nav flex h-16 items-center gap-[30px] pl-7" aria-label="주 메뉴">
-          <span className={`${navItem} active flex items-center`} aria-current="page">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
+          >
             디지털 트윈
-          </span>
+          </NavLink>
+          <NavLink
+            to="/scenario-control"
+            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
+          >
+            시나리오 제어
+          </NavLink>
         </nav>
         <div className="system-title relative grid h-[66px] place-items-center text-center">
           <span className="title-ticks left" aria-hidden="true"></span>
@@ -122,7 +134,7 @@ export default function AppHeader() {
           >
             <Bell size={16} aria-hidden="true" />
             <span className="badge" id="header-alarm-count">
-              0
+              {incidentCount}
             </span>
           </button>
         </div>

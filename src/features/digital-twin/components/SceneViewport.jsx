@@ -16,12 +16,6 @@ export default function SceneViewport() {
         <div className="world-alerts" id="world-alerts" aria-label="3D 설비 장애 위치"></div>
       </div>
       <div className="scene-vignette"></div>
-      <div className="scanlines"></div>
-      <div className="frame"></div>
-      <i className="corner tl"></i>
-      <i className="corner tr"></i>
-      <i className="corner bl"></i>
-      <i className="corner br"></i>
     </>
   );
 }

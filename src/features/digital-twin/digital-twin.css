@@ -154,23 +154,23 @@
     .corner.tl{left:18px;top:18px}.corner.tr{right:18px;top:18px;transform:scaleX(-1)}
     .corner.bl{left:18px;bottom:18px;transform:scaleY(-1)}.corner.br{right:18px;bottom:18px;transform:scale(-1)}
 
-    header{
+    .app-header{
       position:fixed;z-index:20;left:10px;right:10px;top:9px;height:var(--header-h);
       display:grid;grid-template-columns:1fr 520px 1fr;align-items:start;
       isolation:isolate;border-bottom:1px solid #668cc556;
       background:
         radial-gradient(ellipse 41% 128% at 50% -35%,#5d89d6bb 4%,#2e5595a8 42%,transparent 100%),
         linear-gradient(180deg,#273d698c,transparent 26%),
-        linear-gradient(180deg,#152442 0%,#0d182d 57%,#0b1429 88%,#0c1833ed);
+        linear-gradient(180deg,#152442 0%,#0d182d 57%,#0b1429 88%,#0c1833);
       box-shadow:inset 0 1px #88ade13d,0 8px 25px #03081959;
     }
-    header::before,header::after{content:"";position:absolute;pointer-events:none;z-index:-1}
-    header::before{
+    .app-header::before,.app-header::after{content:"";position:absolute;pointer-events:none;z-index:-1}
+    .app-header::before{
       inset:0 0 auto;height:10px;
       clip-path:polygon(0 0,100% 0,100% 100%,86% 100%,85% 50%,15% 50%,14% 100%,0 100%);
       background:linear-gradient(180deg,#8cb3e15c,#304b7833 50%,#5181c653);
     }
-    header::after{
+    .app-header::after{
       inset:auto 0 -1px;height:1px;
       background:linear-gradient(90deg,transparent,#89afeb63 14%,transparent 37%,#81b8fc9c 50%,transparent 63%,#89afeb63 86%,transparent);
     }
@@ -454,8 +454,8 @@
     .dock-hint{color:#a1bad6}
 
     @media(max-width:1250px){:root{--left-w:244px;--right-w:270px}.main-nav{gap:15px;padding-left:16px}.header-tools{gap:10px;padding-right:16px}.system-title{width:420px;justify-self:center}.title-ticks{display:none}.dock-hint{display:none}}
-    @media(max-width:930px){:root{--left-w:210px;--right-w:230px}.main-nav .nav-item:not(.active){display:none}.system-title{width:330px}.header-tools .live-pill,.header-tools .tool-icon{display:none}.breadcrumbs{left:230px;right:250px}.dock-button{padding:0 8px}}
-    @media(max-width:700px){:root{--left-w:170px;--right-w:0px}header{grid-template-columns:1fr 220px 1fr}.system-title{width:220px}.system-title strong{font-size:10px}.header-tools{display:none}.breadcrumbs{left:190px;right:12px}.center-status{left:185px;right:8px}.dock-button span{display:none}.dock-button{padding:0 10px}.scene-vignette{background:linear-gradient(90deg,rgba(2,6,17,.75),transparent 45%)}}
+    @media(max-width:930px){:root{--left-w:210px;--right-w:230px}.system-title{width:330px}.header-tools .live-pill,.header-tools .tool-icon{display:none}.breadcrumbs{left:230px;right:250px}.dock-button{padding:0 8px}}
+    @media(max-width:700px){:root{--left-w:170px;--right-w:0px}.app-header{grid-template-columns:1fr 220px 1fr}.system-title{width:220px}.system-title strong{font-size:10px}.header-tools{display:none}.breadcrumbs{left:190px;right:12px}.center-status{left:185px;right:8px}.dock-button span{display:none}.dock-button{padding:0 10px}.scene-vignette{background:linear-gradient(90deg,rgba(2,6,17,.75),transparent 45%)}}
 
     @media(max-width:1250px) {
       .panel-scroll {--panel-inset:12px}
@@ -491,6 +491,7 @@
 :root{--left-w:286px;--right-w:310px}
 html,body{height:100%;background:#071024!important;overflow:hidden}
 body{font-size:12px}
+.digital-twin-scene{position:fixed;inset:0;min-height:560px;overflow:hidden}
 #render-host{position:fixed;inset:0;z-index:0;background:#071024;cursor:grab;touch-action:none;overflow:hidden}
 #render-host:active{cursor:grabbing}
 #render-host>canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -500,10 +501,10 @@ body{font-size:12px}
 #render-host .world-label{pointer-events:auto}
 #render-host .world-alert{pointer-events:auto}
 #render-host .hover-tooltip{z-index:10}
-header{left:10px;right:10px;top:9px}
-header .tool-icon{padding:0;cursor:pointer}
-header .tool-icon .badge{display:inline-block}
-header .nav-item{font-size:12px}
+.app-header{left:10px;right:10px;top:9px}
+.app-header .tool-icon{padding:0;cursor:pointer}
+.app-header .tool-icon .badge{display:inline-block}
+.app-header .nav-item{font-size:12px}
 .panel{top:92px;bottom:34px}
 .panel .panel-scroll{position:relative;z-index:3}
 .panel .floor-list{gap:6px}
