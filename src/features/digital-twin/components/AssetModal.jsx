@@ -16,7 +16,7 @@ export default function AssetModal() {
         <div className="asset-modal-window relative flex h-[min(870px,calc(100dvh-40px))] min-h-[430px] w-[min(1510px,100%)] flex-col overflow-hidden border border-[#507aaac7] bg-[#071126] shadow-[0_24px_90px_#000b,0_0_0_1px_#9bcaff18]">
           <div className="asset-modal-top flex h-[70px] min-h-[70px] items-center justify-between gap-2.5 border-b border-[#466d9a7a] bg-[#132746] px-6">
             <div>
-              <div className="asset-modal-sub">KNU AIDC / EQUIPMENT INSPECTION · SIMULATION</div>
+              <div className="asset-modal-sub">KNU AIDC / EQUIPMENT INSPECTION</div>
               <h2 id="asset-modal-title">설비 상세</h2>
             </div>
             <div className="asset-modal-actions flex shrink-0 items-center gap-2.5">

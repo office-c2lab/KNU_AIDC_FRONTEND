@@ -4,10 +4,6 @@ const dockButton =
 export default function SceneControls() {
   return (
     <>
-      <div className="scene-caption pointer-events-none fixed right-[calc(var(--right-w)+31px)] bottom-[97px] left-[calc(var(--left-w)+31px)] z-[7] text-center text-[9px] leading-relaxed tracking-[2px] text-[#a1bad6]">
-        <b id="view-title">데이터센터 전체 시설</b>
-        <span id="view-subtitle">4개 층의 메인 건물과 2개 지원 시설</span>
-      </div>
       <div id="incident-overlay" className="incident-overlay" aria-live="polite"></div>
       <div className="center-status pointer-events-none fixed right-[calc(var(--right-w)+31px)] bottom-9 left-[calc(var(--left-w)+31px)] z-[18] flex justify-center">
         <div

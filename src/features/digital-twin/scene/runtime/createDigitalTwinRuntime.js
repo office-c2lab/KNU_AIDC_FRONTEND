@@ -3593,7 +3593,7 @@ export function initDigitalTwin(root) {
         busy = agentIsBusy(agent);
       return `<div class="section-overline">AI OPERATOR / ${esc(asset.id)}</div><h3 class="detail-title">${esc(asset.name)}</h3><p class="detail-summary">${esc(agent.intro)}</p>
   ${infoRow('담당 구역', esc(agent.area))}${infoRow('업무 상태', esc(agentWorkTitle(agent)))}${infoRow('관련 경보', agentRelatedIncidents(agent).length + '건')}
-  <div class="section-label">에이전트 운영 <small>SIMULATION</small></div><button class="inspect-back" data-open-agent-modal="${asset.id}">AI 에이전트 상세 보기 →</button>`;
+  <div class="section-label">에이전트 운영</div><button class="inspect-back" data-open-agent-modal="${asset.id}">AI 에이전트 상세 보기 →</button>`;
     }
     const state = getAssetStatus(asset),
       sensor = getSensor(asset),
@@ -3650,7 +3650,7 @@ export function initDigitalTwin(root) {
     return `<div class="inspect-media"><span class="media-code">${asset.type.includes('GPU') ? 'GPU' : asset.type.includes('COOL') ? 'CDU' : 'DC'}</span><span class="media-text">KNU AIDC / ASSET INSPECTION</span></div>
  <button class="inspect-back" data-focus-zone="${asset.floor ? 'f' + asset.floor[0] : asset.zone}">← ${asset.floor ? asset.floor + ' 층별 정보' : '시설 정보'}로 돌아가기</button>
  <div class="section-overline">${asset.type} / ${asset.id}</div><h3 class="detail-title">${asset.name}</h3><p class="detail-summary">${asset.summary || ''}</p>${statusHtml(state)}
- <div class="section-label">장비 정보 <small>SIMULATION DATA</small></div>
+ <div class="section-label">장비 정보</div>
  ${infoRow('자산 ID', asset.id)}${infoRow('설치 층', asset.floor || '별도 지원 시설')}${infoRow('설치 위치', asset.location)}${infoRow('운영 상태', state)}
  <div class="section-label">센서 모니터링 <small>모의 수치</small></div><div class="metric-grid">
  <div class="small-metric ${state === '장애' ? 'is-hot' : ''}"><span>장비 온도</span><strong>${sensor.temp.toFixed(1)}</strong><small>°C</small></div>
@@ -3933,8 +3933,8 @@ export function initDigitalTwin(root) {
     $('#agent-modal-report').hidden = !isAgent;
     $('#equipment-modal-report').hidden = isAgent;
     $('.asset-modal-sub').textContent = isAgent
-      ? 'KNU AIDC / AI OPERATOR · SIMULATION'
-      : 'KNU AIDC / EQUIPMENT INSPECTION · SIMULATION';
+      ? 'KNU AIDC / AI OPERATOR'
+      : 'KNU AIDC / EQUIPMENT INSPECTION';
     if (isAgent) {
       updateAgentModal(asset);
       return;
@@ -4177,17 +4177,9 @@ export function initDigitalTwin(root) {
       b.classList.toggle('active', isActive);
       b.setAttribute('aria-pressed', String(isActive));
     });
-    $('#view-title').textContent = asset
-      ? `${asset.floor ? asset.floor + ' · ' : ''}${asset.name}`
-      : zones[zone].title;
     $('#crumb-current').textContent = asset
       ? (asset.floor ? asset.floor + ' / ' : '') + asset.id
       : zones[zone].name || zones[zone].title;
-    $('#view-subtitle').textContent = asset
-      ? asset.floor
-        ? FLOOR_INFO[asset.floor].sub
-        : zones[zone].sub
-      : zones[zone].sub;
     twinActions.setNavigation({ activeZone, activeFloor, selectedId });
     twinActions.setAutoRotate(false);
     updateFloorLayout();
@@ -4634,6 +4626,7 @@ export function initDigitalTwin(root) {
           ? all.filter(x => x.zone === activeZone)
           : all;
     const zone = zones[activeZone] || zones.overview;
+    const hasSelection = Boolean(activeAsset || activeFloor || activeZone !== 'overview');
     const bad = group.filter(a => getAssetStatus(a) !== '정상').length;
     const status = activeAsset
       ? getAssetStatus(activeAsset)
@@ -4642,34 +4635,49 @@ export function initDigitalTwin(root) {
         : bad
           ? '주의'
           : '정상';
-    $('#device-kicker').textContent = activeAsset
-      ? activeAsset.type + ' / ' + activeAsset.id
-      : (zone.code || 'CAMPUS') + ' / ' + (activeFloor || 'SITE');
-    $('#device-title').textContent = activeAsset ? activeAsset.name : zone.name || zone.title;
-    $('#device-location').textContent = activeAsset
-      ? activeAsset.location
-      : zone.sub || 'KNU AIDC 데이터센터 · 모의 데이터';
-    $('#device-id-short').textContent = activeAsset ? activeAsset.id : activeFloor || 'ALL';
+    $('#device-kicker').textContent = !hasSelection
+      ? 'SELECTION REQUIRED'
+      : activeAsset
+        ? activeAsset.type + ' / ' + activeAsset.id
+        : (zone.code || 'CAMPUS') + ' / ' + (activeFloor || 'SITE');
+    $('#device-title').textContent = !hasSelection
+      ? '층 또는 설비를 선택하세요'
+      : activeAsset
+        ? activeAsset.name
+        : zone.name || zone.title;
+    $('#device-location').textContent = !hasSelection
+      ? '왼쪽 시설 목록이나 3D 모델에서 선택할 수 있습니다.'
+      : activeAsset
+        ? activeAsset.location
+        : zone.sub || 'KNU AIDC 데이터센터';
+    $('#device-id-short').textContent = !hasSelection
+      ? '—'
+      : activeAsset
+        ? activeAsset.id
+        : activeFloor || zone.code || 'SITE';
     const state = $('#device-state');
+    state.hidden = !hasSelection;
     state.classList.toggle('warning', status === '주의');
     state.classList.toggle('alert-state', severityRank(status) === 3);
     state.textContent =
       status === '정상' ? '● NORMAL' : status === '주의' ? '● WARNING' : '● ALARM';
     const sensor = activeAsset ? getSensor(activeAsset) : null;
     const sum = group.reduce((v, a) => v + getSensor(a).power, 0);
-    const metrics = activeAsset
-      ? [
-          ['Equipment Temp.', sensor.temp.toFixed(1), '°C'],
-          ['Power Draw', sensor.power.toFixed(1), 'kW'],
-          ['Operating Load', String(activeAsset.capacity ?? 68), '%'],
-          ['Status', status, ''],
-        ]
-      : [
-          ['Devices', String(group.length), ''],
-          ['Normal', String(group.length - bad), ''],
-          ['Alerts', String(bad), ''],
-          ['Power (demo)', sum.toFixed(1), 'kW'],
-        ];
+    const metrics = !hasSelection
+      ? []
+      : activeAsset
+        ? [
+            ['Equipment Temp.', sensor.temp.toFixed(1), '°C'],
+            ['Power Draw', sensor.power.toFixed(1), 'kW'],
+            ['Operating Load', String(activeAsset.capacity ?? 68), '%'],
+            ['Status', status, ''],
+          ]
+        : [
+            ['Devices', String(group.length), ''],
+            ['Normal', String(group.length - bad), ''],
+            ['Alerts', String(bad), ''],
+            ['Power', sum.toFixed(1), 'kW'],
+          ];
     $('#device-grid').innerHTML = metrics
       .map(
         ([k, v, u]) =>
@@ -4677,6 +4685,7 @@ export function initDigitalTwin(root) {
       )
       .join('');
     const modalTrigger = $('#open-asset-modal');
+    modalTrigger.hidden = !activeAsset;
     modalTrigger.disabled = !activeAsset;
     modalTrigger.firstElementChild.textContent = activeAsset
       ? '선택 설비 상세 보기'

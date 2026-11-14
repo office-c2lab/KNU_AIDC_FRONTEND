@@ -123,21 +123,21 @@ export default function OperationsSidebar() {
             <div className={subTitle}>
               <h2 id="equipment-heading">Selection Detail</h2>
               <span className={moduleReadout} id="device-id-short">
-                ALL
+                —
               </span>
             </div>
             <div className={`${instrumentCard} selected-card`}>
               <div className="device-head">
                 <div className="device-context">
                   <span className="device-kicker" id="device-kicker">
-                    BUILDING OVERVIEW
+                    SELECTION REQUIRED
                   </span>
-                  <span className="status-tag state-tag" id="device-state">
+                  <span className="status-tag state-tag" id="device-state" hidden>
                     ● NORMAL
                   </span>
                 </div>
-                <h3 id="device-title">KNU AIDC Building 01</h3>
-                <p id="device-location">Chuncheon Campus · Data Center</p>
+                <h3 id="device-title">층 또는 설비를 선택하세요</h3>
+                <p id="device-location">왼쪽 시설 목록이나 3D 모델에서 선택할 수 있습니다.</p>
               </div>
               <div className="device-grid" id="device-grid"></div>
               <button className="asset-detail-trigger" id="open-asset-modal" type="button" disabled>
@@ -227,7 +227,7 @@ export default function OperationsSidebar() {
 
           <details className="agent-quicklist" id="agent-quicklist">
             <summary>
-              AI 운영 요원 <span id="agent-quick-count">07 / SIMULATED</span>
+              AI 운영 요원 <span id="agent-quick-count">07 / 정상 감시</span>
             </summary>
             <div className="agent-shortcuts" id="agent-shortcuts" aria-label="AI 담당자 선택"></div>
             <div className="agent-human-loading" id="agent-human-loading" aria-live="polite">
@@ -237,7 +237,6 @@ export default function OperationsSidebar() {
           <section className="extras-section" aria-label="설비 상세와 장애 시뮬레이션">
             <div className={subTitle}>
               <h2>Operations &amp; Simulation</h2>
-              <span className={moduleReadout}>DEMO</span>
             </div>
             <div className="panel-tabs" role="tablist" aria-label="운영 상세 정보">
               <button

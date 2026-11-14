@@ -19,7 +19,7 @@ export default function FacilitySidebar() {
           <section className="facility-section" aria-labelledby="facility-heading">
             <div className={sectionTitle}>
               <h2 id="facility-heading">Facility Overview</h2>
-              <span className={moduleReadout}>KNU AIDC / DEMO</span>
+              <span className={moduleReadout}>KNU AIDC</span>
             </div>
             <div className={`${instrumentCard} pue-card`}>
               <div className="pue-gauge">
@@ -81,14 +81,7 @@ export default function FacilitySidebar() {
                 </div>
               </div>
               <div className="pue-meta">
-                <b>High Efficiency</b>
-                <span className="status-tag stable">Stable / Normal</span>
-                <div className="pue-note">
-                  <span>
-                    Target PUE <strong>≤ 1.40</strong>
-                  </span>
-                  <span>DEMO DATA</span>
-                </div>
+                <span className="status-tag stable">정상</span>
               </div>
             </div>
           </section>
@@ -97,14 +90,15 @@ export default function FacilitySidebar() {
             <div className={subTitle}>
               <h2 id="power-heading">Power Flow</h2>
               <span className={moduleReadout}>
+                <span className="power-total-label">총 전력</span>
                 <strong>5.84</strong>
                 <span className="unit">MW</span>
               </span>
             </div>
             <div className={`${instrumentCard} power-list`}>
               <div className="power-row">
-                <span>IT Load</span>
-                <div className="bar blue" style={{ '--load': '72%' }} aria-hidden="true">
+                <span>IT 부하</span>
+                <div className="bar blue" style={{ '--load': '63.7%' }} aria-hidden="true">
                   <div className="bar-track">
                     <i></i>
                   </div>
@@ -112,8 +106,8 @@ export default function FacilitySidebar() {
                 <b>3.72</b>
               </div>
               <div className="power-row">
-                <span>Cooling</span>
-                <div className="bar" style={{ '--load': '43%' }} aria-hidden="true">
+                <span>냉각 부하</span>
+                <div className="bar" style={{ '--load': '20.7%' }} aria-hidden="true">
                   <div className="bar-track">
                     <i></i>
                   </div>
@@ -121,8 +115,8 @@ export default function FacilitySidebar() {
                 <b>1.21</b>
               </div>
               <div className="power-row">
-                <span>Electrical</span>
-                <div className="bar amber" style={{ '--load': '31%' }} aria-hidden="true">
+                <span>전력 설비</span>
+                <div className="bar amber" style={{ '--load': '11.6%' }} aria-hidden="true">
                   <div className="bar-track">
                     <i></i>
                   </div>
@@ -130,8 +124,8 @@ export default function FacilitySidebar() {
                 <b>0.68</b>
               </div>
               <div className="power-row">
-                <span>Reserved</span>
-                <div className="bar" style={{ '--load': '17%' }} aria-hidden="true">
+                <span>기타·예비</span>
+                <div className="bar" style={{ '--load': '3.9%' }} aria-hidden="true">
                   <div className="bar-track">
                     <i></i>
                   </div>
