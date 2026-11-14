@@ -728,8 +728,13 @@ header .nav-item{font-size:12px}
 .agent-modal-report[hidden],.asset-modal-report[hidden]{display:none!important}
 .agent-quicklist{margin:12px 0 15px;border:1px solid #3c5e84;background:linear-gradient(140deg,#1c35526d,#0a1830);box-shadow:inset 0 1px #92bced24}
 .agent-quicklist summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:11px 12px;color:#e0f1ff;font-size:11px;font-weight:700}
-.agent-quicklist summary::-webkit-details-marker{display:none}.agent-quicklist summary::after{content:'⌄';color:#83b6ec;font-size:16px}
-.agent-quicklist[open] summary::after{transform:rotate(180deg)}
+.agent-quicklist summary::-webkit-details-marker{display:none}
+.agent-expand-icon{flex:none;color:#83b6ec;transition:transform .18s}
+.agent-quicklist[open] .agent-expand-icon{transform:rotate(180deg)}
+.runtime-icon{display:inline-block;vertical-align:middle;flex:none}
+.state-tag .runtime-icon{width:9px;height:9px;fill:currentColor}
+.inspect-back .runtime-icon{margin:0 4px}
+.lucide{flex-shrink:0}
 .agent-quicklist summary span{color:#88d9ed;font:600 10px ui-monospace,Consolas,monospace}
 .agent-shortcuts{padding:0 6px 6px;display:grid;gap:3px}
 .agent-shortcut{width:100%;display:flex;justify-content:space-between;align-items:center;gap:5px;text-align:left;padding:9px 7px;border:1px solid transparent;border-radius:2px;color:#d5e7f9;background:#172a426a;cursor:pointer}

@@ -1,3 +1,5 @@
+import { House } from 'lucide-react';
+
 const dockButton =
   'dock-button flex h-8 items-center gap-2 border-0 border-r border-[#243e61] bg-transparent px-[13px] text-[#b1c9e5] transition hover:bg-[#102845] hover:text-[#e9f5ff]';
 
@@ -12,9 +14,7 @@ export default function SceneControls() {
           aria-label="데이터센터 3D 관제 도구"
         >
           <button type="button" className={dockButton} id="btn-fit" title="전체 시설 보기">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-              <path d="M3 10.5 12 3l9 7.5V21H6v-8h12v8" />
-            </svg>
+            <House size={14} aria-hidden="true" />
             <span>전체 시설</span>
           </button>
           <span className="dock-divider"></span>

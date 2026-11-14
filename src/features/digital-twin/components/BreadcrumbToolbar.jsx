@@ -1,3 +1,5 @@
+import { House, ChevronRight, RotateCw, RotateCcw } from 'lucide-react';
+
 const chip =
   'chip rounded-sm border border-[#375582] bg-[#12213d] px-2.5 py-[7px] text-[10px] font-semibold whitespace-nowrap text-[#a4bad6] shadow-[inset_0_1px_#9bcaff25] transition hover:border-[#76a6e0] hover:bg-[#243f68] hover:text-[#eff8ff]';
 
@@ -6,10 +8,16 @@ export default function BreadcrumbToolbar() {
     <>
       <div className="breadcrumbs pointer-events-none fixed top-[86px] right-[calc(var(--right-w)+42px)] left-[calc(var(--left-w)+42px)] z-[18] flex h-9 items-center justify-between gap-2.5 text-[#8198b5]">
         <div className="crumb-path pointer-events-auto flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap">
-          <span>⌂</span>
-          <span className="sep">›</span>
+          <span>
+            <House size={14} aria-hidden="true" />
+          </span>
+          <span className="sep">
+            <ChevronRight size={12} aria-hidden="true" />
+          </span>
           <span>KNU AIDC</span>
-          <span className="sep">›</span>
+          <span className="sep">
+            <ChevronRight size={12} aria-hidden="true" />
+          </span>
           <b id="crumb-current">시설 전체</b>
         </div>
         <div
@@ -51,15 +59,11 @@ export default function BreadcrumbToolbar() {
             위에서 보기
           </button>
           <button type="button" className={chip} id="btn-auto" title="자동 회전">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-              <path d="M20 7V3m0 0h-4m4 0-3 3a8 8 0 1 0 2 8" />
-            </svg>
+            <RotateCw size={12} aria-hidden="true" />
             <span>자동 회전</span>
           </button>
           <button type="button" className={chip} id="btn-view-reset" title="현재 시점 초기화">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-              <path d="M4 12a8 8 0 1 0 3-6.2L4 8m0-5v5h5" />
-            </svg>
+            <RotateCcw size={12} aria-hidden="true" />
             <span>초기화</span>
           </button>
           <span className="view-actions-divider" role="separator" aria-hidden="true"></span>

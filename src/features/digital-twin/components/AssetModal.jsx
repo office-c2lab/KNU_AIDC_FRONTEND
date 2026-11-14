@@ -1,3 +1,5 @@
+import { X } from 'lucide-react';
+
 export default function AssetModal() {
   return (
     <>
@@ -30,7 +32,7 @@ export default function AssetModal() {
                 data-asset-modal-close
                 aria-label="상세 모달 닫기"
               >
-                ×
+                <X size={18} aria-hidden="true" />
               </button>
             </div>
           </div>

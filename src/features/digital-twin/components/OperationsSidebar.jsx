@@ -1,3 +1,4 @@
+import { ArrowUpRight, ChevronDown, Circle } from 'lucide-react';
 import { instrumentCard, moduleReadout, panelBase, panelScroll, subTitle } from './uiStyles.js';
 
 export default function OperationsSidebar() {
@@ -22,7 +23,7 @@ export default function OperationsSidebar() {
                     대상 선택
                   </span>
                   <span className="status-tag state-tag" id="device-state" hidden>
-                    ● 정상
+                    <Circle size={10} aria-hidden="true" /> 정상
                   </span>
                 </div>
                 <h3 id="device-title">층 또는 설비를 선택하세요</h3>
@@ -31,7 +32,9 @@ export default function OperationsSidebar() {
               <div className="device-grid" id="device-grid"></div>
               <button className="asset-detail-trigger" id="open-asset-modal" type="button" disabled>
                 <span>설비를 선택하면 상세 보기</span>
-                <span>↗</span>
+                <span>
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </span>
               </button>
             </div>
           </section>
@@ -199,6 +202,7 @@ export default function OperationsSidebar() {
                 AI 운영 요원<small>시설 및 운영 정보 안내</small>
               </span>
               <span id="agent-quick-count">대기 중</span>
+              <ChevronDown className="agent-expand-icon" size={14} aria-hidden="true" />
             </summary>
             <div className="agent-shortcuts" id="agent-shortcuts" aria-label="AI 담당자 선택"></div>
             <div className="agent-human-loading" id="agent-human-loading" hidden aria-live="polite">

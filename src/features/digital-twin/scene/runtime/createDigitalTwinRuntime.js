@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars -- legacy geometry helpers are retained during modular migration */
 import * as THREE from 'three';
+import { iconMarkup } from '../../components/iconMarkup.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -3586,7 +3587,7 @@ export function initDigitalTwin(root) {
         busy = agentIsBusy(agent);
       return `<div class="section-overline">AI 운영 요원 / ${esc(asset.id)}</div><h3 class="detail-title">${esc(asset.name)}</h3><p class="detail-summary">${esc(agent.intro)}</p>
   ${infoRow('담당 구역', esc(agent.area))}${infoRow('업무 상태', esc(agentWorkTitle(agent)))}${infoRow('관련 경보', agentRelatedIncidents(agent).length + '건')}
-  <div class="section-label">에이전트 운영</div><button class="inspect-back" data-open-agent-modal="${asset.id}">AI 에이전트 상세 보기 →</button>`;
+  <div class="section-label">에이전트 운영</div><button class="inspect-back" data-open-agent-modal="${asset.id}">AI 에이전트 상세 보기 ${iconMarkup('ArrowRight')}</button>`;
     }
     const state = getAssetStatus(asset),
       sensor = getSensor(asset),
@@ -3628,7 +3629,7 @@ export function initDigitalTwin(root) {
       ],
     };
     const specialMarkup = primaryIncident
-      ? `<div class="section-label">시나리오별 이상 지표 <small>모의 진단값</small></div><div class="scenario-metric-pair">${(specialMetrics[primaryIncident.scenario.id] || []).map(([label, value]) => `<div><span>${label}</span><strong>${value}</strong></div>`).join('')}</div><button class="inspect-back" data-open-scenario="${primaryIncident.scenario.id}">장애 대응 단계 보기 →</button>`
+      ? `<div class="section-label">시나리오별 이상 지표 <small>모의 진단값</small></div><div class="scenario-metric-pair">${(specialMetrics[primaryIncident.scenario.id] || []).map(([label, value]) => `<div><span>${label}</span><strong>${value}</strong></div>`).join('')}</div><button class="inspect-back" data-open-scenario="${primaryIncident.scenario.id}">장애 대응 단계 보기 ${iconMarkup('ArrowRight')}</button>`
       : '';
     const works = relatedIssues.length
       ? relatedIssues.map(x => [
@@ -3641,7 +3642,7 @@ export function initDigitalTwin(root) {
           ['정기 점검', '예정된 작업 없음', ''],
         ];
     return `<div class="inspect-media"><span class="media-code">${asset.type.includes('GPU') ? 'GPU' : asset.type.includes('COOL') ? 'CDU' : 'DC'}</span><span class="media-text">KNU AIDC / 설비 점검</span></div>
- <button class="inspect-back" data-focus-zone="${asset.floor ? 'f' + asset.floor[0] : asset.zone}">← ${asset.floor ? asset.floor + ' 층별 정보' : '시설 정보'}로 돌아가기</button>
+ <button class="inspect-back" data-focus-zone="${asset.floor ? 'f' + asset.floor[0] : asset.zone}">${iconMarkup('ArrowLeft')} ${asset.floor ? asset.floor + ' 층별 정보' : '시설 정보'}로 돌아가기</button>
  <div class="section-overline">${assetTypeLabel(asset.type)} / ${asset.id}</div><h3 class="detail-title">${asset.name}</h3><p class="detail-summary">${asset.summary || ''}</p>${statusHtml(state)}
  <div class="section-label">장비 정보</div>
  ${infoRow('자산 ID', asset.id)}${infoRow('설치 층', asset.floor || '별도 지원 시설')}${infoRow('설치 위치', asset.location)}${infoRow('운영 상태', state)}
@@ -3687,7 +3688,7 @@ export function initDigitalTwin(root) {
     const cctv = ids.filter(a => a.type === 'CCTV CAMERA');
     const cctvMarkup =
       (data.floor || zone === 'power' || zone === 'cooling') && cctv.length
-        ? `<div class="section-label">보안 CCTV <small>${cctv.length}대 · 클릭해서 위치로 이동</small></div><div class="asset-pick-list">${cctv.map(a => `<button data-focus-id="${a.id}"><span class="asset-indicator"></span><span><strong>${a.name}</strong><small>${a.location}</small></span><b>↗</b></button>`).join('')}</div>`
+        ? `<div class="section-label">보안 CCTV <small>${cctv.length}대 · 클릭해서 위치로 이동</small></div><div class="asset-pick-list">${cctv.map(a => `<button data-focus-id="${a.id}"><span class="asset-indicator"></span><span><strong>${a.name}</strong><small>${a.location}</small></span><b>${iconMarkup('ArrowUpRight')}</b></button>`).join('')}</div>`
         : '';
     const assetMarkup = ids.length
       ? `<div class="section-label">주요 설비 <small>${ids.length}개 / 클릭하여 이동</small></div><div class="asset-pick-list">${ids
@@ -3696,7 +3697,7 @@ export function initDigitalTwin(root) {
           .slice(0, 12)
           .map(
             a =>
-              `<button data-focus-id="${a.id}"><span class="asset-indicator ${getAssetStatus(a) !== '정상' ? 'fault' : ''}"></span><span><strong>${a.name}</strong><small>${a.floor ? `${a.floor} · ` : ''}${a.id}</small></span><b>↗</b></button>`
+              `<button data-focus-id="${a.id}"><span class="asset-indicator ${getAssetStatus(a) !== '정상' ? 'fault' : ''}"></span><span><strong>${a.name}</strong><small>${a.floor ? `${a.floor} · ` : ''}${a.id}</small></span><b>${iconMarkup('ArrowUpRight')}</b></button>`
           )
           .join('')}</div>`
       : '';
@@ -3705,7 +3706,7 @@ export function initDigitalTwin(root) {
  <div class="section-label">시설 정보 <small>전체 현황</small></div>${infoRow('구역', data.level)}${infoRow('등록된 설비', `${ids.length}개`)}${infoRow('주의 / 장애', `${faultCount}건`)}
  ${floorMarkup}
  ${data.floor ? '<div class="section-label">공간 구획 <small>출입구 · 파티션 · 설비 배치</small></div><p class="detail-summary">' + ({ '1F': '보안·반입·예비품 분리 / 후면 MDF·유지보수 출입구', '2F': '서버홀 A/B 차폐 / 전면 점검 공간과 출입 갤러리', '3F': '공랭·액체냉각·CDU 3구역 / 별도 CDU 출입구', '4F': 'NOC·SOC 방음 구획 / 중앙 복도와 독립 지원실' }[data.floor] || '층별 출입구와 설비 구획') + '</p>' : ''}
- ${zone === 'f4' ? '<button class="inspect-back" data-focus-zone="noc">4F 통합 관제실 상세 보기 →</button>' : ''}
+ ${zone === 'f4' ? '<button class="inspect-back" data-focus-zone="noc">4F 통합 관제실 상세 보기 ' + iconMarkup('ArrowRight') + '</button>' : ''}
  <div class="section-label">운영 지표 <small>모의 수치</small></div><div class="metric-grid">
  <div class="small-metric"><span>평균 온도</span><strong>${(data.temp + (data.floor === '3F' && incidentCountForFloor('3F') ? 1.8 : 0)).toFixed(1)}</strong><small>°C</small></div>
  <div class="small-metric"><span>참고 부하</span><strong>${data.power.toFixed(1)}</strong><small>kW</small></div></div>
@@ -4650,7 +4651,8 @@ export function initDigitalTwin(root) {
     state.hidden = !hasSelection;
     state.classList.toggle('warning', status === '주의');
     state.classList.toggle('alert-state', severityRank(status) === 3);
-    state.textContent = status === '정상' ? '● 정상' : status === '주의' ? '● 주의' : '● 장애';
+    state.innerHTML =
+      iconMarkup('Circle') + (status === '정상' ? '정상' : status === '주의' ? '주의' : '장애');
     const sensor = activeAsset ? getSensor(activeAsset) : null;
     const sum = group.reduce((v, a) => v + getSensor(a).power, 0);
     const metrics = !hasSelection
@@ -4732,7 +4734,7 @@ export function initDigitalTwin(root) {
       $('#device-title').textContent = agent.name;
       $('#device-location').textContent = agent.area;
       $('#device-id-short').textContent = agent.id;
-      $('#device-state').textContent = busy ? '● 점검 중' : '● 대기';
+      $('#device-state').innerHTML = iconMarkup('Circle') + (busy ? '점검 중' : '대기');
       $('#device-state').classList.toggle('warning', busy);
       $('#device-state').classList.remove('alert-state');
       $('#device-grid').innerHTML = [
