@@ -393,3 +393,100 @@
 .notifications-panel .alarm-item[data-scenario-focus] {
   cursor: pointer;
 }
+
+.asset-trend-chart {
+  width: 100%;
+  min-width: 0;
+  height: 180px;
+  margin-top: 10px;
+}
+
+.asset-trend-chart .recharts-tooltip-wrapper {
+  z-index: 1;
+}
+
+/* One status treatment across navigation, detail panels and notifications. */
+.digital-twin-root
+  :is(
+    .health,
+    .status-tag,
+    .state-pill,
+    .infra-state,
+    .asset-modal-label,
+    #agent-modal-status,
+    #agent-quick-count,
+    .alarm-severity
+  ) {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #73e1c0;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.digital-twin-root
+  :is(
+    .health,
+    .status-tag,
+    .state-pill,
+    .infra-state,
+    .asset-modal-label,
+    #agent-modal-status,
+    #agent-quick-count,
+    .alarm-severity
+  )::before {
+  content: '';
+  display: inline-block;
+  flex: none;
+  width: 5px;
+  height: 5px;
+  margin: 0;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: none;
+}
+
+.digital-twin-root .state-tag .lucide {
+  display: none;
+}
+
+.digital-twin-root
+  :is(
+    .health.warn,
+    .status-tag.warning,
+    .state-pill.warning,
+    .infra-state.warning,
+    .asset-modal-label.warning,
+    .asset-modal-label.is-warning,
+    #agent-modal-status.busy
+  ) {
+  color: #eac476;
+}
+
+.digital-twin-root
+  :is(
+    .health.error,
+    .state-tag.alert-state,
+    .state-pill.danger,
+    .infra-state.fault,
+    .asset-modal-label.is-critical
+  ) {
+  color: #ff8188;
+}
+
+.digital-twin-root .health.error::before {
+  background: currentColor;
+}
+
+.digital-twin-root .alarm-severity {
+  color: var(--severity, #73e1c0);
+}

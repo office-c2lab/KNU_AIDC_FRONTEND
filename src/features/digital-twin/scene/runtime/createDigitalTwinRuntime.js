@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars -- legacy geometry helpers are retained during modular migration */
 import * as THREE from 'three';
 import { iconMarkup } from '../../components/iconMarkup.js';
+import { createAssetTrendData } from '../../createAssetTrendData.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -3887,35 +3888,6 @@ export function initDigitalTwin(root) {
     modalPreviewCamera.aspect = w / h;
     modalPreviewCamera.updateProjectionMatrix();
   }
-  function assetTrendSVG(asset, kind) {
-    const sensor = getSensor(asset);
-    const isTemp = kind === 'temp';
-    const base = isTemp ? sensor.temp : sensor.power;
-    const seed = [...asset.id].reduce((n, ch) => n + ch.charCodeAt(0), 0);
-    const amp = isTemp ? Math.max(0.28, base * 0.013) : Math.max(0.07, base * 0.04);
-    const values = Array.from({ length: 17 }, (_, i) =>
-      Math.max(
-        0,
-        base +
-          Math.sin(i * 0.57 + seed * 0.31) * amp * 0.64 +
-          Math.sin(i * 0.23 + seed) * amp * 0.35 +
-          (i - 16) * amp * 0.012
-      )
-    );
-    values[16] = base;
-    let lower = Math.min(...values) - amp * 0.8,
-      upper = Math.max(...values) + amp * 0.8;
-    if (upper <= lower) upper = lower + 1;
-    const scaleY = v => 13 + ((upper - v) / (upper - lower)) * 129;
-    const points = values.map((v, i) => `${(28 + i * 19.0).toFixed(1)},${scaleY(v).toFixed(1)}`);
-    const color = isTemp ? '#79d6fb' : '#6ce0c2';
-    const guid = isTemp ? 'assetChartTemp' : 'assetChartPower';
-    const textValue = v => v.toFixed(1);
-    return `<defs><linearGradient id="${guid}Fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="${color}" stop-opacity=".30"/><stop offset="1" stop-color="${color}" stop-opacity=".01"/></linearGradient></defs>
- <g>${[16, 55, 95, 135].map(y => `<path class="chart-grid" d="M28 ${y} H339"/>`).join('')}${[28, 104, 180, 256, 332].map(x => `<path class="chart-grid" d="M${x} 9 V144"/>`).join('')}</g>
- <path d="M${points.join(' L')} L332 143 L28 143Z" fill="url(#${guid}Fill)"/><polyline points="${points.join(' ')}" fill="none" stroke="${color}" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="332" cy="${scaleY(base).toFixed(1)}" r="3.4" fill="#ecfaff" stroke="${color}" stroke-width="1.5"/>
- <text x="3" y="18">${textValue(upper)}</text><text x="3" y="137">${textValue(lower)}</text><text x="27" y="164">−60분</text><text x="173" y="164">−30분</text><text x="310" y="164">현재</text>`;
-  }
   function updateAssetModal() {
     if (!assetModalId) return;
     const asset = registry.get(assetModalId);
@@ -3927,6 +3899,7 @@ export function initDigitalTwin(root) {
       ? 'KNU AIDC / AI 운영 요원'
       : 'KNU AIDC / 설비 점검';
     if (isAgent) {
+      twinActions.setAssetDetail(null);
       updateAgentModal(asset);
       return;
     }
@@ -3958,8 +3931,13 @@ export function initDigitalTwin(root) {
     $('#asset-modal-power').innerHTML = `${sensor.power.toFixed(1)}<small>kW</small>`;
     $('#asset-modal-util').innerHTML = `${util.toFixed(0)}<small>%</small>`;
     $('#asset-modal-util-bar').style.width = util + '%';
-    $('#asset-modal-temp-chart').innerHTML = assetTrendSVG(asset, 'temp');
-    $('#asset-modal-power-chart').innerHTML = assetTrendSVG(asset, 'power');
+    twinActions.setAssetDetail({
+      id: asset.id,
+      name: asset.name,
+      temp: sensor.temp,
+      power: sensor.power,
+      trend: createAssetTrendData(asset.id, sensor),
+    });
     const events = issues.length
       ? issues.map(issue => [
           issue.primary ? issue.scenario.title : issue.reason,
@@ -4016,6 +3994,7 @@ export function initDigitalTwin(root) {
   function closeAssetModal() {
     if (!assetModalId) return;
     assetModalId = null;
+    twinActions.setAssetDetail(null);
     $('#asset-modal').hidden = true;
     if (modalPreviewMount) modalPreviewMount.clear();
     modalPreviewHumanMixer = null;
@@ -5430,6 +5409,7 @@ export function initDigitalTwin(root) {
 
   return () => {
     disposed = true;
+    twinActions.setAssetDetail(null);
     window.cancelAnimationFrame(animationFrameId);
     window.removeEventListener('keydown', handleGlobalKeydown);
     window.removeEventListener('resize', resize);

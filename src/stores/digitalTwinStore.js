@@ -14,6 +14,7 @@ const initialState = {
   selectedIncidentId: null,
   incidents: [],
   notificationsOpen: false,
+  assetDetail: null,
 };
 
 export const useDigitalTwinStore = create(set => ({
@@ -21,6 +22,7 @@ export const useDigitalTwinStore = create(set => ({
 
   setNavigation: navigation => set(navigation),
   setNotificationsOpen: notificationsOpen => set({ notificationsOpen }),
+  setAssetDetail: assetDetail => set({ assetDetail }),
   setSplitLevel: splitLevel =>
     set({ splitLevel: Math.max(0, Math.min(2, Math.trunc(splitLevel))) }),
   selectVisualization: (mode, forceOn = false) =>

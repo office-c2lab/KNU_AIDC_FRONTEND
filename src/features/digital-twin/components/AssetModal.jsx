@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import AssetTrendChart from './AssetTrendChart.jsx';
 
 export default function AssetModal() {
   return (
@@ -144,28 +145,14 @@ export default function AssetModal() {
                     <strong>온도 변화 추세</strong>
                     <small>최근 60분</small>
                   </div>
-                  <svg
-                    id="asset-modal-temp-chart"
-                    className="asset-modal-chart"
-                    viewBox="0 0 350 175"
-                    preserveAspectRatio="none"
-                    role="img"
-                    aria-label="온도 변화 그래프"
-                  ></svg>
+                  <AssetTrendChart kind="temp" />
                 </section>
                 <section className="asset-modal-card asset-chart-card">
                   <div className="asset-chart-title">
                     <strong>소비 전력 추세</strong>
                     <small>최근 60분</small>
                   </div>
-                  <svg
-                    id="asset-modal-power-chart"
-                    className="asset-modal-chart"
-                    viewBox="0 0 350 175"
-                    preserveAspectRatio="none"
-                    role="img"
-                    aria-label="소비 전력 변화 그래프"
-                  ></svg>
+                  <AssetTrendChart kind="power" />
                 </section>
                 <section className="asset-modal-card asset-modal-note">
                   <h3>설비 점검 · 관련 이벤트</h3>
