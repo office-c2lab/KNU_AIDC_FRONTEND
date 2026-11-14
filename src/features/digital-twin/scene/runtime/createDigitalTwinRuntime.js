@@ -3417,6 +3417,22 @@ export function initDigitalTwin(root) {
   );
 
   const initialRegistryCount = registry.size;
+  twinActions.setAssetCatalog(
+    [...registry.values()]
+      .filter(asset => asset.type !== 'AI AGENT')
+      .map(asset => ({
+        id: asset.id,
+        name: asset.name,
+        type: asset.type,
+        floor: asset.floor,
+        zone: asset.zone,
+        location: asset.location,
+        temp: asset.temp,
+        power: asset.power,
+        capacity: asset.capacity,
+        summary: asset.summary,
+      }))
+  );
   // A monitor wall's mesh root is floor-centered; its visible body lives at a specific wall coordinate.
   function assetWorldPoint(asset) {
     asset.root.updateWorldMatrix(true, false);

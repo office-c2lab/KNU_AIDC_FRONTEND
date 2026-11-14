@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { DEFAULT_ASSET_CATALOG } from '../features/digital-twin/scene/config/assetCatalog.js';
 
 const initialState = {
   activeZone: 'overview',
@@ -13,7 +14,13 @@ const initialState = {
   chosenScenarioId: 'gpu',
   selectedIncidentId: null,
   incidents: [],
-  assetSummary: { total: 0, normal: 0, warning: 0, fault: 0 },
+  assetSummary: {
+    total: DEFAULT_ASSET_CATALOG.length,
+    normal: DEFAULT_ASSET_CATALOG.length,
+    warning: 0,
+    fault: 0,
+  },
+  assetCatalog: DEFAULT_ASSET_CATALOG.map(asset => ({ ...asset })),
   auditEvents: [],
   notificationsOpen: false,
   assetDetail: null,
@@ -53,6 +60,7 @@ export const useDigitalTwinStore = create(set => ({
   setScenarioState: scenario => set(scenario),
   setIncidents: incidents => set({ incidents: incidents.map(incident => ({ ...incident })) }),
   setAssetSummary: assetSummary => set({ assetSummary: { ...assetSummary } }),
+  setAssetCatalog: assetCatalog => set({ assetCatalog: assetCatalog.map(asset => ({ ...asset })) }),
   addAuditEvent: event =>
     set(state => ({
       auditEvents: [
@@ -131,6 +139,7 @@ export const useDigitalTwinStore = create(set => ({
       incidents: [],
       auditEvents: [],
       assetSummary: { ...initialState.assetSummary },
+      assetCatalog: initialState.assetCatalog.map(asset => ({ ...asset })),
     }),
 }));
 

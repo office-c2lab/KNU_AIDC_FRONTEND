@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, CircleGauge, RotateCcw, Server, X } from 'lucide-react';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
@@ -6,25 +6,41 @@ import '../features/dashboard/dashboard.css';
 
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
 const steps = ['감지', '확인', '원인 분석', '복구 조치', '정상 확인'];
-
-function formatDelta(value, suffix) {
-  const numeric = Number(value) || 0;
-  return `${numeric > 0 ? '+' : ''}${numeric}${suffix}`;
-}
+const facilityGroups = [
+  { id: '4F', name: '통합 관제층', matches: asset => asset.floor === '4F' },
+  { id: '3F', name: 'AI / GPU 전산층', matches: asset => asset.floor === '3F' },
+  { id: '2F', name: '일반 서버 전산층', matches: asset => asset.floor === '2F' },
+  { id: '1F', name: '보안·통신·장비 반입', matches: asset => asset.floor === '1F' },
+  { id: 'P', name: '전력 설비동', matches: asset => !asset.floor && asset.zone === 'power' },
+  { id: 'C', name: '냉각 설비동', matches: asset => !asset.floor && asset.zone === 'cooling' },
+];
 
 export default function DashboardPage() {
   const incidents = useDigitalTwinStore(state => state.incidents);
   const chosenScenarioId = useDigitalTwinStore(state => state.chosenScenarioId);
   const assetSummary = useDigitalTwinStore(state => state.assetSummary);
-  const auditEvents = useDigitalTwinStore(state => state.auditEvents);
+  const assetCatalog = useDigitalTwinStore(state => state.assetCatalog);
   const setScenarioState = useDigitalTwinStore(state => state.setScenarioState);
   const runIncident = useDigitalTwinStore(state => state.runIncident);
   const endIncident = useDigitalTwinStore(state => state.endIncident);
   const resetIncidents = useDigitalTwinStore(state => state.resetIncidents);
   const selectVisualization = useDigitalTwinStore(state => state.selectVisualization);
 
-  const selected = scenarioById.get(chosenScenarioId) ?? SCENARIOS[0];
-  const selectedIncident = incidents.find(incident => incident.id === selected.id);
+  const [selectedFacilityId, setSelectedFacilityId] = useState('3F');
+  const [selectedAssetId, setSelectedAssetId] = useState(
+    () => scenarioById.get(chosenScenarioId)?.asset ?? null
+  );
+  const selectedFacility = facilityGroups.find(group => group.id === selectedFacilityId);
+  const facilityAssets = useMemo(
+    () => assetCatalog.filter(asset => selectedFacility?.matches(asset)),
+    [assetCatalog, selectedFacility]
+  );
+  const selectedAsset =
+    assetCatalog.find(asset => asset.id === selectedAssetId) ?? facilityAssets[0];
+  const selected = SCENARIOS.find(scenario => scenario.asset === selectedAsset?.id) ?? null;
+  const selectedIncident = selected
+    ? incidents.find(incident => incident.id === selected.id)
+    : null;
   const runningIds = useMemo(() => new Set(incidents.map(incident => incident.id)), [incidents]);
 
   const liveSummary = useMemo(() => {
@@ -48,25 +64,35 @@ export default function DashboardPage() {
   }, [assetSummary.total, incidents]);
 
   const startSelectedScenario = () => {
+    if (!selected) return;
     runIncident(selected.id);
     if (['thermal', 'power', 'coolant'].includes(selected.mode)) {
       selectVisualization(selected.mode, true);
     }
   };
 
+  const selectedAssetState = useMemo(() => {
+    if (!selectedAsset) return '연동 대기';
+    for (const incident of incidents) {
+      const scenario = scenarioById.get(incident.id);
+      if (scenario?.asset === selectedAsset.id) return scenario.status;
+    }
+    for (const incident of incidents) {
+      const scenario = scenarioById.get(incident.id);
+      const related = scenario?.related.find(asset => asset.id === selectedAsset.id);
+      if (related) return related.state;
+    }
+    return '정상';
+  }, [incidents, selectedAsset]);
+
+  const selectAsset = asset => {
+    setSelectedAssetId(asset.id);
+    const scenario = SCENARIOS.find(item => item.asset === asset.id);
+    if (scenario) setScenarioState({ chosenScenarioId: scenario.id });
+  };
+
   return (
     <main className="dashboard-main">
-      <div className="dashboard-heading">
-        <div>
-          <span>SCENARIO CONTROL CENTER</span>
-          <h1>가상 장애 시나리오 제어</h1>
-          <p>대상 장비를 선택해 장애를 발생시키고 상태 변화와 대응 현황을 확인합니다.</p>
-        </div>
-        <div className="dashboard-live">
-          <i /> 실시간 연동
-        </div>
-      </div>
-
       <section className="status-overview" aria-labelledby="overview-heading">
         <h2 id="overview-heading" className="sr-only">
           전체 운영 현황
@@ -109,63 +135,107 @@ export default function DashboardPage() {
         <section className="dashboard-panel scenario-control" aria-labelledby="scenario-heading">
           <header className="dashboard-panel-heading">
             <div>
-              <span>SCENARIO CONTROL</span>
-              <h2 id="scenario-heading">시나리오 제어</h2>
+              <span>FACILITY CONTROL</span>
+              <h2 id="scenario-heading">시설·장비 제어</h2>
             </div>
-            <b>{SCENARIOS.length}종</b>
+            <b>{assetCatalog.length || '연동 대기'}개 설비</b>
           </header>
           <div className="scenario-dashboard-list">
-            {SCENARIOS.map(scenario => (
-              <button
-                type="button"
-                key={scenario.id}
-                className={`${selected.id === scenario.id ? 'selected' : ''}${runningIds.has(scenario.id) ? ' running' : ''}`}
-                onClick={() => setScenarioState({ chosenScenarioId: scenario.id })}
-              >
-                <i />
-                <span>
-                  <strong>{scenario.title}</strong>
-                  <small>
-                    {scenario.asset} · {scenario.category}
-                  </small>
-                </span>
-                <em>{runningIds.has(scenario.id) ? '진행 중' : scenario.level}</em>
-              </button>
-            ))}
+            <nav className="facility-control-tabs" aria-label="층 및 지원 시설">
+              {facilityGroups.map(group => {
+                const count = assetCatalog.filter(asset => group.matches(asset)).length;
+                return (
+                  <button
+                    type="button"
+                    key={group.id}
+                    className={selectedFacilityId === group.id ? 'active' : ''}
+                    aria-pressed={selectedFacilityId === group.id}
+                    onClick={() => setSelectedFacilityId(group.id)}
+                  >
+                    <b>{group.id}</b>
+                    <span>{group.name}</span>
+                    <small>{count}</small>
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="facility-asset-heading">
+              <div>
+                <b>{selectedFacility?.id}</b>
+                <span>{selectedFacility?.name}</span>
+              </div>
+              <small>{facilityAssets.length}개 설비</small>
+            </div>
+            <div className="scenario-facility-assets">
+              {facilityAssets.length ? (
+                facilityAssets.map(asset => {
+                  const scenario = SCENARIOS.find(item => item.asset === asset.id);
+                  const running = scenario && runningIds.has(scenario.id);
+                  return (
+                    <button
+                      type="button"
+                      key={asset.id}
+                      className={`${selectedAsset?.id === asset.id ? 'selected' : ''}${running ? ' running' : ''}`}
+                      onClick={() => selectAsset(asset)}
+                    >
+                      <i />
+                      <span>
+                        <strong>{asset.id}</strong>
+                        <small>{asset.name || asset.type}</small>
+                      </span>
+                      <em>{running ? '장애' : scenario ? '제어 가능' : '정상'}</em>
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="dashboard-empty">디지털 트윈 설비 정보를 불러오는 중입니다.</p>
+              )}
+            </div>
           </div>
           <div className="selected-scenario">
             <div className="selected-scenario-title">
               <div>
-                <small>
-                  {selected.category} / {selected.asset}
-                </small>
-                <h3>{selected.title}</h3>
+                <small>{selectedAsset?.type ?? '설비를 선택하세요'}</small>
+                <h3>{selectedAsset?.id ?? '설비 연동 대기'}</h3>
               </div>
-              <span className={selected.level === '긴급' ? 'critical' : ''}>{selected.level}</span>
+              <span className={selectedAssetState !== '정상' ? 'critical' : ''}>
+                {selectedAssetState}
+              </span>
             </div>
-            <p>{selected.condition}</p>
+            <p>{selectedAsset?.summary ?? '디지털 트윈 화면에서 설비 정보를 먼저 불러오세요.'}</p>
             <dl>
               <div>
-                <dt>예상 영향</dt>
-                <dd>{selected.impact}</dd>
+                <dt>설치 위치</dt>
+                <dd>{selectedAsset?.location ?? '—'}</dd>
               </div>
               <div>
-                <dt>점검 방향</dt>
-                <dd>{selected.cause}</dd>
+                <dt>설비 유형</dt>
+                <dd>{selectedAsset?.type ?? '—'}</dd>
               </div>
             </dl>
-            {selectedIncident ? (
-              <button
-                type="button"
-                className="scenario-action stop"
-                onClick={() => endIncident(selected.id)}
-              >
-                시나리오 종료
-              </button>
+            {selected ? (
+              <div className="asset-control-scenario">
+                <small>실행 가능한 시나리오</small>
+                <strong>{selected.title}</strong>
+                <p>{selected.condition}</p>
+                {selectedIncident ? (
+                  <button
+                    type="button"
+                    className="scenario-action stop"
+                    onClick={() => endIncident(selected.id)}
+                  >
+                    시나리오 종료
+                  </button>
+                ) : (
+                  <button type="button" className="scenario-action" onClick={startSelectedScenario}>
+                    가상 장애 발생
+                  </button>
+                )}
+              </div>
             ) : (
-              <button type="button" className="scenario-action" onClick={startSelectedScenario}>
-                가상 장애 발생
-              </button>
+              <div className="asset-control-unavailable">
+                이 설비에는 실행 가능한 가상 장애 시나리오가 등록되어 있지 않습니다.
+              </div>
             )}
           </div>
         </section>
@@ -177,30 +247,41 @@ export default function DashboardPage() {
                 <span>LIVE STATUS</span>
                 <h2 id="live-heading">실시간 상태 확인</h2>
               </div>
-              <b className={selectedIncident ? 'is-fault' : ''}>
-                {selectedIncident ? selected.status : '대기'}
+              <b className={selectedAssetState !== '정상' ? 'is-fault' : ''}>
+                {selectedAssetState}
               </b>
             </header>
             <div className="live-device">
               <div>
                 <small>선택 장비</small>
-                <strong>{selected.asset}</strong>
+                <strong>{selectedAsset?.id ?? '—'}</strong>
               </div>
-              <span>{selected.category}</span>
+              <span>{selectedAsset?.name ?? '설비 연동 대기'}</span>
             </div>
             <div className="live-metrics">
               <div>
-                <span>온도 변화</span>
-                <strong>{selectedIncident ? formatDelta(selected.temp, '°C') : '0°C'}</strong>
+                <span>현재 온도</span>
+                <strong>
+                  {selectedAsset
+                    ? `${((selectedAsset.temp || 0) + (selectedIncident ? selected.temp : 0)).toFixed(1)}°C`
+                    : '—'}
+                </strong>
               </div>
               <div>
-                <span>부하 변화</span>
-                <strong>{selectedIncident ? formatDelta(selected.power, '') : '0'}</strong>
+                <span>현재 부하</span>
+                <strong>
+                  {selectedAsset
+                    ? Math.max(
+                        0,
+                        (selectedAsset.power || 0) + (selectedIncident ? selected.power : 0)
+                      ).toFixed(2)
+                    : '—'}
+                </strong>
               </div>
               <div>
                 <span>장비 상태</span>
-                <strong className={selectedIncident ? 'fault-text' : ''}>
-                  {selectedIncident ? selected.status : '정상'}
+                <strong className={selectedAssetState !== '정상' ? 'fault-text' : ''}>
+                  {selectedAssetState}
                 </strong>
               </div>
             </div>
@@ -256,51 +337,6 @@ export default function DashboardPage() {
           </section>
         </div>
       </div>
-
-      <section className="dashboard-panel event-log" aria-labelledby="event-heading">
-        <header className="dashboard-panel-heading">
-          <div>
-            <span>EVENT HISTORY</span>
-            <h2 id="event-heading">이벤트 이력</h2>
-          </div>
-          <b>최근 {Math.min(auditEvents.length, 12)}건</b>
-        </header>
-        <div className="event-table" role="table">
-          <div className="event-table-head" role="row">
-            <span>시간</span>
-            <span>사용자</span>
-            <span>대상 장비</span>
-            <span>이벤트</span>
-            <span>상태</span>
-          </div>
-          {auditEvents.length ? (
-            auditEvents.slice(0, 12).map(event => {
-              const scenario = scenarioById.get(event.scenarioId);
-              return (
-                <div className="event-table-row" role="row" key={event.id}>
-                  <time>
-                    {new Intl.DateTimeFormat('ko-KR', {
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                    }).format(new Date(event.timestamp))}
-                  </time>
-                  <span>{event.actor}</span>
-                  <strong>{scenario?.asset ?? '전체 시설'}</strong>
-                  <span>{event.action ?? event.message}</span>
-                  <em className={event.kind}>
-                    {event.kind === 'danger' ? '장애' : event.kind === 'success' ? '완료' : '정보'}
-                  </em>
-                </div>
-              );
-            })
-          ) : (
-            <p className="dashboard-empty">기록된 이벤트가 없습니다.</p>
-          )}
-        </div>
-      </section>
     </main>
   );
 }
