@@ -106,6 +106,11 @@ export function createHumanModelLoader(context) {
       layout = { height: dimensions.y, center: center.clone(), minY: bounds.min.y };
       humanLayoutCache.set(avatarKey, layout);
     }
+    // Keep an untouched source for the detail renderer. Cloning the already mounted
+    // scene actor also copied reveal state, site heading and other runtime transforms.
+    agent.previewTemplate = gltf.scene;
+    agent.previewLayout = layout;
+    agent.previewClips = gltf.animations || [];
     // SkeletonUtils copies skinned bones correctly, unlike Object3D.clone(true).
     const human = cloneSkinnedModel(gltf.scene);
     const pivot = new THREE.Group();

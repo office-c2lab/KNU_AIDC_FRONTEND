@@ -3797,22 +3797,26 @@ export function initDigitalTwin(root) {
     modalPreviewDrawers = [];
     modalPreviewHumanMixer = null;
     // Clone only this asset's model — NOT the floor, partitions or all other racks.
-    const isRealHuman = asset.type === 'AI AGENT' && aiAgents.get(asset.id)?.realLoaded;
+    const agent = asset.type === 'AI AGENT' ? aiAgents.get(asset.id) : null;
+    const isRealHuman = Boolean(agent?.previewTemplate && agent?.previewLayout);
     // Keep the preview empty for roles without an approved model. In particular,
     // do not manufacture a procedural placeholder in the detail modal.
     if (asset.type === 'AI AGENT' && !isRealHuman) {
       resizeAssetPreview();
       return;
     }
-    const agent = isRealHuman ? aiAgents.get(asset.id) : null;
-    // Keep the complete agent root while cloning so SkeletonUtils can preserve every
-    // skinned-bone relationship. Scene-only marker objects are removed immediately below.
-    const device = isRealHuman ? cloneSkinnedModel(asset.root) : asset.root.clone(true);
+    let device;
     if (isRealHuman) {
-      device.getObjectByName('agent-ground-ring')?.removeFromParent();
-      device.getObjectByName('agent-alert-beacon')?.removeFromParent();
-      const direction = device.getObjectByName('agent-direction');
-      if (direction) direction.rotation.y = 0;
+      const human = cloneSkinnedModel(agent.previewTemplate);
+      const { height, center, minY } = agent.previewLayout;
+      const scale = 1.73 / height;
+      human.scale.setScalar(scale);
+      human.position.set(-center.x * scale, -minY * scale, -center.z * scale);
+      device = new THREE.Group();
+      device.name = 'agent-human-model';
+      device.add(human);
+    } else {
+      device = asset.root.clone(true);
     }
     // Engineering details are distance-culled in the main scene. The close-up modal
     // must show them even when the source is far from the main camera.
@@ -3827,12 +3831,6 @@ export function initDigitalTwin(root) {
           const sourceMaterials = Array.isArray(part.material) ? part.material : [part.material];
           const previewMaterials = sourceMaterials.map(material => {
             const previewMaterial = material.clone();
-            const revealState = agent.revealMaterials?.find(entry => entry.material === material);
-            if (revealState) {
-              previewMaterial.opacity = revealState.opacity;
-              previewMaterial.transparent = revealState.transparent;
-              previewMaterial.depthWrite = revealState.depthWrite;
-            }
             return previewMaterial;
           });
           part.material = Array.isArray(part.material) ? previewMaterials : previewMaterials[0];
@@ -3849,7 +3847,7 @@ export function initDigitalTwin(root) {
       const previewHuman = device.getObjectByName('agent-human-model');
       const model = previewHuman?.children[0];
       const idle =
-        agent.realClips?.find(c => /idle|stand|rest/i.test(c.name)) || agent.realClips?.[0];
+        agent.previewClips?.find(c => /idle|stand|rest/i.test(c.name)) || agent.previewClips?.[0];
       if (model && idle) {
         modalPreviewHumanMixer = new THREE.AnimationMixer(model);
         modalPreviewHumanMixer.clipAction(idle).play();
