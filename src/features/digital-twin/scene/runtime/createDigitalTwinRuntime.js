@@ -4932,13 +4932,6 @@ export function initDigitalTwin(root) {
     }
   });
   $('#btn-agent-visibility').addEventListener('click', twinActions.toggleAgentsVisible);
-  $('#agent-shortcuts').addEventListener('click', e => {
-    const item = e.target.closest('[data-agent-id]');
-    if (item) {
-      if (!agentsVisible) setAgentVisibility(true);
-      focusAsset(item.dataset.agentId);
-    }
-  });
   $('#btn-fit').addEventListener('click', () => setZone('overview'));
   $('#btn-auto').addEventListener('click', () => {
     twinActions.toggleAutoRotate();
