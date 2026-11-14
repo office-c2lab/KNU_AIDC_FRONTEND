@@ -38,6 +38,9 @@ export default function DashboardPage() {
   const selectedAsset =
     assetCatalog.find(asset => asset.id === selectedAssetId) ?? facilityAssets[0];
   const selected = SCENARIOS.find(scenario => scenario.asset === selectedAsset?.id) ?? null;
+  const controllableAssetCount = facilityAssets.filter(asset =>
+    SCENARIOS.some(scenario => scenario.asset === asset.id)
+  ).length;
   const selectedIncident = selected
     ? incidents.find(incident => incident.id === selected.id)
     : null;
@@ -166,6 +169,16 @@ export default function DashboardPage() {
               </div>
               <small>{facilityAssets.length}개 설비</small>
             </div>
+            <div className="facility-control-summary">
+              <span>
+                정상{' '}
+                {facilityAssets.length -
+                  incidents.filter(incident =>
+                    facilityAssets.some(asset => asset.id === scenarioById.get(incident.id)?.asset)
+                  ).length}
+              </span>
+              <span>시나리오 제어 {controllableAssetCount}</span>
+            </div>
             <div className="scenario-facility-assets">
               {facilityAssets.length ? (
                 facilityAssets.map(asset => {
@@ -212,12 +225,61 @@ export default function DashboardPage() {
                 <dt>설비 유형</dt>
                 <dd>{selectedAsset?.type ?? '—'}</dd>
               </div>
+              <div>
+                <dt>현재 온도</dt>
+                <dd>
+                  {selectedAsset
+                    ? `${((selectedAsset.temp || 0) + (selectedIncident ? selected.temp : 0)).toFixed(1)}°C`
+                    : '—'}
+                </dd>
+              </div>
+              <div>
+                <dt>현재 부하</dt>
+                <dd>
+                  {selectedAsset
+                    ? `${Math.max(0, (selectedAsset.power || 0) + (selectedIncident ? selected.power : 0)).toFixed(2)} kW`
+                    : '—'}
+                </dd>
+              </div>
+              <div>
+                <dt>운영 용량</dt>
+                <dd>{selectedAsset ? `${selectedAsset.capacity ?? 0}%` : '—'}</dd>
+              </div>
+              <div>
+                <dt>대응 단계</dt>
+                <dd>{selectedIncident ? steps[selectedIncident.stage] : '시나리오 미실행'}</dd>
+              </div>
             </dl>
             {selected ? (
               <div className="asset-control-scenario">
-                <small>실행 가능한 시나리오</small>
-                <strong>{selected.title}</strong>
+                <div className="asset-scenario-heading">
+                  <div>
+                    <small>실행 가능한 시나리오</small>
+                    <strong>{selected.title}</strong>
+                  </div>
+                  <span className={selected.level === '긴급' ? 'critical' : ''}>
+                    {selected.level}
+                  </span>
+                </div>
                 <p>{selected.condition}</p>
+                <dl className="scenario-brief">
+                  <div>
+                    <dt>예상 영향</dt>
+                    <dd>{selected.impact}</dd>
+                  </div>
+                  <div>
+                    <dt>점검 방향</dt>
+                    <dd>{selected.cause}</dd>
+                  </div>
+                </dl>
+                <div className="scenario-checks">
+                  <small>대응 체크포인트</small>
+                  <ol>
+                    {selected.checks.map(check => (
+                      <li key={check}>{check}</li>
+                    ))}
+                  </ol>
+                </div>
                 {selectedIncident ? (
                   <button
                     type="button"
@@ -241,56 +303,6 @@ export default function DashboardPage() {
         </section>
 
         <div className="dashboard-side-stack">
-          <section className="dashboard-panel live-status" aria-labelledby="live-heading">
-            <header className="dashboard-panel-heading">
-              <div>
-                <span>LIVE STATUS</span>
-                <h2 id="live-heading">실시간 상태 확인</h2>
-              </div>
-              <b className={selectedAssetState !== '정상' ? 'is-fault' : ''}>
-                {selectedAssetState}
-              </b>
-            </header>
-            <div className="live-device">
-              <div>
-                <small>선택 장비</small>
-                <strong>{selectedAsset?.id ?? '—'}</strong>
-              </div>
-              <span>{selectedAsset?.name ?? '설비 연동 대기'}</span>
-            </div>
-            <div className="live-metrics">
-              <div>
-                <span>현재 온도</span>
-                <strong>
-                  {selectedAsset
-                    ? `${((selectedAsset.temp || 0) + (selectedIncident ? selected.temp : 0)).toFixed(1)}°C`
-                    : '—'}
-                </strong>
-              </div>
-              <div>
-                <span>현재 부하</span>
-                <strong>
-                  {selectedAsset
-                    ? Math.max(
-                        0,
-                        (selectedAsset.power || 0) + (selectedIncident ? selected.power : 0)
-                      ).toFixed(2)
-                    : '—'}
-                </strong>
-              </div>
-              <div>
-                <span>장비 상태</span>
-                <strong className={selectedAssetState !== '정상' ? 'fault-text' : ''}>
-                  {selectedAssetState}
-                </strong>
-              </div>
-            </div>
-            <div className="status-progress">
-              <span>대응 단계</span>
-              <b>{selectedIncident ? steps[selectedIncident.stage] : '시나리오 미실행'}</b>
-            </div>
-          </section>
-
           <section className="dashboard-panel active-scenarios" aria-labelledby="active-heading">
             <header className="dashboard-panel-heading">
               <div>
