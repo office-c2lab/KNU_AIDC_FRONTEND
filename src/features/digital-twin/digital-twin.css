@@ -763,11 +763,11 @@ header .nav-item{font-size:12px}
 
 /* User-facing selection, notifications and operator directory. */
 .right-panel{border-radius:7px}
-.right-panel .agent-quicklist summary{justify-content:flex-start}
-.right-panel .agent-quicklist .agent-summary-copy{flex:1;font:650 11px system-ui,sans-serif;color:#e0f1ff}
-.right-panel .agent-summary-copy small{display:block;margin-top:5px;font-size:9px;font-weight:400;color:#91b4d6;letter-spacing:.4px}
-.right-panel #agent-quick-count{flex:none;color:#73e1c0;font-size:9px}
-.right-panel #agent-quick-count::before{content:'';display:inline-block;width:5px;height:5px;margin-right:6px;border-radius:50%;background:currentColor}
+.panel .agent-quicklist summary{justify-content:flex-start}
+.panel .agent-quicklist .agent-summary-copy{flex:1;font:650 11px system-ui,sans-serif;color:#e0f1ff}
+.panel .agent-summary-copy small{display:block;margin-top:5px;font-size:9px;font-weight:400;color:#91b4d6;letter-spacing:.4px}
+.panel #agent-quick-count{flex:none;color:#73e1c0;font-size:9px}
+.panel #agent-quick-count::before{content:'';display:inline-block;width:5px;height:5px;margin-right:6px;border-radius:50%;background:currentColor}
 .right-panel .device-head p{line-height:1.7}
 .right-panel .device-grid:empty{display:none}
 .right-panel [hidden]{display:none!important}

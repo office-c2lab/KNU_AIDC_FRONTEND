@@ -4268,8 +4268,9 @@ export function initDigitalTwin(root) {
   function renderIncidentOverlay() {
     const incidents = [...activeIncidents.values()];
     const overlay = $('#incident-overlay');
+    overlay.hidden = incidents.length === 0;
     if (!incidents.length) {
-      overlay.innerHTML = '<div class="overlay-healthy"><i></i> 현재 발생한 장애 없음</div>';
+      overlay.replaceChildren();
       overlay.classList.remove('has-incidents');
     } else {
       overlay.classList.add('has-incidents');

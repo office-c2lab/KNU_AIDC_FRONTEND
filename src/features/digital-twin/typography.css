@@ -194,7 +194,7 @@
   overflow-wrap: break-word;
 }
 
-.digital-twin-root .left-panel .power-row {
+.digital-twin-root .panel .power-row {
   min-height: 34px;
   font-size: var(--type-body);
 }
