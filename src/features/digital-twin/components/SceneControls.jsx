@@ -1,66 +1,69 @@
 import { House } from 'lucide-react';
+import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 
-const dockButton =
-  'dock-button flex h-8 items-center gap-2 border-0 border-r border-[#243e61] bg-transparent px-[13px] text-[#b1c9e5] transition hover:bg-[#102845] hover:text-[#e9f5ff]';
+const dockButton = 'dock-button';
 
 export default function SceneControls() {
+  const viewMode = useDigitalTwinStore(state => state.viewMode);
+  const utilities = useDigitalTwinStore(state => state.utilities);
+  const agentsVisible = useDigitalTwinStore(state => state.agentsVisible);
+
   return (
     <>
       <div id="incident-overlay" className="incident-overlay" aria-live="polite"></div>
-      <div className="center-status pointer-events-none fixed right-[calc(var(--right-w)+31px)] bottom-9 left-[calc(var(--left-w)+31px)] z-[18] flex justify-center">
-        <div
-          className="control-dock pointer-events-auto flex h-12 max-w-full items-center overflow-x-auto border border-[#6384b0a6] bg-[#101d34f5] px-2.5 shadow-[inset_0_1px_#a3c6f035,0_8px_24px_#030a1ca0]"
-          role="toolbar"
-          aria-label="데이터센터 3D 관제 도구"
-        >
-          <button type="button" className={dockButton} id="btn-fit" title="전체 시설 보기">
-            <House size={14} aria-hidden="true" />
-            <span>전체 시설</span>
-          </button>
-          <span className="dock-divider"></span>
-          <span className="dock-group-label">분석 모드</span>
-          <button
-            type="button"
-            className={`${dockButton} active`}
-            data-mode="normal"
-            title="일반 시각화"
-          >
-            일반
-          </button>
-          <button type="button" className={dockButton} data-mode="thermal" title="온도 분포 보기">
-            온도
-          </button>
-          <span className="dock-divider"></span>
-          <span className="dock-group-label">표시 레이어</span>
-          <button
-            type="button"
-            className={dockButton}
-            data-mode="power"
-            title="전력 A/B 계통을 켜거나 끕니다"
-            aria-label="전력 계통"
-            aria-pressed="false"
-          >
-            전력 꺼짐
-          </button>
-          <button
-            type="button"
-            className={dockButton}
-            data-mode="coolant"
-            title="냉수 공급·회수 계통을 켜거나 끕니다"
-            aria-label="냉각 계통"
-            aria-pressed="false"
-          >
-            냉각 꺼짐
-          </button>
-          <button
-            type="button"
-            className={`${dockButton} dock-agent active`}
-            id="btn-agent-visibility"
-            title="AI 운영 요원 표시 / 숨기기"
-            aria-pressed="true"
-          >
-            요원 켜짐
-          </button>
+      <div className="center-status">
+        <div className="control-dock" role="toolbar" aria-label="데이터센터 3D 관제 도구">
+          <div className="dock-group dock-home-group">
+            <button type="button" className={dockButton} id="btn-fit" title="전체 시설 보기">
+              <House size={14} aria-hidden="true" />
+              <span>전체 시설</span>
+            </button>
+          </div>
+
+          <div className="dock-group" role="group" aria-label="분석 모드">
+            <button
+              type="button"
+              className={`${dockButton}${viewMode === 'thermal' ? ' active' : ''}`}
+              data-mode="thermal"
+              aria-pressed={viewMode === 'thermal'}
+              title="온도 분포를 켜거나 끕니다"
+            >
+              온도
+            </button>
+          </div>
+
+          <div className="dock-group" role="group" aria-label="표시 레이어">
+            <button
+              type="button"
+              className={`${dockButton}${utilities.power ? ' active' : ''}`}
+              data-mode="power"
+              title="전력 A/B 계통을 켜거나 끕니다"
+              aria-pressed={utilities.power}
+            >
+              전력
+            </button>
+            <button
+              type="button"
+              className={`${dockButton}${utilities.coolant ? ' active' : ''}`}
+              data-mode="coolant"
+              title="냉수 공급·회수 계통을 켜거나 끕니다"
+              aria-pressed={utilities.coolant}
+            >
+              냉각
+            </button>
+          </div>
+
+          <div className="dock-group">
+            <button
+              type="button"
+              className={`${dockButton}${agentsVisible ? ' active' : ''}`}
+              id="btn-agent-visibility"
+              aria-pressed={agentsVisible}
+              title="AI 운영 요원을 표시하거나 숨깁니다"
+            >
+              에이전트
+            </button>
+          </div>
         </div>
       </div>
       <div id="floor-separation-hint" hidden></div>

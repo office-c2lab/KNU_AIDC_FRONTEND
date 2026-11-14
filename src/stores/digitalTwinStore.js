@@ -32,14 +32,10 @@ export const useDigitalTwinStore = create(set => ({
 
       if (mode === 'normal') {
         viewMode = 'normal';
-        utilities.power = false;
-        utilities.coolant = false;
       } else if (mode === 'thermal') {
         viewMode = forceOn ? 'thermal' : state.viewMode === 'thermal' ? 'normal' : 'thermal';
-        utilities.power = false;
-        utilities.coolant = false;
       } else if (mode === 'power' || mode === 'coolant') {
-        viewMode = 'normal';
+        viewMode = state.viewMode;
         utilities[mode] = forceOn ? true : !utilities[mode];
       } else {
         return state;

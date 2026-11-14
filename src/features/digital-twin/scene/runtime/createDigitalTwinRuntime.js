@@ -2707,7 +2707,6 @@ export function initDigitalTwin(root) {
     const btn = $('#btn-agent-visibility');
     btn.classList.toggle('active', agentsVisible);
     btn.setAttribute('aria-pressed', String(agentsVisible));
-    btn.textContent = agentsVisible ? '요원 켜짐' : '요원 꺼짐';
     if (!agentsVisible && selectedId && aiAgents.has(selectedId)) setZone(activeZone, null, false);
   }
 
@@ -4164,7 +4163,7 @@ export function initDigitalTwin(root) {
       const name = b.dataset.mode;
       const active =
         name === 'normal'
-          ? currentMode === 'normal' && !power && !cooling
+          ? currentMode === 'normal'
           : name === 'thermal'
             ? currentMode === 'thermal'
             : name === 'power'
@@ -4172,8 +4171,6 @@ export function initDigitalTwin(root) {
               : cooling;
       b.classList.toggle('active', active);
       b.setAttribute('aria-pressed', String(active));
-      if (name === 'power' || name === 'coolant')
-        b.textContent = `${name === 'power' ? '전력' : '냉각'} ${active ? '켜짐' : '꺼짐'}`;
     });
     for (const d of heatDisks) {
       const a = registry.get(d.entityId),

@@ -1,97 +1,175 @@
-import { House, ChevronRight, RotateCw, RotateCcw } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Check, ChevronDown, ChevronRight, House, RotateCcw, RotateCw } from 'lucide-react';
+import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 
-const chip =
-  'chip rounded-sm border border-[#375582] bg-[#12213d] px-2.5 py-[7px] text-[10px] font-semibold whitespace-nowrap text-[#a4bad6] shadow-[inset_0_1px_#9bcaff25] transition hover:border-[#76a6e0] hover:bg-[#243f68] hover:text-[#eff8ff]';
+const chip = 'chip control-menu-trigger';
+const menuItem = 'control-menu-item';
+
+function Menu({ id, label, summary, openMenu, setOpenMenu, children }) {
+  const isOpen = openMenu === id;
+
+  return (
+    <div className="control-menu">
+      <button
+        type="button"
+        className={`${chip}${isOpen ? ' active' : ''}`}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-controls={`${id}-menu`}
+        onClick={() => setOpenMenu(isOpen ? null : id)}
+      >
+        <span>{label}</span>
+        <small>{summary}</small>
+        <ChevronDown size={13} aria-hidden="true" />
+      </button>
+      <div
+        className="control-menu-popover"
+        id={`${id}-menu`}
+        role="menu"
+        aria-label={label}
+        hidden={!isOpen}
+        onClick={() => setOpenMenu(null)}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function SelectedMark({ selected }) {
+  return selected ? <Check size={13} aria-hidden="true" /> : <span aria-hidden="true" />;
+}
 
 export default function BreadcrumbToolbar() {
+  const [openMenu, setOpenMenu] = useState(null);
+  const toolbarRef = useRef(null);
+  const splitLevel = useDigitalTwinStore(state => state.splitLevel);
+  const activeFloor = useDigitalTwinStore(state => state.activeFloor);
+  const autoRotate = useDigitalTwinStore(state => state.autoRotate);
+  const highQuality = useDigitalTwinStore(state => state.highQuality);
+  const splitLabels = ['기본', '분리 1단계', '분리 2단계'];
+
+  useEffect(() => {
+    if (!openMenu) return undefined;
+    const closeOnOutsideClick = event => {
+      if (!toolbarRef.current?.contains(event.target)) setOpenMenu(null);
+    };
+    const closeOnEscape = event => {
+      if (event.key === 'Escape') {
+        setOpenMenu(null);
+        toolbarRef.current?.querySelector('[aria-expanded="true"]')?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [openMenu]);
+
   return (
-    <>
-      <div className="breadcrumbs pointer-events-none fixed top-[86px] right-[calc(var(--right-w)+42px)] left-[calc(var(--left-w)+42px)] z-[18] flex h-9 items-center justify-between gap-2.5 text-[#8198b5]">
-        <div className="crumb-path pointer-events-auto flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap">
-          <span>
-            <House size={14} aria-hidden="true" />
-          </span>
-          <span className="sep">
-            <ChevronRight size={12} aria-hidden="true" />
-          </span>
-          <span>KNU AIDC</span>
-          <span className="sep">
-            <ChevronRight size={12} aria-hidden="true" />
-          </span>
-          <b id="crumb-current">시설 전체</b>
-        </div>
-        <div
-          className="view-actions pointer-events-auto flex shrink-0 items-center gap-1"
-          role="toolbar"
-          aria-label="시설 층 배치, 시점 및 화질 설정"
+    <div className="breadcrumbs">
+      <div className="crumb-path">
+        <House size={14} aria-hidden="true" />
+        <ChevronRight className="sep" size={12} aria-hidden="true" />
+        <span>KNU AIDC</span>
+        <ChevronRight className="sep" size={12} aria-hidden="true" />
+        <b id="crumb-current">시설 전체</b>
+      </div>
+      <div
+        ref={toolbarRef}
+        className="view-actions"
+        role="toolbar"
+        aria-label="시설 층 배치, 시점 및 보기 설정"
+      >
+        <Menu
+          id="layout-control"
+          label="층 배치"
+          summary={activeFloor ? '층 단독 보기' : splitLabels[splitLevel]}
+          openMenu={openMenu}
+          setOpenMenu={setOpenMenu}
         >
-          <span className="view-actions-label">층 배치</span>
-          <button
-            type="button"
-            className={`${chip} active`}
-            data-split-level="0"
-            aria-pressed="true"
-            title="4개 층 기본 배치"
-          >
-            기본
+          {splitLabels.map((label, level) => {
+            const selected = !activeFloor && splitLevel === level;
+            return (
+              <button
+                type="button"
+                className={`${menuItem}${selected ? ' active' : ''}`}
+                data-split-level={level}
+                aria-pressed={selected}
+                role="menuitemradio"
+                aria-checked={selected}
+                key={label}
+              >
+                <SelectedMark selected={selected} />
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </Menu>
+
+        <Menu
+          id="camera-control"
+          label="시점"
+          summary={autoRotate ? '자동 회전 중' : '카메라'}
+          openMenu={openMenu}
+          setOpenMenu={setOpenMenu}
+        >
+          <button type="button" className={menuItem} id="topChip" role="menuitem">
+            <span aria-hidden="true" />
+            <span>위에서 보기</span>
           </button>
           <button
             type="button"
-            className={chip}
-            data-split-level="1"
-            aria-pressed="false"
-            title="층 분리 1단계"
+            className={`${menuItem}${autoRotate ? ' active' : ''}`}
+            id="btn-auto"
+            aria-pressed={autoRotate}
+            role="menuitemcheckbox"
+            aria-checked={autoRotate}
           >
-            분리 1단계
-          </button>
-          <button
-            type="button"
-            className={chip}
-            data-split-level="2"
-            aria-pressed="false"
-            title="층 분리 2단계"
-          >
-            분리 2단계
-          </button>
-          <span className="view-actions-divider" role="separator" aria-hidden="true"></span>
-          <span className="view-actions-label">시점</span>
-          <button type="button" className={chip} id="topChip" title="위에서 내려다보는 시점">
-            위에서 보기
-          </button>
-          <button type="button" className={chip} id="btn-auto" title="자동 회전">
-            <RotateCw size={12} aria-hidden="true" />
+            <RotateCw size={13} aria-hidden="true" />
             <span>자동 회전</span>
           </button>
-          <button type="button" className={chip} id="btn-view-reset" title="현재 시점 초기화">
-            <RotateCcw size={12} aria-hidden="true" />
-            <span>초기화</span>
+          <button type="button" className={menuItem} id="btn-view-reset" role="menuitem">
+            <RotateCcw size={13} aria-hidden="true" />
+            <span>시점 초기화</span>
           </button>
-          <span className="view-actions-divider" role="separator" aria-hidden="true"></span>
-          <span className="view-actions-label">화질</span>
-          <div className="quality-options flex gap-1" role="group" aria-label="렌더링 화질 선택">
-            <button
-              type="button"
-              className={chip}
-              id="quality-low"
-              data-quality="low"
-              aria-pressed="false"
-              title="저화질 모드로 렌더링 부담 줄이기"
-            >
-              성능
-            </button>
-            <button
-              type="button"
-              className={`${chip} active`}
-              id="quality-high"
-              data-quality="high"
-              aria-pressed="true"
-              title="고화질 모드로 선명하게 표시"
-            >
-              고화질
-            </button>
-          </div>
-        </div>
+        </Menu>
+
+        <Menu
+          id="quality-control"
+          label="보기 설정"
+          summary={highQuality ? '고화질' : '성능'}
+          openMenu={openMenu}
+          setOpenMenu={setOpenMenu}
+        >
+          <button
+            type="button"
+            className={`${menuItem}${!highQuality ? ' active' : ''}`}
+            id="quality-low"
+            data-quality="low"
+            aria-pressed={!highQuality}
+            role="menuitemradio"
+            aria-checked={!highQuality}
+          >
+            <SelectedMark selected={!highQuality} />
+            <span>성능</span>
+          </button>
+          <button
+            type="button"
+            className={`${menuItem}${highQuality ? ' active' : ''}`}
+            id="quality-high"
+            data-quality="high"
+            aria-pressed={highQuality}
+            role="menuitemradio"
+            aria-checked={highQuality}
+          >
+            <SelectedMark selected={highQuality} />
+            <span>고화질</span>
+          </button>
+        </Menu>
       </div>
-    </>
+    </div>
   );
 }

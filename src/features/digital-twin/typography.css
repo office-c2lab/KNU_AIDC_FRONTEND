@@ -51,7 +51,6 @@
     .device-kicker,
     .device-head p,
     .module-readout,
-    .dock-group-label,
     .view-actions-label,
     .alarm-copy small,
     .alarm-severity,
@@ -150,7 +149,7 @@
 }
 
 .digital-twin-root .left-panel .floor-copy strong {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.5;
 }
@@ -161,7 +160,7 @@
 }
 
 .digital-twin-root .left-panel .floor-button .health {
-  font-size: 10px;
+  font-size: var(--type-caption);
   font-weight: 400;
 }
 
@@ -219,7 +218,7 @@
 }
 
 .digital-twin-root :is(.chip, .dock-button) {
-  min-height: 34px;
+  min-height: 32px;
 }
 
 .digital-twin-root .right-panel .infra-metrics {
