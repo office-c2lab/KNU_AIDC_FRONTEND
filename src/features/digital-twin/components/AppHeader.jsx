@@ -121,7 +121,7 @@ export default function AppHeader() {
         </div>
 
         <div className="header-tools flex h-16 items-center justify-end gap-[18px] pr-7 text-[#9dafc4]">
-          <span className="operator-name text-[#b4c6de]">USER</span>
+          <span className="operator-name text-[#b4c6de]">ADMIN</span>
           <button
             type="button"
             className="tool-icon relative grid h-[29px] w-[29px] place-items-center rounded-sm border border-[#3a5279] bg-[#16243d] text-[#bdd3ed]"

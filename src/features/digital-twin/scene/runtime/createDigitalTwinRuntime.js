@@ -4144,6 +4144,8 @@ export function initDigitalTwin(root) {
   }
   function setZone(zone, assetId = null, move = true) {
     if (!zones[zone]) return;
+    const hoverTooltip = $('#hover-tooltip');
+    if (hoverTooltip) hoverTooltip.style.display = 'none';
     activeZone = zone;
     selectedId = assetId;
     const asset = assetId ? registry.get(assetId) : null;
@@ -4887,7 +4889,7 @@ export function initDigitalTwin(root) {
     const hit = hitTest(e),
       tip = $('#hover-tooltip');
     if (hit) {
-      let name = hit.id
+      const name = hit.id
         ? hit.name
         : hit.isFloor
           ? `${hit.floor} · ${FLOOR_INFO[hit.floor].name}`
@@ -5048,13 +5050,7 @@ export function initDigitalTwin(root) {
       w = hostRect.width,
       h = hostRect.height;
     for (const a of labelAnchors) {
-      const display = a.floor
-        ? activeFloor
-          ? activeFloor === a.floor
-          : a.zone === 'f' + a.floor[0]
-        : activeFloor
-          ? false
-          : true;
+      const display = a.floor ? !activeFloor && a.zone === 'f' + a.floor[0] : !activeFloor;
       const world = (typeof a.world === 'function' ? a.world() : a.world).clone();
       const p = world.clone().project(camera);
       const visible =
