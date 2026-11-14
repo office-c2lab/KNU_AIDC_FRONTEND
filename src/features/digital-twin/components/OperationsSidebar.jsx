@@ -152,50 +152,6 @@ export default function OperationsSidebar() {
             </div>
           </section>
 
-          <section aria-labelledby="alarm-heading">
-            <div className={subTitle}>
-              <h2 id="alarm-heading">알림 및 이벤트</h2>
-              <span className={moduleReadout} id="alarm-count">
-                00
-              </span>
-            </div>
-            <ul className={`${instrumentCard} alarm-list`} id="alarm-list">
-              <li className="alarm-item" data-level="warning">
-                <span className="alarm-level" aria-hidden="true"></span>
-                <div className="alarm-copy">
-                  <b>GPU B구역 온도 상승</b>
-                  <small>3층 · 냉기 통로 센서 T-31</small>
-                </div>
-                <div className="alarm-meta">
-                  <time className="alarm-time">11:42</time>
-                  <span className="alarm-severity">주의</span>
-                </div>
-              </li>
-              <li className="alarm-item" data-level="info">
-                <span className="alarm-level" aria-hidden="true"></span>
-                <div className="alarm-copy">
-                  <b>UPS 배터리 점검 예정</b>
-                  <small>1층 · UPS-B 유지보수</small>
-                </div>
-                <div className="alarm-meta">
-                  <time className="alarm-time">10:18</time>
-                  <span className="alarm-severity">안내</span>
-                </div>
-              </li>
-              <li className="alarm-item" data-level="resolved">
-                <span className="alarm-level" aria-hidden="true"></span>
-                <div className="alarm-copy">
-                  <b>냉각 설정 최적화 완료</b>
-                  <small>AI 제어 절차 완료</small>
-                </div>
-                <div className="alarm-meta">
-                  <time className="alarm-time">09:54</time>
-                  <span className="alarm-severity">해결</span>
-                </div>
-              </li>
-            </ul>
-          </section>
-
           <details className="agent-quicklist" id="agent-quicklist">
             <summary>
               <span className="agent-summary-copy">

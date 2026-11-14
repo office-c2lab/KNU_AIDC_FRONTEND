@@ -13,12 +13,14 @@ const initialState = {
   chosenScenarioId: 'gpu',
   selectedIncidentId: null,
   incidents: [],
+  notificationsOpen: false,
 };
 
 export const useDigitalTwinStore = create(set => ({
   ...initialState,
 
   setNavigation: navigation => set(navigation),
+  setNotificationsOpen: notificationsOpen => set({ notificationsOpen }),
   setSplitLevel: splitLevel =>
     set({ splitLevel: Math.max(0, Math.min(2, Math.trunc(splitLevel))) }),
   selectVisualization: (mode, forceOn = false) =>

@@ -1,0 +1,395 @@
+/* Shared typography for Korean, Latin labels, identifiers and numeric readouts. */
+.digital-twin-root {
+  --ui-font: 'Noto Sans KR Variable', 'Noto Sans KR', sans-serif;
+  --readout-font: var(--ui-font);
+  --type-title: 13px;
+  --type-body: 12px;
+  --type-caption: 11px;
+  font-family: var(--ui-font);
+  font-size: var(--type-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Legacy panels and inline chart labels set their own font families. */
+.digital-twin-root *,
+.digital-twin-root *::before,
+.digital-twin-root *::after {
+  font-family: var(--ui-font) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.digital-twin-root .panel {
+  --readout-font: var(--ui-font);
+}
+
+.digital-twin-root :is(.section-title, .sub-title, .infra-title) {
+  font-size: var(--type-title);
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.digital-twin-root :is(.floor-copy strong, .device-head h3, .agent-shortcut strong) {
+  font-size: var(--type-title);
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+}
+
+.digital-twin-root :is(.dock-button, .chip, .asset-detail-trigger, .alarm-copy b) {
+  font-size: var(--type-body);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.digital-twin-root
+  :is(
+    .floor-copy small,
+    .device-kicker,
+    .device-head p,
+    .module-readout,
+    .dock-group-label,
+    .view-actions-label,
+    .alarm-copy small,
+    .alarm-severity,
+    .infra-metrics small,
+    .asset-pane-heading small,
+    .asset-modal-sub,
+    .agent-modal-kicker,
+    .asset-modal-view-note
+  ) {
+  font-size: var(--type-caption);
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.digital-twin-root
+  :is(
+    .power-row b,
+    .infra-metrics strong,
+    .metric strong,
+    .gauge-value strong,
+    .asset-signal-value
+  ) {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.digital-twin-root :is(.asset-modal-top h2, .agent-modal-header h3) {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.digital-twin-root .system-title strong {
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.digital-twin-root :is(.system-title small, .floor-no, .health) {
+  letter-spacing: 0;
+}
+
+.digital-twin-root .floor-copy small {
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+/* Give dense operational summaries room to wrap without crowding status badges. */
+.digital-twin-root .panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #55779a transparent;
+}
+
+.digital-twin-root .panel .sub-title {
+  margin: 18px 0 10px;
+  color: #e2edfb;
+}
+
+.digital-twin-root .panel .floor-list {
+  gap: 7px;
+}
+
+.digital-twin-root .left-panel .floor-button {
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  column-gap: 7px;
+  row-gap: 4px;
+  padding: 9px 8px;
+  min-height: 48px;
+}
+
+.digital-twin-root .floor-button .floor-copy {
+  display: contents;
+}
+
+.digital-twin-root .floor-copy strong {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.digital-twin-root .floor-copy small {
+  grid-column: 2 / -1;
+  grid-row: 2;
+  margin: 0;
+  color: #bdd0e5;
+  line-height: 1.65;
+}
+
+.digital-twin-root .floor-button .floor-no {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.digital-twin-root .floor-button .health {
+  grid-column: 3;
+  grid-row: 1;
+  font-size: var(--type-caption);
+}
+
+.digital-twin-root .left-panel .floor-copy strong {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.digital-twin-root .left-panel .floor-no {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.digital-twin-root .left-panel .floor-button .health {
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.digital-twin-root
+  :is(
+    .dock-group-label,
+    .view-actions-label,
+    .device-kicker,
+    .device-head p,
+    .alarm-copy small,
+    .infra-metrics small,
+    .asset-pane-heading small,
+    .asset-modal-sub,
+    .agent-modal-kicker,
+    .asset-modal-view-note
+  ) {
+  color: #b8cce3;
+}
+
+.digital-twin-root
+  :is(
+    .device-head p,
+    .alarm-copy small,
+    .asset-modal-meta p,
+    .agent-modal-header p,
+    .agent-modal-empty
+  ) {
+  line-height: 1.75;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.digital-twin-root .left-panel .power-row {
+  min-height: 34px;
+  font-size: var(--type-body);
+}
+
+.digital-twin-root .alarm-item {
+  padding: 12px 10px;
+  gap: 7px;
+}
+
+.digital-twin-root .alarm-copy b {
+  font-weight: 600;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+.digital-twin-root .alarm-meta {
+  gap: 6px;
+}
+
+.digital-twin-root .device-head {
+  padding: 14px 12px;
+}
+
+.digital-twin-root :is(.chip, .dock-button) {
+  min-height: 34px;
+}
+
+.digital-twin-root .right-panel .infra-metrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding: 9px;
+}
+
+.digital-twin-root .infra-metrics > div:first-child {
+  grid-column: 1 / -1;
+}
+
+.digital-twin-root .infra-metrics small {
+  white-space: normal;
+}
+
+.digital-twin-root
+  :is(
+    .agent-modal-tile small,
+    .asset-signal-title,
+    .signal-foot,
+    .asset-meta-grid,
+    .asset-modal-meta p,
+    .asset-modal-footer
+  ) {
+  font-size: var(--type-caption);
+}
+
+@media (max-width: 930px) {
+  .digital-twin-root {
+    --type-title: 12px;
+    --type-body: 11px;
+    --type-caption: 10px;
+  }
+}
+.pue-scale-card {
+  padding: 12px;
+}
+.pue-scale-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.pue-scale-value strong {
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 650;
+  color: #f0f7ff;
+}
+.digital-twin-root .pue-scale-value .status-tag {
+  padding: 0;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #79e3c2;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.pue-scale {
+  position: relative;
+  padding-bottom: 10px;
+}
+.pue-scale-track {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 6px;
+  overflow: hidden;
+  border: 1px solid #6384a54d;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #347c79, #476b7d 45%, #666c70 72%, #97745e);
+  box-shadow: inset 0 1px 2px #020b1c55;
+}
+.pue-scale-track span:not(:last-child) {
+  border-right: 1px solid #0b1b31b3;
+}
+.pue-scale-marker {
+  position: absolute;
+  top: -3px;
+  left: var(--pue-position);
+  width: 1px;
+  height: 13px;
+  background: #bfe9ee;
+  box-shadow: 0 0 5px #85d6d755;
+  transform: translateX(-50%);
+}
+.pue-scale-marker::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -2px;
+  width: 5px;
+  height: 3px;
+  border-radius: 1px;
+  background: #bfe9ee;
+}
+.pue-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #9db4ce;
+  font-size: 10px;
+}
+.pue-scale-note {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid #45638740;
+  color: #b8cce3;
+  font-size: var(--type-caption);
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+.notifications-panel {
+  position: fixed;
+  top: 78px;
+  right: 26px;
+  z-index: 100;
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100dvh - 100px);
+  overflow-y: auto;
+  border: 1px solid #5274a2a6;
+  border-radius: 6px;
+  background: #0b192efc;
+  box-shadow: 0 16px 40px #02091799;
+}
+
+.notifications-panel[hidden] {
+  display: none;
+}
+
+.notifications-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 12px;
+  border-bottom: 1px solid #45658b55;
+}
+
+.notifications-heading h2 {
+  flex: 1;
+  margin: 0;
+  font-size: var(--type-title);
+  font-weight: 600;
+  color: #e2edfb;
+}
+
+.notifications-heading button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #b8cce3;
+}
+
+.notifications-heading button:hover {
+  background: #284467;
+  color: #fff;
+}
+
+.notifications-panel .alarm-list {
+  padding: 4px;
+}
+
+.notifications-panel .alarm-item[data-scenario-focus] {
+  cursor: pointer;
+}

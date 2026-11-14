@@ -2045,7 +2045,7 @@ export function initDigitalTwin(root) {
       temp: 30.1,
       power: 0.08,
       capacity: 28,
-      summary: `${location}의 벽면에 설치된 불릿형 보안 CCTV. 렌즈 주변 IR LED와 작동 LED가 점등됩니다. 수치 및 상태는 시연용이며 실제 영상은 연결되지 않습니다.`,
+      summary: `${location}의 벽면에 설치된 불릿형 보안 CCTV. 렌즈 주변 IR LED와 작동 LED가 점등됩니다.`,
     });
     registerFx(id, { kind: 'cctv', irLeds, halo, statusLed, phase: Number(id.slice(-2)) * 0.75 });
     return root;
@@ -2409,7 +2409,7 @@ export function initDigitalTwin(root) {
       y: 0.4,
       angle: -0.25,
       tint: 0x58d6bf,
-      intro: '출입 인증과 CCTV 상태를 모의 감시합니다.',
+      intro: '출입 인증과 CCTV 상태를 감시합니다.',
       monitor: ['GATE-01', 'GATE-02', 'CCTV-1F-01'],
       scenarios: ['access'],
     },
@@ -2425,7 +2425,7 @@ export function initDigitalTwin(root) {
       y: 0.4,
       angle: -0.28,
       tint: 0x72b9ef,
-      intro: '서버·네트워크 동작과 서비스 상태를 모의 분석합니다.',
+      intro: '서버·네트워크 동작과 서비스 상태를 분석합니다.',
       monitor: ['SRV-04', 'CORE-01', 'CRAC-01'],
       scenarios: ['server', 'network'],
     },
@@ -2441,7 +2441,7 @@ export function initDigitalTwin(root) {
       y: 0.4,
       angle: 0.35,
       tint: 0xa99cf7,
-      intro: 'GPU 부하, 온도 및 CDU 유량 상태를 모의 점검합니다.',
+      intro: 'GPU 부하, 온도 및 CDU 유량 상태를 점검합니다.',
       monitor: ['GPU-03', 'LIQ-GPU-01', 'CDU-01'],
       scenarios: ['gpu', 'cdu'],
     },
@@ -2473,7 +2473,7 @@ export function initDigitalTwin(root) {
       y: 0.4,
       angle: -1.0,
       tint: 0xf0b77a,
-      intro: '출입·보안 관련 이벤트를 모의 분석합니다.',
+      intro: '출입·보안 관련 이벤트를 분석합니다.',
       monitor: ['SOC-WALL-01', 'SOC-OPS-01', 'GATE-01'],
       scenarios: ['access', 'network'],
     },
@@ -2489,7 +2489,7 @@ export function initDigitalTwin(root) {
       y: 0.4,
       angle: -0.25,
       tint: 0xf2c36d,
-      intro: 'UPS 이중화·축전지·배전 전원 상태를 모의 감시합니다.',
+      intro: 'UPS 이중화·축전지·배전 전원 상태를 감시합니다.',
       monitor: ['UPS-01', 'UPS-02', 'BAT-01', 'SWGR-01'],
       scenarios: ['ups'],
     },
@@ -2505,7 +2505,7 @@ export function initDigitalTwin(root) {
       y: 0.4,
       angle: -0.55,
       tint: 0x75dcf4,
-      intro: '냉동기·순환펌프·냉각수 상태를 모의 감시합니다.',
+      intro: '냉동기·순환펌프·냉각수 상태를 감시합니다.',
       monitor: ['CH-01', 'PUMP-01', 'HEX-01', 'CDU-01'],
       scenarios: ['chiller', 'cdu'],
     },
@@ -2667,8 +2667,7 @@ export function initDigitalTwin(root) {
     const incidents = agentRelatedIncidents(config),
       busy = incidents.length > 0;
     $('#agent-modal-role').textContent = config.role;
-    $('#agent-modal-description').textContent =
-      config.intro + ' 실제 AI 의사결정이나 현장 제어 기능은 연결되지 않았습니다.';
+    $('#agent-modal-description').textContent = config.intro;
     const status = $('#agent-modal-status');
     status.textContent = agentWorkTitle(config);
     status.classList.toggle('busy', busy);
@@ -2681,10 +2680,10 @@ export function initDigitalTwin(root) {
       ? incidents
           .map(incident => {
             const data = SCENARIO_BY_ID.get(incident.id);
-            return `<div class="agent-modal-event"><div><strong>${esc(data?.title || incident.id)}</strong><small>관련 설비: ${esc(data?.asset || '-')} · 모의 장애 시나리오</small></div><b>${esc(incidentSteps[incident.stage] || '확인')}</b></div>`;
+            return `<div class="agent-modal-event"><div><strong>${esc(data?.title || incident.id)}</strong><small>관련 설비: ${esc(data?.asset || '-')}</small></div><b>${esc(incidentSteps[incident.stage] || '확인')}</b></div>`;
           })
           .join('')
-      : `<div class="agent-modal-empty">담당 구역에 진행 중인 모의 장애가 없습니다.<br>현재는 점검 대기 및 설비 상태 모니터링 동작을 수행하고 있습니다.</div>`;
+      : `<div class="agent-modal-empty">담당 구역에 진행 중인 장애가 없습니다.<br>현재는 점검 대기 및 설비 상태 모니터링 동작을 수행하고 있습니다.</div>`;
     $('#asset-modal-title').textContent = `${config.name} · ${asset.id}`;
     $('#asset-modal-device-id').textContent = asset.id + ' · AI 운영 요원';
     $('#asset-modal-name').textContent = config.name;
@@ -3451,7 +3450,7 @@ export function initDigitalTwin(root) {
   function setInspectorTab(tab) {
     inspectorTab = tab;
     if (tab === 'asset') updateInspector();
-    else $('#alarm-list').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    else twinActions.setNotificationsOpen(true);
   }
   function runScenario(id) {
     const s = SCENARIO_BY_ID.get(id);
@@ -3518,7 +3517,7 @@ export function initDigitalTwin(root) {
           .join('')
       : '<div class="scenario-empty">현재 진행 중인 장애가 없습니다. 아래 시나리오를 선택해 실행해보세요.</div>';
     $('#scenario-view').innerHTML = `
- <div class="scenario-topline"><span>INCIDENT SIMULATOR</span><strong>${active.length}건 진행 중</strong></div>
+ <div class="scenario-topline"><span>장애 현황</span><strong>${active.length}건 진행 중</strong></div>
  <div class="scenario-section-title">진행 중인 장애</div><div class="active-cases">${incidentList}</div>
  <div class="scenario-section-title">장애 시나리오 선택 <small>8종</small></div>
  <div class="scenario-selector">${SCENARIOS.map(s => `<button data-scenario-id="${s.id}" class="scenario-choice ${selected.id === s.id ? 'chosen' : ''} ${activeIncidents.has(s.id) ? 'running' : ''}"><b>${esc(s.title)}</b><small>${esc(s.category)}</small></button>`).join('')}</div>
@@ -3532,7 +3531,7 @@ export function initDigitalTwin(root) {
      : `<button class="scenario-primary" data-run-scenario="${selected.id}">이 장애 시나리오 실행</button>`
  }
  </section>
- <div class="scenario-section-title">관제 이벤트 이력 <small>모의 데이터</small></div><div class="event-history">${
+ <div class="scenario-section-title">관제 이벤트 이력</div><div class="event-history">${
    eventLog.length
      ? eventLog
          .slice(0, 10)
@@ -3543,7 +3542,7 @@ export function initDigitalTwin(root) {
          .join('')
      : '<div class="scenario-empty">발생한 이벤트가 없습니다.</div>'
  }</div>
- <div class="scenario-note">이 화면의 센서 값·장애·영향 분석·복구 단계는 모두 데모 시뮬레이션입니다. 실제 설비를 제어하거나 장애 원인을 자동 확정하지 않습니다.</div>`;
+`;
     $('#scenario-count').textContent = String(active.length);
   }
 
@@ -3629,7 +3628,7 @@ export function initDigitalTwin(root) {
       ],
     };
     const specialMarkup = primaryIncident
-      ? `<div class="section-label">시나리오별 이상 지표 <small>모의 진단값</small></div><div class="scenario-metric-pair">${(specialMetrics[primaryIncident.scenario.id] || []).map(([label, value]) => `<div><span>${label}</span><strong>${value}</strong></div>`).join('')}</div><button class="inspect-back" data-open-scenario="${primaryIncident.scenario.id}">장애 대응 단계 보기 ${iconMarkup('ArrowRight')}</button>`
+      ? `<div class="section-label">시나리오별 이상 지표</div><div class="scenario-metric-pair">${(specialMetrics[primaryIncident.scenario.id] || []).map(([label, value]) => `<div><span>${label}</span><strong>${value}</strong></div>`).join('')}</div><button class="inspect-back" data-open-scenario="${primaryIncident.scenario.id}">장애 대응 단계 보기 ${iconMarkup('ArrowRight')}</button>`
       : '';
     const works = relatedIssues.length
       ? relatedIssues.map(x => [
@@ -3646,7 +3645,7 @@ export function initDigitalTwin(root) {
  <div class="section-overline">${assetTypeLabel(asset.type)} / ${asset.id}</div><h3 class="detail-title">${asset.name}</h3><p class="detail-summary">${asset.summary || ''}</p>${statusHtml(state)}
  <div class="section-label">장비 정보</div>
  ${infoRow('자산 ID', asset.id)}${infoRow('설치 층', asset.floor || '별도 지원 시설')}${infoRow('설치 위치', asset.location)}${infoRow('운영 상태', state)}
- <div class="section-label">센서 모니터링 <small>모의 수치</small></div><div class="metric-grid">
+ <div class="section-label">센서 모니터링</div><div class="metric-grid">
  <div class="small-metric ${state === '장애' ? 'is-hot' : ''}"><span>장비 온도</span><strong>${sensor.temp.toFixed(1)}</strong><small>°C</small></div>
  <div class="small-metric"><span>소비 전력</span><strong>${sensor.power.toFixed(1)}</strong><small>kW</small></div></div>
  <div class="bar-card"><div class="bar-label"><span>가동률 / 부하 지표</span><b>${metric}%</b></div><div class="meter"><i style="width:${metric}%"></i></div></div>
@@ -3707,12 +3706,12 @@ export function initDigitalTwin(root) {
  ${floorMarkup}
  ${data.floor ? '<div class="section-label">공간 구획 <small>출입구 · 파티션 · 설비 배치</small></div><p class="detail-summary">' + ({ '1F': '보안·반입·예비품 분리 / 후면 MDF·유지보수 출입구', '2F': '서버홀 A/B 차폐 / 전면 점검 공간과 출입 갤러리', '3F': '공랭·액체냉각·CDU 3구역 / 별도 CDU 출입구', '4F': 'NOC·SOC 방음 구획 / 중앙 복도와 독립 지원실' }[data.floor] || '층별 출입구와 설비 구획') + '</p>' : ''}
  ${zone === 'f4' ? '<button class="inspect-back" data-focus-zone="noc">4F 통합 관제실 상세 보기 ' + iconMarkup('ArrowRight') + '</button>' : ''}
- <div class="section-label">운영 지표 <small>모의 수치</small></div><div class="metric-grid">
+ <div class="section-label">운영 지표</div><div class="metric-grid">
  <div class="small-metric"><span>평균 온도</span><strong>${(data.temp + (data.floor === '3F' && incidentCountForFloor('3F') ? 1.8 : 0)).toFixed(1)}</strong><small>°C</small></div>
  <div class="small-metric"><span>참고 부하</span><strong>${data.power.toFixed(1)}</strong><small>kW</small></div></div>
  ${cctvMarkup}
  ${assetMarkup}
- <div class="section-label">진행 중 업무</div>${statuses.map((x, i) => `<div class="work-item ${faultCount && i === 0 ? 'warning' : ''}"><i class="work-bullet"></i><div><strong>${x}</strong><small>${faultCount && i === 0 ? '이상 이벤트 · 확인 필요' : '시설 운영 · 모의 데이터'}</small></div></div>`).join('')}`;
+ <div class="section-label">진행 중 업무</div>${statuses.map((x, i) => `<div class="work-item ${faultCount && i === 0 ? 'warning' : ''}"><i class="work-bullet"></i><div><strong>${x}</strong><small>${faultCount && i === 0 ? '이상 이벤트 · 확인 필요' : '시설 운영'}</small></div></div>`).join('')}`;
   }
 
   // V28 — interactive rack device modal with a separate, orbitable render of the REAL device geometry.
@@ -3940,7 +3939,7 @@ export function initDigitalTwin(root) {
     $('#asset-modal-device-id').textContent = asset.id + ' · ' + assetTypeLabel(asset.type);
     $('#asset-modal-name').textContent = asset.name;
     $('#asset-modal-summary').textContent =
-      asset.summary || '선택 설비의 상태와 시뮬레이션 지표를 표시합니다.';
+      asset.summary || '선택 설비의 상태와 지표를 표시합니다.';
     $('#asset-modal-location').textContent = asset.location || 'KNU AIDC';
     $('#asset-modal-type').textContent = assetTypeLabel(asset.type);
     const state = $('#asset-modal-status');
@@ -3969,7 +3968,7 @@ export function initDigitalTwin(root) {
             : '연관 설비 · ' + issue.state,
         ])
       : [
-          ['시설 상태 확인', '모의 센서 범위 정상'],
+          ['시설 상태 확인', '이상 없음'],
           ['정기 점검', '예정된 점검 작업 없음'],
         ];
     $('#asset-modal-events').innerHTML = events
@@ -4270,8 +4269,7 @@ export function initDigitalTwin(root) {
     const incidents = [...activeIncidents.values()];
     const overlay = $('#incident-overlay');
     if (!incidents.length) {
-      overlay.innerHTML =
-        '<div class="overlay-healthy"><i></i> 현재 발생한 장애 없음 <small>모의 관제</small></div>';
+      overlay.innerHTML = '<div class="overlay-healthy"><i></i> 현재 발생한 장애 없음</div>';
       overlay.classList.remove('has-incidents');
     } else {
       overlay.classList.add('has-incidents');
@@ -4591,8 +4589,6 @@ export function initDigitalTwin(root) {
     document.getElementById('infra-cooling-load').innerHTML = coolingLoad + '<em>%</em>';
     document.getElementById('infra-cooling-pct').textContent = coolingLoad + '%';
     document.getElementById('infra-cooling-bar').style.width = coolingLoad + '%';
-    $('#summary-power').textContent = `부하 ${powerLoad}% · 배터리 ${battery}%`;
-    $('#summary-cooling').textContent = `출수 ${supply.toFixed(1)}°C · 부하 ${coolingLoad}%`;
     for (const [led, id] of [
       ['infra-led-ups', 'UPS-01'],
       ['infra-led-bat', 'BAT-01'],
@@ -4670,6 +4666,20 @@ export function initDigitalTwin(root) {
             ['이상 설비', String(bad), ''],
             ['소비 전력', sum.toFixed(1), 'kW'],
           ];
+    // Floor readings belong to the selected floor's detail, alongside its asset summary.
+    const tempMap = { '4F': 22.4, '3F': 24.6, '2F': 23.1, '1F': 22.8 };
+    const humMap = { '4F': 47.5, '3F': 44.1, '2F': 46.8, '1F': 48.2 };
+    const loadMap = { '4F': 38, '3F': 86, '2F': 71, '1F': 64 };
+    if (activeFloor && !activeAsset) {
+      const temp =
+        tempMap[activeFloor] +
+        (activeFloor === '3F' && incidentCountForFloor(activeFloor) ? 1.8 : 0);
+      metrics.unshift(
+        ['층 온도', temp.toFixed(1), '°C'],
+        ['습도', String(humMap[activeFloor]), '%'],
+        ['층 부하', String(loadMap[activeFloor]), '%']
+      );
+    }
     $('#device-grid').innerHTML = metrics
       .map(
         ([k, v, u]) =>
@@ -4701,15 +4711,6 @@ export function initDigitalTwin(root) {
         el.classList.toggle('warn', Boolean(count));
       }
     }
-    const tempMap = { '4F': '22.4', '3F': '24.6', '2F': '23.1', '1F': '22.8' };
-    const humMap = { '4F': '47.5', '3F': '44.1', '2F': '46.8', '1F': '48.2' };
-    const loadMap = { '4F': '38', '3F': '86', '2F': '71', '1F': '64' };
-    for (const floor of floorList) {
-      const count = incidentCountForFloor(floor);
-      const temp = (Number(tempMap[floor]) + (floor === '3F' && count ? 1.8 : 0)).toFixed(1);
-      $(`#summary-${floor}`).textContent =
-        `${temp}°C · 습도 ${humMap[floor]}% · 부하 ${loadMap[floor]}%`;
-    }
     const alarmIds = [...activeIncidents.values()].map(i => ({
       scenario: SCENARIO_BY_ID.get(i.id),
       incident: i,
@@ -4726,7 +4727,7 @@ export function initDigitalTwin(root) {
               `<li class="alarm-item" data-level="critical" data-scenario-focus="${s.id}"><span class="alarm-level"></span><div class="alarm-copy"><b>${esc(s.title)}</b><small>${esc(s.asset)} · ${esc(incidentSteps[i.stage])}</small></div><div class="alarm-meta"><time class="alarm-time">${new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(i.started)}</time><span class="alarm-severity">장애</span></div></li>`
           )
           .join('')
-      : '<li class="alarm-item" data-level="resolved"><span class="alarm-level"></span><div class="alarm-copy"><b>전체 설비 모니터링 정상</b><small>실제 연동이 아닌 시뮬레이션 데이터입니다.</small></div><div class="alarm-meta"><span class="alarm-severity">정상</span></div></li>';
+      : '<li class="alarm-item" data-level="resolved"><span class="alarm-level"></span><div class="alarm-copy"><b>전체 설비 모니터링 정상</b></div><div class="alarm-meta"><span class="alarm-severity">정상</span></div></li>';
     if (activeAsset?.type === 'AI AGENT') {
       const agent = aiAgents.get(activeAsset.id),
         busy = agentIsBusy(agent);
@@ -4967,7 +4968,6 @@ export function initDigitalTwin(root) {
       twinActions.setHighQuality(button.dataset.quality === 'high');
     })
   );
-  $('#header-alarm').addEventListener('click', () => setInspectorTab('scenario'));
   $('#topChip').addEventListener('click', () => {
     const target = activeFloor ? [0, FLOOR_Y[activeFloor] + 1, 0] : [0, 8, 0];
     animateCamera([0, activeFloor ? FLOOR_Y[activeFloor] + 41 : 85, 0.2], target, 900);
@@ -4991,6 +4991,7 @@ export function initDigitalTwin(root) {
       twinActions.setScenarioState({ chosenScenarioId });
       setInspectorTab('scenario');
       focusAsset(SCENARIO_BY_ID.get(chosenScenarioId).asset);
+      twinActions.setNotificationsOpen(false);
     }
   });
   root
@@ -5026,6 +5027,7 @@ export function initDigitalTwin(root) {
     } else if (b.dataset.overlayAll) setInspectorTab('scenario');
   });
   const handleGlobalKeydown = e => {
+    if (digitalTwinStore.getState().notificationsOpen || e.defaultPrevented) return;
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
     if (assetModalId) {
       if (e.key === 'Escape') {

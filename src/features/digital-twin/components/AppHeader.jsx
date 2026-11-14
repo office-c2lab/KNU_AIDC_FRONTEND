@@ -1,9 +1,12 @@
 import { Bell } from 'lucide-react';
+import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 
 const navItem =
   'nav-item relative h-16 border-0 bg-transparent px-0.5 font-semibold tracking-[0.15px] text-[#a8b9d2] transition-colors hover:text-[#f0f7ff]';
 
 export default function AppHeader() {
+  const notificationsOpen = useDigitalTwinStore(state => state.notificationsOpen);
+  const setNotificationsOpen = useDigitalTwinStore(state => state.setNotificationsOpen);
   return (
     <>
       <header className="fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833ed] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959] max-[1250px]:grid-cols-[1fr_420px_1fr] max-[930px]:grid-cols-[1fr_330px_1fr] max-[700px]:grid-cols-[1fr_220px_1fr]">
@@ -111,6 +114,9 @@ export default function AppHeader() {
             type="button"
             className="tool-icon relative grid h-[29px] w-[29px] place-items-center rounded-sm border border-[#3a5279] bg-[#16243d] text-[#bdd3ed]"
             id="header-alarm"
+            aria-expanded={notificationsOpen}
+            aria-controls="notifications-panel"
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
             title="알림 및 이벤트 보기"
             aria-label="알림 및 이벤트 보기"
           >

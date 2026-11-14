@@ -101,7 +101,7 @@ export default function AssetModal() {
                 <div id="agent-modal-devices" className="agent-modal-device-list"></div>
               </div>
               <div className="asset-modal-card agent-modal-section">
-                <h4>현재 점검 및 이벤트 · 모의 상태</h4>
+                <h4>현재 점검 및 이벤트</h4>
                 <div id="agent-modal-events"></div>
               </div>
             </div>
@@ -112,21 +112,21 @@ export default function AssetModal() {
                   <div className="asset-signal-value" id="asset-modal-state">
                     정상
                   </div>
-                  <small className="signal-foot">설비 상태 / 장애 시뮬레이션 연동</small>
+                  <small className="signal-foot">설비 상태</small>
                 </div>
                 <div className="asset-modal-card asset-signal-card">
                   <span className="asset-signal-title">장비 온도</span>
                   <div className="asset-signal-value" id="asset-modal-temp">
                     —
                   </div>
-                  <small className="signal-foot">모의 온도 센서</small>
+                  <small className="signal-foot">장비 온도</small>
                 </div>
                 <div className="asset-modal-card asset-signal-card">
                   <span className="asset-signal-title">소비 전력</span>
                   <div className="asset-signal-value" id="asset-modal-power">
                     —
                   </div>
-                  <small className="signal-foot">모의 전력 지표</small>
+                  <small className="signal-foot">소비 전력</small>
                 </div>
                 <div className="asset-modal-card asset-signal-card">
                   <span className="asset-signal-title">가동률 / 부하</span>
@@ -142,7 +142,7 @@ export default function AssetModal() {
                 <section className="asset-modal-card asset-chart-card">
                   <div className="asset-chart-title">
                     <strong>온도 변화 추세</strong>
-                    <small>모의 추세 · 최근 60분</small>
+                    <small>최근 60분</small>
                   </div>
                   <svg
                     id="asset-modal-temp-chart"
@@ -150,13 +150,13 @@ export default function AssetModal() {
                     viewBox="0 0 350 175"
                     preserveAspectRatio="none"
                     role="img"
-                    aria-label="온도 변화 모의 그래프"
+                    aria-label="온도 변화 그래프"
                   ></svg>
                 </section>
                 <section className="asset-modal-card asset-chart-card">
                   <div className="asset-chart-title">
                     <strong>소비 전력 추세</strong>
-                    <small>모의 추세 · 최근 60분</small>
+                    <small>최근 60분</small>
                   </div>
                   <svg
                     id="asset-modal-power-chart"
@@ -164,7 +164,7 @@ export default function AssetModal() {
                     viewBox="0 0 350 175"
                     preserveAspectRatio="none"
                     role="img"
-                    aria-label="소비 전력 변화 모의 그래프"
+                    aria-label="소비 전력 변화 그래프"
                   ></svg>
                 </section>
                 <section className="asset-modal-card asset-modal-note">
@@ -175,7 +175,6 @@ export default function AssetModal() {
             </div>
           </div>
           <div className="asset-modal-footer flex min-h-[38px] items-center justify-between gap-4 border-t border-[#35587b] bg-[#0a1a32] px-[18px] py-2.5 text-[10px] text-[#91acc8]">
-            <span>본 상세 화면의 수치·추세·이벤트는 실제 센서 연결이 아닌 데모 데이터입니다.</span>
             <button type="button" data-asset-modal-close>
               닫기
             </button>

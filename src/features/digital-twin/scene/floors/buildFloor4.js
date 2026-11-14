@@ -139,7 +139,7 @@ export function buildFloor4(context) {
       temp: 23.7,
       power: 1.9,
       capacity: 88,
-      summary: '전산실·전력·냉각·보안 운영 지표를 표시하는 상황판. 화면 데이터는 모의 값입니다.',
+      summary: '전산실·전력·냉각·보안 운영 지표를 표시하는 상황판.',
       markerLocal: [(x0 + x1) / 2, 0, z],
     });
     const faultTiles = [];
