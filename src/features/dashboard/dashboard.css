@@ -37,20 +37,20 @@
 
 .status-overview {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
   flex: none;
-  margin-bottom: 14px;
+  margin-bottom: 0;
 }
 
 .status-card {
   display: grid;
-  grid-template-columns: 36px 1fr auto;
+  grid-template-columns: 22px minmax(0, 1fr);
   align-items: center;
-  gap: 11px;
+  gap: 8px;
   min-width: 0;
   min-height: 68px;
-  padding: 12px 15px;
+  padding: 12px 10px;
   border: 1px solid #2c4768;
   background: #101d34d9;
 }
@@ -80,7 +80,7 @@
 }
 
 .status-card small {
-  text-align: right;
+  display: none;
 }
 .status-card.normal > svg {
   color: #73e1c0;
@@ -94,11 +94,17 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(250px, 20vw, 300px);
+  grid-template-columns: 280px minmax(0, 1fr) clamp(250px, 20vw, 300px);
+  grid-template-rows: minmax(0, 1fr);
   gap: 14px;
   flex: 1;
   align-items: stretch;
   min-height: 0;
+}
+
+.dashboard-grid > aside {
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .dashboard-panel {
@@ -138,7 +144,7 @@
 
 .scenario-control {
   display: grid;
-  grid-template-columns: minmax(280px, 0.7fr) minmax(320px, 1.3fr);
+  grid-template-columns: 300px minmax(0, 1fr);
   grid-template-rows: auto 1fr;
   min-height: 0;
   overflow: hidden;
@@ -149,65 +155,16 @@
 }
 
 .scenario-dashboard-list {
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: 9px;
   min-height: 0;
   padding: 10px;
-  overflow-y: auto;
+  overflow: hidden;
+  background: #0a1629;
   border-right: 1px solid #294463;
   scrollbar-width: thin;
   scrollbar-color: #41658c transparent;
-}
-
-.facility-control-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 4px;
-  margin-bottom: 4px;
-}
-
-.facility-control-tabs button {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 5px;
-  min-width: 0;
-  min-height: 38px;
-  padding: 6px 7px;
-  border: 1px solid #2b4665;
-  background: #101e34;
-  color: #8da7c2;
-  text-align: left;
-}
-
-.facility-control-tabs button:hover {
-  border-color: #4e7298;
-  background: #182d49;
-}
-
-.facility-control-tabs button.active {
-  border-color: #70a2d2;
-  background: #22496f;
-  color: #fff;
-}
-
-.facility-control-tabs b {
-  color: #9fd2ff;
-  font-size: 11px;
-}
-
-.facility-control-tabs span {
-  overflow: hidden;
-  font-size: 10px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.facility-control-tabs small {
-  margin: 0;
-  color: #89a9c9;
-  font-size: 10px;
 }
 
 .facility-asset-heading {
@@ -219,6 +176,9 @@
   padding: 0 7px;
   color: #91aac4;
   font-size: 11px;
+  flex: none;
+  border-top: 1px solid #294463;
+  padding-top: 8px;
 }
 
 .facility-asset-heading div {
@@ -239,6 +199,7 @@
   display: flex;
   gap: 6px;
   padding: 0 7px;
+  flex: none;
 }
 
 .facility-control-summary span {
@@ -251,7 +212,12 @@
 
 .scenario-facility-assets {
   display: grid;
+  align-content: start;
   gap: 3px;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #41658c transparent;
 }
 
 .scenario-facility-assets button {
@@ -498,7 +464,7 @@
 
 .dashboard-side-stack {
   display: grid;
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 14px;
   min-height: 0;
 }
@@ -652,7 +618,8 @@
   }
 
   .dashboard-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 260px minmax(0, 1fr);
+    grid-template-rows: minmax(560px, 1fr) auto;
     flex: none;
     min-height: 0;
   }
@@ -660,6 +627,7 @@
     min-height: 560px;
   }
   .dashboard-side-stack {
+    grid-column: 2;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     min-height: 280px;
@@ -667,6 +635,21 @@
 }
 
 @media (max-width: 760px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .dashboard-grid > aside {
+    grid-column: 1;
+    grid-row: 1;
+    max-height: 420px;
+  }
+
+  .dashboard-side-stack {
+    grid-column: 1;
+  }
+
   .dashboard-main {
     margin: 0 12px;
     padding-top: 94px;
@@ -687,6 +670,7 @@
     overflow: visible;
   }
   .scenario-dashboard-list {
+    height: 520px;
     max-height: 520px;
     border-right: 0;
     border-bottom: 1px solid #294463;

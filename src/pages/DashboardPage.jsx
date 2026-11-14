@@ -1,3 +1,4 @@
+import ScenarioFacilitySidebar from '../features/dashboard/ScenarioFacilitySidebar.jsx';
 import { useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, CircleGauge, RotateCcw, Server, X } from 'lucide-react';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
@@ -36,11 +37,8 @@ export default function DashboardPage() {
     [assetCatalog, selectedFacility]
   );
   const selectedAsset =
-    assetCatalog.find(asset => asset.id === selectedAssetId) ?? facilityAssets[0];
+    facilityAssets.find(asset => asset.id === selectedAssetId) ?? facilityAssets[0];
   const selected = SCENARIOS.find(scenario => scenario.asset === selectedAsset?.id) ?? null;
-  const controllableAssetCount = facilityAssets.filter(asset =>
-    SCENARIOS.some(scenario => scenario.asset === asset.id)
-  ).length;
   const selectedIncident = selected
     ? incidents.find(incident => incident.id === selected.id)
     : null;
@@ -96,115 +94,21 @@ export default function DashboardPage() {
 
   return (
     <main className="dashboard-main">
-      <section className="status-overview" aria-labelledby="overview-heading">
-        <h2 id="overview-heading" className="sr-only">
-          전체 운영 현황
-        </h2>
-        <article className="status-card total">
-          <Server aria-hidden="true" />
-          <div>
-            <span>전체 설비</span>
-            <strong>{liveSummary.total || '—'}</strong>
-          </div>
-          <small>{liveSummary.total ? 'Three.js 설비 연동' : '설비 데이터 로딩 전'}</small>
-        </article>
-        <article className="status-card normal">
-          <CheckCircle2 aria-hidden="true" />
-          <div>
-            <span>정상</span>
-            <strong>{liveSummary.total ? liveSummary.normal : '—'}</strong>
-          </div>
-          <small>정상 운영 설비</small>
-        </article>
-        <article className="status-card warning">
-          <AlertTriangle aria-hidden="true" />
-          <div>
-            <span>주의</span>
-            <strong>{liveSummary.warning}</strong>
-          </div>
-          <small>연관 영향 설비</small>
-        </article>
-        <article className="status-card fault">
-          <CircleGauge aria-hidden="true" />
-          <div>
-            <span>장애</span>
-            <strong>{liveSummary.fault}</strong>
-          </div>
-          <small>{incidents.length}건 진행 중</small>
-        </article>
-      </section>
-
       <div className="dashboard-grid">
-        <section className="dashboard-panel scenario-control" aria-labelledby="scenario-heading">
-          <header className="dashboard-panel-heading">
-            <div>
-              <span>FACILITY CONTROL</span>
-              <h2 id="scenario-heading">시설·장비 제어</h2>
-            </div>
-            <b>{assetCatalog.length || '연동 대기'}개 설비</b>
-          </header>
-          <div className="scenario-dashboard-list">
-            <nav className="facility-control-tabs" aria-label="층 및 지원 시설">
-              {facilityGroups.map(group => {
-                const count = assetCatalog.filter(asset => group.matches(asset)).length;
-                return (
-                  <button
-                    type="button"
-                    key={group.id}
-                    className={selectedFacilityId === group.id ? 'active' : ''}
-                    aria-pressed={selectedFacilityId === group.id}
-                    onClick={() => setSelectedFacilityId(group.id)}
-                  >
-                    <b>{group.id}</b>
-                    <span>{group.name}</span>
-                    <small>{count}</small>
-                  </button>
-                );
-              })}
-            </nav>
-            <div className="facility-asset-heading">
-              <div>
-                <b>{selectedFacility?.id}</b>
-                <span>{selectedFacility?.name}</span>
-              </div>
-              <small>{facilityAssets.length}개 설비</small>
-            </div>
-            <div className="facility-control-summary">
-              <span>
-                정상{' '}
-                {facilityAssets.length -
-                  incidents.filter(incident =>
-                    facilityAssets.some(asset => asset.id === scenarioById.get(incident.id)?.asset)
-                  ).length}
-              </span>
-              <span>시나리오 제어 {controllableAssetCount}</span>
-            </div>
-            <div className="scenario-facility-assets">
-              {facilityAssets.length ? (
-                facilityAssets.map(asset => {
-                  const scenario = SCENARIOS.find(item => item.asset === asset.id);
-                  const running = scenario && runningIds.has(scenario.id);
-                  return (
-                    <button
-                      type="button"
-                      key={asset.id}
-                      className={`${selectedAsset?.id === asset.id ? 'selected' : ''}${running ? ' running' : ''}`}
-                      onClick={() => selectAsset(asset)}
-                    >
-                      <i />
-                      <span>
-                        <strong>{asset.id}</strong>
-                        <small>{asset.name || asset.type}</small>
-                      </span>
-                      <em>{running ? '장애' : scenario ? '제어 가능' : '정상'}</em>
-                    </button>
-                  );
-                })
-              ) : (
-                <p className="dashboard-empty">디지털 트윈 설비 정보를 불러오는 중입니다.</p>
-              )}
-            </div>
-          </div>
+        <ScenarioFacilitySidebar
+          facilityGroups={facilityGroups}
+          assetCatalog={assetCatalog}
+          selectedAssetId={selectedAsset?.id}
+          runningIds={runningIds}
+          onSelectAsset={(facilityId, asset) => {
+            setSelectedFacilityId(facilityId);
+            selectAsset(asset);
+          }}
+        />
+        <section
+          className="dashboard-panel flex min-h-0 min-w-0 flex-col overflow-hidden"
+          aria-label="선택 설비 상세"
+        >
           <div className="selected-scenario">
             <div className="selected-scenario-title">
               <div>
@@ -303,10 +207,47 @@ export default function DashboardPage() {
         </section>
 
         <div className="dashboard-side-stack">
+          <section className="status-overview" aria-labelledby="overview-heading">
+            <h2 id="overview-heading" className="sr-only">
+              전체 운영 현황
+            </h2>
+            <article className="status-card total">
+              <Server aria-hidden="true" />
+              <div>
+                <span>전체 설비</span>
+                <strong>{liveSummary.total || '—'}</strong>
+              </div>
+              <small>{liveSummary.total ? 'Three.js 설비 연동' : '설비 데이터 로딩 전'}</small>
+            </article>
+            <article className="status-card normal">
+              <CheckCircle2 aria-hidden="true" />
+              <div>
+                <span>정상</span>
+                <strong>{liveSummary.total ? liveSummary.normal : '—'}</strong>
+              </div>
+              <small>정상 운영 설비</small>
+            </article>
+            <article className="status-card warning">
+              <AlertTriangle aria-hidden="true" />
+              <div>
+                <span>주의</span>
+                <strong>{liveSummary.warning}</strong>
+              </div>
+              <small>연관 영향 설비</small>
+            </article>
+            <article className="status-card fault">
+              <CircleGauge aria-hidden="true" />
+              <div>
+                <span>장애</span>
+                <strong>{liveSummary.fault}</strong>
+              </div>
+              <small>{incidents.length}건 진행 중</small>
+            </article>
+          </section>
+
           <section className="dashboard-panel active-scenarios" aria-labelledby="active-heading">
             <header className="dashboard-panel-heading">
               <div>
-                <span>ACTIVE SCENARIOS</span>
                 <h2 id="active-heading">진행 중 시나리오</h2>
               </div>
               <b>{incidents.length}건</b>
