@@ -4568,15 +4568,18 @@ export function initDigitalTwin(root) {
       sec.hidden = !chosen;
       sec.classList.toggle('is-focused', chosen);
     }
-    const upsFault = activeIncidents.has('ups'),
-      cduFault = activeIncidents.has('cdu'),
-      chillerFault = activeIncidents.has('chiller');
+    const hasFault = ids => ids.some(id => rank(id) >= 3);
+    const upsFault = hasFault(['UPS-01', 'UPS-02']),
+      batteryFault = hasFault(['BAT-01']),
+      cduFault = hasFault(['CDU-01', 'CDU-02']),
+      chillerFault = hasFault(['CH-01', 'CH-02']),
+      pumpFault = hasFault(['PUMP-01', 'PUMP-02']);
     // Synthetic readings for prototype demonstrations only, not telemetry.
-    const battery = upsFault ? 71 : 96;
+    const battery = upsFault || batteryFault ? 71 : 96;
     const powerLoad = upsFault ? 87 : 68;
     const supply = chillerFault ? 24.7 : cduFault ? 19.3 : 18.2;
-    const flow = cduFault ? 82 : chillerFault ? 131 : 148;
-    const coolingLoad = chillerFault ? 87 : cduFault ? 78 : 61;
+    const flow = pumpFault ? 60 : cduFault ? 82 : chillerFault ? 131 : 148;
+    const coolingLoad = chillerFault ? 87 : pumpFault ? 82 : cduFault ? 78 : 61;
     const upsLabel = r => (r >= 3 ? '이상' : r === 2 ? '주의' : '정상');
     document.getElementById('infra-ups-status').textContent =
       upsLabel(rank('UPS-01')) + ' / ' + upsLabel(rank('UPS-02'));

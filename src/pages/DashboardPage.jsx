@@ -1,6 +1,6 @@
 import ScenarioFacilitySidebar from '../features/dashboard/ScenarioFacilitySidebar.jsx';
 import { useMemo, useState } from 'react';
-import { RotateCcw, X } from 'lucide-react';
+import { ChevronDown, RotateCcw, X } from 'lucide-react';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import '../features/dashboard/dashboard.css';
@@ -220,22 +220,92 @@ export default function DashboardPage() {
               {incidents.length ? (
                 incidents.map(incident => {
                   const scenario = scenarioById.get(incident.id);
+                  if (!scenario) return null;
                   return (
-                    <article key={incident.id}>
-                      <i />
-                      <div>
-                        <strong>{scenario.title}</strong>
-                        <small>
-                          {scenario.asset} · {steps[incident.stage]}
-                        </small>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => endIncident(incident.id)}
-                        aria-label={`${scenario.title} 종료`}
-                      >
-                        <X size={14} />
-                      </button>
+                    <article key={incident.id} aria-label={scenario.title}>
+                      <details className="active-scenario-disclosure">
+                        <summary>
+                          <div>
+                            <div className="active-scenario-title-row">
+                              <strong>{scenario.title}</strong>
+                              <span className="active-scenario-state">
+                                {scenario.status} · {scenario.level}
+                              </span>
+                            </div>
+                            <small>
+                              {scenario.asset} · {steps[incident.stage]}
+                            </small>
+                          </div>
+                          <ChevronDown
+                            className="active-scenario-chevron"
+                            size={16}
+                            aria-hidden="true"
+                          />
+                        </summary>
+                        <div className="active-scenario-content">
+                          <p className="active-scenario-condition">{scenario.condition}</p>
+                          <dl className="active-scenario-details">
+                            <div>
+                              <dt>현재 대응 단계</dt>
+                              <dd className="active-scenario-stage">
+                                {incident.stage + 1} / {steps.length} · {steps[incident.stage]}
+                              </dd>
+                            </div>
+                            <div>
+                              <dt>시작 시각</dt>
+                              <dd>
+                                <time dateTime={new Date(incident.started).toISOString()}>
+                                  {new Intl.DateTimeFormat('ko-KR', {
+                                    timeZone: 'Asia/Seoul',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit',
+                                  }).format(new Date(incident.started))}
+                                </time>
+                              </dd>
+                            </div>
+                            <div>
+                              <dt>예상 영향</dt>
+                              <dd>{scenario.impact}</dd>
+                            </div>
+                            <div>
+                              <dt>점검 방향</dt>
+                              <dd>{scenario.cause}</dd>
+                            </div>
+                          </dl>
+                          <div className="active-scenario-checks">
+                            <h3>대응 체크포인트</h3>
+                            <ol>
+                              {scenario.checks.map(check => (
+                                <li key={check}>{check}</li>
+                              ))}
+                            </ol>
+                          </div>
+                          {scenario.related.length > 0 && (
+                            <div className="active-scenario-related">
+                              <h3>연관 설비</h3>
+                              <ul>
+                                {scenario.related.map(asset => (
+                                  <li key={asset.id}>
+                                    <span>
+                                      {asset.id} · {asset.state}
+                                    </span>
+                                    <p>{asset.why}</p>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          <button
+                            className="active-scenario-end"
+                            type="button"
+                            onClick={() => endIncident(incident.id)}
+                            aria-label={`${scenario.title} 종료`}
+                          >
+                            <X size={14} aria-hidden="true" /> 시나리오 종료
+                          </button>
+                        </div>
+                      </details>
                     </article>
                   );
                 })

@@ -1,4 +1,7 @@
-export const SCENARIOS = [
+import { DEFAULT_ASSET_CATALOG } from './assetCatalog.js';
+import { SCENARIO_TEMPLATES } from './scenarioTemplates.js';
+
+const REPRESENTATIVE_SCENARIOS = [
   {
     id: 'gpu',
     title: 'GPU 서버 과열',
@@ -183,3 +186,33 @@ export const SCENARIOS = [
     power: -0.8,
   },
 ];
+
+export function buildScenarios(assets) {
+  const representatives = new Map(REPRESENTATIVE_SCENARIOS.map(item => [item.asset, item]));
+  const equipment = assets.filter(asset => asset.type !== 'AI AGENT');
+  const assetIds = new Set(equipment.map(asset => asset.id));
+  const generated = equipment
+    .filter(asset => !representatives.has(asset.id))
+    .map(asset => {
+      const template = SCENARIO_TEMPLATES[asset.type];
+      if (!template)
+        throw new Error(`시나리오 유형이 등록되지 않았습니다: ${asset.type} (${asset.id})`);
+      return {
+        ...template,
+        id: `asset-${asset.id.toLowerCase()}`,
+        asset: asset.id,
+        zone: asset.zone,
+        category: asset.type,
+        status: '장애',
+        title: `${asset.id} ${template.title}`,
+        condition: `${asset.name}: ${template.condition}`,
+        impact: `${asset.location || asset.floor || '해당 구역'} · ${template.impact}`,
+        checks: template.checks.map(check => `${asset.id} · ${check}`),
+        // Do not infer wiring or physical dependencies from proximity alone.
+        related: [],
+      };
+    });
+  return [...REPRESENTATIVE_SCENARIOS.filter(item => assetIds.has(item.asset)), ...generated];
+}
+
+export const SCENARIOS = buildScenarios(DEFAULT_ASSET_CATALOG);
