@@ -1,6 +1,7 @@
 import ScenarioFacilitySidebar from '../features/dashboard/ScenarioFacilitySidebar.jsx';
+import EquipmentOverview from '../features/dashboard/EquipmentOverview.jsx';
 import { useMemo, useState } from 'react';
-import { ChevronDown, RotateCcw, X } from 'lucide-react';
+import { ChevronDown, ClipboardList, Flame, Info, Play, RotateCcw, X } from 'lucide-react';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import '../features/dashboard/dashboard.css';
@@ -107,99 +108,89 @@ export default function DashboardPage() {
           }}
         />
         <section
-          className="dashboard-panel flex min-h-0 min-w-0 flex-col overflow-hidden"
+          className="scenario-workspace flex min-h-0 min-w-0 flex-col overflow-hidden"
           aria-label="선택 설비 상세"
         >
-          <div className="selected-scenario">
-            <div className="selected-scenario-title">
-              <div>
-                <small>{selectedAsset?.id ?? '설비 연동 대기'}</small>
-                <h3>{selectedAsset?.name ?? '설비를 선택하세요'}</h3>
-              </div>
-              <span className={selectedAssetState !== '정상' ? 'critical' : ''}>
-                {selectedAssetState}
-              </span>
-            </div>
-            <p>{selectedAsset?.summary ?? '디지털 트윈 화면에서 설비 정보를 먼저 불러오세요.'}</p>
-            <h4 className="asset-info-heading">설비 정보</h4>
-            <dl className="asset-info-list">
-              <div>
-                <dt>설치 위치</dt>
-                <dd>{selectedAsset?.location ?? '—'}</dd>
-              </div>
-              <div>
-                <dt>설비 유형</dt>
-                <dd>{selectedAsset?.type ?? '—'}</dd>
-              </div>
-              <div>
-                <dt>현재 온도</dt>
-                <dd>
-                  {selectedAsset
-                    ? `${((selectedAsset.temp || 0) + (selectedIncident ? selected.temp : 0)).toFixed(1)}°C`
-                    : '—'}
-                </dd>
-              </div>
-              <div>
-                <dt>소비 전력</dt>
-                <dd>
-                  {selectedAsset
-                    ? `${Math.max(0, (selectedAsset.power || 0) + (selectedIncident ? selected.power : 0)).toFixed(2)} kW`
-                    : '—'}
-                </dd>
-              </div>
-              <div>
-                <dt>운영 용량</dt>
-                <dd>{selectedAsset ? `${selectedAsset.capacity ?? 0}%` : '—'}</dd>
-              </div>
-              <div>
-                <dt>대응 단계</dt>
-                <dd>{selectedIncident ? steps[selectedIncident.stage] : '시나리오 미실행'}</dd>
-              </div>
-            </dl>
+          <div className="scenario-workspace-scroll">
+            <EquipmentOverview
+              asset={selectedAsset}
+              incidents={incidents}
+              facilityName={selectedFacility?.name}
+              facilityAssets={facilityAssets}
+              stage={selectedIncident ? steps[selectedIncident.stage] : null}
+            />
             {selected ? (
-              <div className="asset-control-scenario">
-                <div className="asset-scenario-heading">
+              <section className="scenario-runner" aria-labelledby="scenario-runner-title">
+                <h2 id="scenario-runner-title">
+                  <Play size={20} aria-hidden="true" />
+                  시나리오 실행
+                </h2>
+                <div className="scenario-runner-select">
+                  <label htmlFor="selected-equipment-scenario">실행 시나리오</label>
                   <div>
-                    <small>실행 가능한 시나리오</small>
-                    <strong>{selected.title}</strong>
+                    <Flame size={17} aria-hidden="true" />
+                    <select
+                      id="selected-equipment-scenario"
+                      value={selected.id}
+                      onChange={event => setScenarioState({ chosenScenarioId: event.target.value })}
+                    >
+                      {SCENARIOS.filter(item => item.asset === selectedAsset.id).map(item => (
+                        <option key={item.id} value={item.id}>
+                          {item.title}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  <span className={selected.level === '긴급' ? 'critical' : ''}>
-                    {selected.level}
-                  </span>
                 </div>
-                <p>{selected.condition}</p>
-                <dl className="scenario-brief">
+                <div className="scenario-runner-impact">
+                  <h3>
+                    <Info size={17} aria-hidden="true" />
+                    예상 영향
+                  </h3>
                   <div>
-                    <dt>예상 영향</dt>
-                    <dd>{selected.impact}</dd>
+                    <p>{selected.condition}</p>
+                    <p>{selected.impact}</p>
                   </div>
-                  <div>
-                    <dt>점검 방향</dt>
-                    <dd>{selected.cause}</dd>
-                  </div>
-                </dl>
-                <div className="scenario-checks">
-                  <small>대응 체크포인트</small>
+                </div>
+                <details className="scenario-runner-procedure" key={selected.id}>
+                  <summary>
+                    <ClipboardList size={17} aria-hidden="true" />
+                    <span>점검 절차 및 대응 체크포인트</span>
+                    <ChevronDown size={16} aria-hidden="true" />
+                  </summary>
+                  <p>{selected.cause}</p>
                   <ol>
                     {selected.checks.map(check => (
                       <li key={check}>{check}</li>
                     ))}
                   </ol>
+                </details>
+                <div className="scenario-runner-context">
+                  <span
+                    className={`equipment-status ${selectedAssetState === '정상' ? 'normal' : selectedAssetState === '주의' ? 'warning' : 'fault'}`}
+                  >
+                    {selectedAssetState}
+                  </span>
+                  <span>시나리오 등급 · {selected.level}</span>
                 </div>
                 {selectedIncident ? (
                   <button
                     type="button"
-                    className="scenario-action stop"
+                    className="scenario-runner-action stop"
                     onClick={() => endIncident(selected.id)}
                   >
-                    시나리오 종료
+                    <X size={18} aria-hidden="true" /> 시나리오 종료
                   </button>
                 ) : (
-                  <button type="button" className="scenario-action" onClick={startSelectedScenario}>
-                    가상 장애 발생
+                  <button
+                    type="button"
+                    className="scenario-runner-action"
+                    onClick={startSelectedScenario}
+                  >
+                    <Play size={18} aria-hidden="true" /> 시나리오 실행
                   </button>
                 )}
-              </div>
+              </section>
             ) : (
               <div className="asset-control-unavailable">
                 이 설비에는 실행 가능한 가상 장애 시나리오가 등록되어 있지 않습니다.

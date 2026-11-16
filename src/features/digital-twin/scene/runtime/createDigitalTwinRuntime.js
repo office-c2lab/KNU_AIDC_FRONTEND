@@ -20,16 +20,16 @@ import { digitalTwinStore } from '../../../../stores/digitalTwinStore.js';
 import { FLOOR_INFO, FLOOR_Y, zones } from '../config/facilityConfig.js';
 import { SCENARIOS } from '../config/scenarioConfig.js';
 
-export function initDigitalTwin(root) {
+export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   /*
    * KNU AIDC Data Center Prototype V36 — cooling annex stray pipe cleanup; V35 facility picking retained.
    * 기존 KNU AIDC 시설 분류/자산 개념 참조, 수치 및 장애는 100% 프론트엔드 시뮬레이션.
    * 디테일 지오메트리(랙 프레임, 도어, 팬, CDU, 냉각기, UPS 등)는 JS에서 생성합니다.
    */
-  const $ = q => root.querySelector(q) ?? document.querySelector(q);
+  const $ = q => root.querySelector(q) ?? (modelsOnly ? null : document.querySelector(q));
   let disposed = false;
-  const host = $('#render-host');
-  const labelsHost = $('#world-labels');
+  const host = modelsOnly ? document.createElement('div') : $('#render-host');
+  const labelsHost = modelsOnly ? document.createElement('div') : $('#world-labels');
   const clock = new THREE.Clock();
   const registry = new Map();
   const heatDisks = [];
@@ -111,7 +111,13 @@ export function initDigitalTwin(root) {
     twinActions.setScenarioState({ chosenScenarioId, selectedIncidentId });
     twinActions.setIncidents([...activeIncidents.values()]);
   };
-  const { renderer, scene, camera, controls, applyRenderQuality } = createRenderingCore({
+  const { renderer, scene, camera, controls, applyRenderQuality } = modelsOnly ? {
+    renderer: { capabilities: { getMaxAnisotropy: () => 1 } },
+    scene: new THREE.Scene(),
+    camera: new THREE.PerspectiveCamera(),
+    controls: null,
+    applyRenderQuality: () => {},
+  } : createRenderingCore({
     THREE,
     OrbitControls,
     host,
@@ -1064,7 +1070,7 @@ export function initDigitalTwin(root) {
       for (let i = 0; i < path.beads.length; i++) {
         const orb = path.beads[i];
         orb.position.copy(path.curve.getPoint((t * speed + i / path.beads.length) % 1));
-        orb.material.color.setHex(issue ? 0xf2a870 : path.color);
+        orb.material.color.setHex(issue ? 0xff6475 : path.color);
         orb.visible = utilityEnabled.coolant;
       }
     }
@@ -2397,6 +2403,36 @@ export function initDigitalTwin(root) {
 
   // Seven simulated roles use approved GLBs after loading. No procedural/fallback
   // person is rendered during initial loading or after a failed model request.
+  if (modelsOnly) {
+    // Reuse the exact equipment builders without starting the twin's renderer,
+    // simulation, DOM controls, store writes or animation loop.
+    const models = new Map([...registry].map(([id, asset]) => [id, asset.root]));
+    const retained = new Set();
+    const resources = object => {
+      const result = new Set();
+      object.traverse(part => {
+        if (part.geometry) result.add(part.geometry);
+        for (const material of [part.material].flat().filter(Boolean)) {
+          result.add(material);
+          for (const value of Object.values(material)) if (value?.isTexture) result.add(value);
+        }
+      });
+      return result;
+    };
+    for (const model of models.values()) for (const resource of resources(model)) retained.add(resource);
+    for (const resource of resources(scene)) if (!retained.has(resource)) resource.dispose();
+    for (const model of models.values()) {
+      model.removeFromParent();
+      model.position.set(0, 0, 0);
+      model.traverse(part => {
+        if (part.name?.startsWith('internal-machinery:')) part.visible = true;
+      });
+    }
+    scene.clear();
+    labelsHost.replaceChildren();
+    return { models, dispose: () => { for (const resource of retained) resource.dispose(); } };
+  }
+
   const AI_AGENT_CONFIG = [
     {
       id: 'AI-SEC-01',
@@ -3324,7 +3360,7 @@ export function initDigitalTwin(root) {
         dot.visible = show && selected;
         const progress = (t * (failure ? 0.09 : 0.22) + j * 0.5) % 1;
         dot.position.set(section.x, a + (b - a) * progress, section.z);
-        dot.material.color.setHex(failure ? 0xff9d71 : FEED_CONFIG[section.feed].color);
+        dot.material.color.setHex(failure ? 0xff6475 : FEED_CONFIG[section.feed].color);
       }
     }
     const visibleFeed = kind => (kind === 'power' ? powerMode : coolMode);
@@ -3341,7 +3377,7 @@ export function initDigitalTwin(root) {
         (feed === 'pa' && faultPowerA) ||
         (feed === 'cs' && faultCool) ||
         (feed === 'cs' && activeFloor === '3F' && faultCdu);
-      const displayColor = failure ? 0xff9d71 : spec.color;
+      const displayColor = failure ? 0xff6475 : spec.color;
       pipe.visible = enabled;
       pipe.position.y = (bottom + top) / 2;
       pipe.scale.y = Math.max(0.01, height);
@@ -3368,8 +3404,8 @@ export function initDigitalTwin(root) {
         (route.feed === 'cs' && faultCool) ||
         (route.feed === 'cs' && route.floor === '3F' && faultCdu);
       const material = route.mesh.material;
-      material.color.setHex(failed && active ? 0xff9c67 : route.base);
-      material.emissive.setHex(failed && active ? 0xff713f : route.base);
+      material.color.setHex(failed && active ? 0xff6475 : route.base);
+      material.emissive.setHex(failed && active ? 0xff6475 : route.base);
       material.emissiveIntensity = active ? 0.32 : 0.028;
       route.mesh.visible =
         active &&
@@ -3398,7 +3434,7 @@ export function initDigitalTwin(root) {
           (t * (affected ? 0.055 : 0.15) + i / route.beads.length) % 1
         );
         route.beads[i].position.copy(pos);
-        route.beads[i].material.color.setHex(affected ? 0xff9166 : FEED_CONFIG[route.feed].color);
+        route.beads[i].material.color.setHex(affected ? 0xff6475 : FEED_CONFIG[route.feed].color);
       }
     }
   }
@@ -4268,25 +4304,8 @@ export function initDigitalTwin(root) {
     floorGroups[key].add(strip);
     floorAlertOutlines.set(key, strip);
   }
-  function renderIncidentOverlay() {
+  function updateZoneIncidentCounts() {
     const incidents = [...activeIncidents.values()];
-    const overlay = $('#incident-overlay');
-    overlay.hidden = incidents.length === 0;
-    if (!incidents.length) {
-      overlay.replaceChildren();
-      overlay.classList.remove('has-incidents');
-    } else {
-      overlay.classList.add('has-incidents');
-      overlay.innerHTML = `<div class="overlay-title"><span>진행 중 장애</span><b>${incidents.length}건</b></div>${incidents
-        .slice(0, 4)
-        .map(v => {
-          const s = SCENARIO_BY_ID.get(v.id);
-          return `<button data-overlay-focus="${s.id}"><i></i><span><strong>${esc(s.title)}</strong><small>${esc(s.asset)} · ${incidentSteps[v.stage]}</small></span><b>위치</b></button>`;
-        })
-        .join(
-          ''
-        )}${incidents.length > 4 ? `<button data-overlay-all="true" class="overlay-more">나머지 ${incidents.length - 4}건 보기</button>` : ''}`;
-    }
     root.querySelectorAll('.zone-nav [data-zone]').forEach(b => {
       const key = b.dataset.zone;
       const count = key.startsWith('f')
@@ -4511,7 +4530,7 @@ export function initDigitalTwin(root) {
     updateAgentShortcuts();
     updateIssueVisuals();
     updateSummary();
-    renderIncidentOverlay();
+    updateZoneIncidentCounts();
     renderScenarioPanel();
     updateInspector();
     syncModeControls();
@@ -4697,7 +4716,7 @@ export function initDigitalTwin(root) {
       const el = $('#health-' + floor);
       if (!el) continue;
       el.textContent = problems ? `장애 ${problems}` : '정상';
-      el.classList.toggle('warn', Boolean(problems));
+      el.classList.remove('warn');
       el.classList.toggle('error', Boolean(problems));
     }
     for (const key of ['power', 'cooling']) {
@@ -4708,20 +4727,19 @@ export function initDigitalTwin(root) {
       if (el) {
         el.textContent = count ? '장애 ' + count : '정상';
         el.classList.toggle('error', Boolean(count));
-        el.classList.toggle('warn', Boolean(count));
+        el.classList.remove('warn');
       }
     }
     const alarmIds = [...activeIncidents.values()].map(i => ({
       scenario: SCENARIO_BY_ID.get(i.id),
       incident: i,
     }));
-    $('#alarm-count').textContent = `최근 ${Math.min(alarmIds.length, 3)}건`;
+    $('#alarm-count').textContent = `전체 ${alarmIds.length}건`;
     $('#header-alarm-count').textContent = alarmIds.length;
     $('#header-alarm-count').style.display = alarmIds.length ? 'inline-block' : 'none';
     $('#alarm-list').innerHTML = alarmIds.length
       ? alarmIds
           .sort((a, b) => b.incident.started - a.incident.started)
-          .slice(0, 3)
           .map(
             ({ scenario: s, incident: i }) =>
               `<li class="alarm-item" data-level="critical" data-scenario-focus="${s.id}"><span class="alarm-level"></span><div class="alarm-copy"><b>${esc(s.title)}</b><small>${esc(s.asset)} · ${esc(incidentSteps[i.stage])}</small></div><div class="alarm-meta"><time class="alarm-time">${new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(i.started)}</time><span class="alarm-severity">장애</span></div></li>`
@@ -5007,18 +5025,6 @@ export function initDigitalTwin(root) {
       renderScenarioPanel();
     }
   });
-  $('#incident-overlay').addEventListener('click', e => {
-    const b = e.target.closest('button');
-    if (!b) return;
-    if (b.dataset.overlayFocus) {
-      const s = SCENARIO_BY_ID.get(b.dataset.overlayFocus);
-      focusAsset(s.asset);
-      chosenScenarioId = s.id;
-      selectedIncidentId = s.id;
-      twinActions.setScenarioState({ chosenScenarioId, selectedIncidentId });
-      setInspectorTab('scenario');
-    } else if (b.dataset.overlayAll) setInspectorTab('scenario');
-  });
   const handleGlobalKeydown = e => {
     if (digitalTwinStore.getState().notificationsOpen || e.defaultPrevented) return;
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -5116,9 +5122,7 @@ export function initDigitalTwin(root) {
               setFxColor(
                 led,
                 active
-                  ? critical && (Math.floor(t * 8) + i) % 2 === 0
-                    ? pulseCritical
-                    : pulseWarn
+                  ? activeColor
                   : fx.kind === 'gpuRack'
                     ? 0x9ca7ff
                     : 0x64e6c3
@@ -5164,8 +5168,7 @@ export function initDigitalTwin(root) {
             fx.portFault?.forEach((p, i) => {
               const show = active;
               p.visible = show;
-              const c = critical && (Math.floor(t * 10) + i) % 2 === 0 ? pulseCritical : pulseWarn;
-              setFxColor(p, c);
+              setFxColor(p, activeColor);
               p.material.opacity = show ? pulseOpacity(0.16, 0.78, t, 10, i * 0.4) : 0;
             });
             if (fx.uplinkGlow) {
@@ -5186,7 +5189,7 @@ export function initDigitalTwin(root) {
           {
             const normal = fx.kind === 'battery' ? 0xa7dd6e : 0x67e3cb;
             fx.statusBars?.forEach((bar, i) => {
-              setFxColor(bar, active ? (critical && i === 0 ? pulseCritical : pulseWarn) : normal);
+              setFxColor(bar, active ? activeColor : normal);
               bar.material.opacity = active ? pulseOpacity(0.28, 0.6, t, 6, i) : 0.95;
             });
             if (fx.screenGlow) {
@@ -5203,15 +5206,11 @@ export function initDigitalTwin(root) {
           break;
         case 'cdu':
           {
-            const criticalC = primaryIds.includes('cdu');
+            const criticalC = critical;
             fx.flowLeds?.forEach((led, i) => {
               setFxColor(
                 led,
-                active
-                  ? criticalC && (Math.floor(t * 7) + i) % 3 === 0
-                    ? pulseCritical
-                    : 0x79eaf5
-                  : 0x6ce2ef
+                active ? activeColor : 0x6ce2ef
               );
               led.material.opacity = active ? pulseOpacity(0.22, 0.65, t, 7, i * 0.2) : 0.92;
             });
@@ -5242,10 +5241,7 @@ export function initDigitalTwin(root) {
             }
             fx.fanAlerts?.forEach((fan, i) => {
               fan.visible = active;
-              setFxColor(
-                fan,
-                critical && (Math.floor(t * 8) + i) % 2 === 0 ? pulseCritical : pulseWarn
-              );
+              setFxColor(fan, activeColor);
               fan.material.opacity = active ? pulseOpacity(0.12, 0.7, t, 8, i) : 0;
               fan.scale.setScalar(1 + 0.1 * Math.sin(t * 5 + i));
             });
@@ -5277,11 +5273,7 @@ export function initDigitalTwin(root) {
             fx.gateLeds?.forEach((led, i) => {
               setFxColor(
                 led,
-                active && (Math.floor(t * 10) + i) % 2 === 0
-                  ? pulseCritical
-                  : active
-                    ? pulseWarn
-                    : 0x59e2bb
+                active ? activeColor : 0x59e2bb
               );
               led.material.opacity = active ? pulseOpacity(0.32, 0.55, t, 9, i) : 0.96;
             });
@@ -5401,7 +5393,7 @@ export function initDigitalTwin(root) {
   controls.autoRotate = autoRotate;
   $('#btn-auto').classList.toggle('is-on', autoRotate);
   renderScenarioPanel();
-  renderIncidentOverlay();
+  updateZoneIncidentCounts();
   updateNocWall();
   resize();
   loadRealHumanLibrary();

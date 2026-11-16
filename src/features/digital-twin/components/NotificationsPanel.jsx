@@ -49,7 +49,7 @@ export default function NotificationsPanel({ dashboardMode = false }) {
       <div className="notifications-heading">
         <h2 id="alarm-heading">알림 및 이벤트</h2>
         <span className="module-readout" id="alarm-count">
-          최근 0건
+          전체 {dashboardMode ? incidents.length : 0}건
         </span>
         <button
           ref={closeRef}
@@ -78,6 +78,7 @@ export default function NotificationsPanel({ dashboardMode = false }) {
                 <div className="alarm-meta">
                   <time className="alarm-time">
                     {new Intl.DateTimeFormat('ko-KR', {
+                      timeZone: 'Asia/Seoul',
                       hour: '2-digit',
                       minute: '2-digit',
                     }).format(new Date(incident.started))}

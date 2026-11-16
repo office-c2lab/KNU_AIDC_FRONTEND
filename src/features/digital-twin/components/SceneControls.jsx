@@ -10,7 +10,6 @@ export default function SceneControls() {
 
   return (
     <>
-      <div id="incident-overlay" className="incident-overlay" aria-live="polite"></div>
       <div className="center-status">
         <div className="control-dock" role="toolbar" aria-label="데이터센터 3D 관제 도구">
           <div className="dock-group dock-home-group">
