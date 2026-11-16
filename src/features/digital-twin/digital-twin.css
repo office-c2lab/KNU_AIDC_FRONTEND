@@ -722,7 +722,7 @@ body{font-size:12px}
 /* V37 — restrained AIDC AI operations design; agents are distinct from equipment. */
 .agent-modal-report[hidden],.asset-modal-report[hidden]{display:none!important}
 .asset-modal{padding-top:var(--modal-top-space);padding-bottom:24px}
-.asset-modal-window{height:min(870px,calc(100dvh - var(--modal-top-space) - 24px))}
+.asset-modal-window{height:min(870px,calc(var(--app-viewport-height,100dvh) - var(--modal-top-space) - 24px))}
 .agent-quicklist{margin:12px 0 15px;border:1px solid #3c5e84;background:linear-gradient(140deg,#1c35526d,#0a1830);box-shadow:inset 0 1px #92bced24}
 .agent-quicklist summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:11px 12px;color:#e0f1ff;font-size:11px;font-weight:700}
 .agent-quicklist summary::-webkit-details-marker{display:none}

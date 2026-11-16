@@ -3524,6 +3524,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     selectedIncidentId = id;
     if (!activeIncidents.has(id)) {
       activeIncidents.set(id, { id, stage: 0, started: new Date() });
+      twinActions.addAuditEvent({ scenarioId: id, action: '장애 발생', kind: 'danger' });
       writeEvent(`${s.title} · ${s.asset}에서 ${s.status} 발생`, 'danger');
       s.related.forEach(a => writeEvent(`${a.id} · ${a.why}`, 'warning'));
     } else writeEvent(`${s.title} · 이미 진행 중인 장애로 이동`);
@@ -3539,18 +3540,22 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     const s = SCENARIO_BY_ID.get(id);
     if (item.stage >= 3) {
       activeIncidents.delete(id);
+      twinActions.addAuditEvent({ scenarioId: id, action: '시나리오 종료', kind: 'success' });
       writeEvent(`${s.title} · 정상 확인 완료, 장애 종료`, 'success');
       selectedIncidentId = activeIncidents.size ? [...activeIncidents.keys()][0] : null;
     } else {
       item.stage++;
+      twinActions.addAuditEvent({ scenarioId: id, action: `${incidentSteps[item.stage]} 단계 완료`, kind: 'info' });
       writeEvent(`${s.title} · ${incidentSteps[item.stage]} 단계 완료`, 'info');
     }
     syncIncidentStore();
     refreshIncidents();
   }
   function resetAllIncidents() {
-    if (activeIncidents.size)
+    if (activeIncidents.size) {
+      twinActions.addAuditEvent({ action: `모든 시나리오 종료 (${activeIncidents.size}건)`, kind: 'success' });
       writeEvent(`전체 시나리오 초기화 · ${activeIncidents.size}건 정리`, 'success');
+    }
     activeIncidents.clear();
     selectedIncidentId = null;
     syncIncidentStore();
@@ -4497,8 +4502,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     updateNocWall();
   }
   function updateAlertLabels() {
-    const bounds = host.getBoundingClientRect(),
-      distance = camera.position.distanceTo(controls.target);
+    const distance = camera.position.distanceTo(controls.target);
     for (const [id, btn] of issueLabels) {
       const a = registry.get(id),
         issue = issueMeshes.get(id);
@@ -4520,8 +4524,8 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
           !isHiddenBehindArchitecture(pos);
       btn.style.display = visible ? 'flex' : 'none';
       if (visible) {
-        btn.style.left = `${(p.x * 0.5 + 0.5) * bounds.width}px`;
-        btn.style.top = `${(-p.y * 0.5 + 0.5) * bounds.height}px`;
+        btn.style.left = `${(p.x * 0.5 + 0.5) * host.clientWidth}px`;
+        btn.style.top = `${(-p.y * 0.5 + 0.5) * host.clientHeight}px`;
       }
     }
     for (const entry of issueLinks) {
@@ -4938,8 +4942,9 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
           ? `${hit.floor} · ${FLOOR_INFO[hit.floor].name}`
           : zones[hit.zone]?.name || '시설';
       tip.style.display = 'block';
-      tip.style.left = `${e.clientX - host.getBoundingClientRect().left + 13}px`;
-      tip.style.top = `${e.clientY - host.getBoundingClientRect().top + 14}px`;
+      const rect = host.getBoundingClientRect();
+      tip.style.left = `${(e.clientX - rect.left) * host.clientWidth / rect.width + 13}px`;
+      tip.style.top = `${(e.clientY - rect.top) * host.clientHeight / rect.height + 14}px`;
       tip.textContent = `${name} · ${hit.id ? (selectedId === hit.id ? '한 번 더 클릭해 상세 보기' : '클릭해서 이동 · 더블클릭 상세') : '클릭하여 이동'}`;
       renderer.domElement.style.cursor = 'pointer';
     } else {
@@ -5077,9 +5082,8 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   }
   function updateLabels() {
     if (!renderer?.domElement) return;
-    const hostRect = host.getBoundingClientRect(),
-      w = hostRect.width,
-      h = hostRect.height;
+    const w = host.clientWidth,
+      h = host.clientHeight;
     for (const a of labelAnchors) {
       const display = a.floor ? !activeFloor && a.zone === 'f' + a.floor[0] : !activeFloor;
       const world = (typeof a.world === 'function' ? a.world() : a.world).clone();

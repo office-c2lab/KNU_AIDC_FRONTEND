@@ -339,8 +339,8 @@
   top: 78px;
   right: 26px;
   z-index: 100;
-  width: min(360px, calc(100vw - 32px));
-  max-height: calc(100dvh - 100px);
+  width: min(360px, calc(var(--app-viewport-width, 100vw) - 32px));
+  max-height: calc(var(--app-viewport-height, 100dvh) - 100px);
   overflow-y: auto;
   border: 1px solid #5274a2a6;
   border-radius: 6px;

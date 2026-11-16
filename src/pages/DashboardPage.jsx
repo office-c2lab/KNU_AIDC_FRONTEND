@@ -1,7 +1,7 @@
 import ScenarioFacilitySidebar from '../features/dashboard/ScenarioFacilitySidebar.jsx';
 import EquipmentOverview from '../features/dashboard/EquipmentOverview.jsx';
+import ScenarioHistory from '../features/dashboard/ScenarioHistory.jsx';
 import { useMemo, useRef, useState } from 'react';
-import { RotateCcw } from 'lucide-react';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import '../features/dashboard/dashboard.css';
@@ -130,60 +130,62 @@ export default function DashboardPage() {
               incidents={incidents}
               stage={selectedIncident ? steps[selectedIncident.stage] : null}
             />
-            {selected ? (
-              <section className="scenario-runner" aria-labelledby="scenario-runner-title">
-                <h2 id="scenario-runner-title">시나리오 실행</h2>
-                <div className="scenario-runner-name">
-                  <h3>{selected.title.replace(selected.asset, '').trim()}</h3>
-                  <span>시나리오 등급 · {selected.level}</span>
-                </div>
-                <div className="scenario-runner-impact">
-                  <h3>예상 영향</h3>
-                  <div>
-                    <p>{selected.condition}</p>
-                    <p>{selected.impact}</p>
+            <div className="scenario-operation-grid">
+              {selected ? (
+                <section className="scenario-runner" aria-labelledby="scenario-runner-title">
+                  <h2 id="scenario-runner-title">시나리오 실행</h2>
+                  <div className="scenario-runner-name">
+                    <h3>{selected.title.replace(selected.asset, '').trim()}</h3>
+                    <span>시나리오 등급 · {selected.level}</span>
                   </div>
+                  <dl className="scenario-runner-summary">
+                    <div>
+                      <dt>장애 상황</dt>
+                      <dd>{selected.condition}</dd>
+                    </div>
+                    <div>
+                      <dt>예상 영향</dt>
+                      <dd>{selected.impact}</dd>
+                    </div>
+                  </dl>
+                  <div className="scenario-runner-procedure">
+                    <h3>점검 절차</h3>
+                    <p>{selected.cause}</p>
+                    <ol>
+                      {selected.checks.map(check => (
+                        <li key={check}>
+                          <span>{check.replace(`${selected.asset} · `, '')}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                  <div className="scenario-runner-footer">
+                    {selectedIncident ? (
+                      <button
+                        type="button"
+                        className="scenario-runner-action stop"
+                        onClick={() => endIncident(selected.id)}
+                      >
+                        시나리오 종료
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="scenario-runner-action"
+                        onClick={startSelectedScenario}
+                      >
+                        시나리오 실행
+                      </button>
+                    )}
+                  </div>
+                </section>
+              ) : (
+                <div className="asset-control-unavailable">
+                  이 설비에는 실행 가능한 가상 장애 시나리오가 등록되어 있지 않습니다.
                 </div>
-                <details className="scenario-runner-procedure" key={selected.id}>
-                  <summary>
-                    <span>점검 절차 및 대응 체크포인트</span>
-                    <span className="procedure-toggle-closed" aria-hidden="true">
-                      펼치기
-                    </span>
-                    <span className="procedure-toggle-open" aria-hidden="true">
-                      접기
-                    </span>
-                  </summary>
-                  <p>{selected.cause}</p>
-                  <ol>
-                    {selected.checks.map(check => (
-                      <li key={check}>{check}</li>
-                    ))}
-                  </ol>
-                </details>
-                {selectedIncident ? (
-                  <button
-                    type="button"
-                    className="scenario-runner-action stop"
-                    onClick={() => endIncident(selected.id)}
-                  >
-                    시나리오 종료
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="scenario-runner-action"
-                    onClick={startSelectedScenario}
-                  >
-                    시나리오 실행
-                  </button>
-                )}
-              </section>
-            ) : (
-              <div className="asset-control-unavailable">
-                이 설비에는 실행 가능한 가상 장애 시나리오가 등록되어 있지 않습니다.
-              </div>
-            )}
+              )}
+              <ScenarioHistory />
+            </div>
           </div>
         </section>
 
@@ -236,14 +238,11 @@ export default function DashboardPage() {
                 <p className="dashboard-empty">현재 진행 중인 장애가 없습니다.</p>
               )}
             </div>
-            <button
-              type="button"
-              className="reset-scenarios"
-              onClick={() => resetIncidents()}
-              disabled={!incidents.length}
-            >
-              <RotateCcw size={14} /> 전체 초기화
-            </button>
+            {incidents.length > 0 && (
+              <button type="button" className="reset-scenarios" onClick={() => resetIncidents()}>
+                모든 시나리오 종료
+              </button>
+            )}
           </section>
         </div>
       </div>

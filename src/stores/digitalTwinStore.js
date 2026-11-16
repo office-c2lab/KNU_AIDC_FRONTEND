@@ -126,7 +126,7 @@ export const useDigitalTwinStore = create(set => ({
               timestamp: new Date().toISOString(),
               actor,
               kind: 'success',
-              action: `전체 초기화 (${state.incidents.length}건)`,
+              action: `모든 시나리오 종료 (${state.incidents.length}건)`,
             },
             ...state.auditEvents,
           ].slice(0, 50)

@@ -14,7 +14,8 @@
 }
 
 .equipment-overview,
-.scenario-runner {
+.scenario-runner,
+.scenario-history {
   min-width: 0;
   border: 1px solid #324f72;
   border-radius: 12px;
@@ -367,18 +368,140 @@
 }
 
 .scenario-runner {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 760px;
   justify-self: start;
+  gap: 20px;
+  padding: 22px;
+}
+.scenario-operation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 14px;
+  margin-inline: 18px;
+}
+.scenario-operation-grid > .scenario-runner,
+.scenario-operation-grid > .asset-control-unavailable {
+  grid-column: 1;
+}
+.scenario-history {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  min-width: 0;
+  min-height: 0;
+}
+.scenario-history > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #304a68;
+  flex-shrink: 0;
+}
+.scenario-history-body {
+  position: relative;
+  flex: 1;
+  min-height: 240px;
+  margin-top: 6px;
+}
+.scenario-history h2 {
+  margin: 0;
+  color: #e6f6ff;
+  font-size: 18px;
+}
+.scenario-history > header > span {
+  color: #9fb7d1;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.scenario-history-list {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #41658c transparent;
+}
+.scenario-history-list li {
+  padding: 14px 0;
+  min-width: 0;
+}
+.scenario-history-list li + li {
+  border-top: 1px solid #2c466655;
+}
+.scenario-history-event {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+.scenario-history-event strong {
+  color: #dce9f8;
+  font-size: 13px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.scenario-history-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #a8c5e2;
+  font-size: 11px;
+}
+.scenario-history-action::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.scenario-history-action.danger {
+  color: #ff8188;
+}
+.scenario-history-action.success {
+  color: #73e1c0;
+}
+.scenario-history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 10px;
+  margin-top: 7px;
+  color: #9eb5ce;
+  font-size: 11px;
+}
+.scenario-history-meta time {
+  margin-left: auto;
+}
+.scenario-history-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  margin: 0;
+  padding: 28px 4px;
+  color: #a5bad7;
+  font-size: 12px;
+  line-height: 1.9;
+  text-align: center;
 }
 .scenario-runner h2 {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 4px;
+  margin: 0;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #304a68;
   color: #e6f6ff;
   font-size: 18px;
 }
@@ -395,97 +518,88 @@
 .scenario-runner-name h3 {
   margin: 0;
   color: #e0edf6;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
+  line-height: 1.6;
 }
 .scenario-runner-name > span {
   color: #a9c1d2;
   font-size: 12px;
 }
-.scenario-runner-impact {
+.scenario-runner-summary {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: start;
-  gap: 8px;
-  padding: 12px;
-  border-radius: 6px;
-  background: #142641;
-}
-.scenario-runner-impact h3 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  gap: 18px;
   margin: 0;
-  color: #a8d4ff;
-  font-size: 13px;
 }
-.scenario-runner-impact p {
+.scenario-runner-summary dt {
   margin: 0;
-  color: #c4d8e7;
+  color: #a9c9eb;
   font-size: 13px;
-  line-height: 1.8;
+  font-weight: 600;
+}
+.scenario-runner-summary dd {
+  margin: 6px 0 0;
+  color: #e0eaf6;
+  font-size: 14px;
+  line-height: 1.9;
   overflow-wrap: anywhere;
+  word-break: keep-all;
 }
 .scenario-runner-procedure {
-  border-top: 1px solid #29495e;
-  border-bottom: 1px solid #29495e;
+  padding-top: 20px;
+  border-top: 1px solid #304a68;
 }
-.scenario-runner-procedure summary {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 0;
-  cursor: pointer;
-  list-style: none;
-  color: #cfe1ee;
-  font-size: 13px;
-}
-.scenario-runner-procedure summary::-webkit-details-marker {
-  display: none;
-}
-.scenario-runner-procedure .procedure-toggle-closed,
-.scenario-runner-procedure .procedure-toggle-open {
-  margin-left: auto;
-  color: #a8c5e2;
-  font-size: 11px;
-}
-.scenario-runner-procedure .procedure-toggle-open,
-.scenario-runner-procedure[open] .procedure-toggle-closed {
-  display: none;
-}
-.scenario-runner-procedure[open] .procedure-toggle-open {
-  display: inline;
-}
-.scenario-runner-procedure summary > svg:first-child {
-  color: #83b9ff;
-}
-.scenario-runner-procedure summary > svg:last-child {
-  margin-left: auto;
-  transition: transform 0.16s;
-}
-.scenario-runner-procedure[open] summary > svg:last-child {
-  transform: rotate(180deg);
-}
-.scenario-runner-procedure summary:hover {
-  color: #dceefa;
+.scenario-runner-procedure h3 {
+  margin: 0;
+  padding: 0 0 10px;
+  color: #e4effb;
+  font-size: 15px;
+  font-weight: 600;
 }
 .scenario-runner-procedure p {
   margin: 0 0 12px;
-  color: #c4d8e7;
+  color: #b8cce2;
   font-size: 13px;
-  line-height: 1.8;
+  line-height: 1.9;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 .scenario-runner-procedure ol {
   display: grid;
-  gap: 8px;
-  margin: 0 0 16px;
-  padding-left: 24px;
-  color: #d6e7f3;
-  font-size: 13px;
-  line-height: 1.8;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: procedure-step;
+  color: #e0eaf6;
+  font-size: 14px;
+  line-height: 1.9;
 }
-.scenario-runner-procedure li::marker {
+.scenario-runner-procedure li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 0;
+  counter-increment: procedure-step;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.scenario-runner-procedure li + li {
+  border-top: 1px solid #2c466655;
+}
+.scenario-runner-procedure li::before {
+  content: counter(procedure-step, decimal-leading-zero);
   color: #83b9ff;
+  font-size: 12px;
+  font-weight: 600;
+  padding-top: 2px;
+}
+.scenario-runner-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #304a68;
 }
 .scenario-runner-action {
   display: flex;
@@ -493,7 +607,8 @@
   justify-content: center;
   gap: 12px;
   width: min(100%, 220px);
-  justify-self: start;
+  align-self: flex-end;
+  flex-shrink: 0;
   min-height: 44px;
   border: 1px solid #6c9dce;
   border-radius: 7px;
@@ -522,6 +637,15 @@
 }
 
 @container (max-width: 760px) {
+  .scenario-operation-grid {
+    grid-template-columns: minmax(0, 1fr);
+    margin-inline: 14px;
+  }
+  .scenario-operation-grid > .scenario-runner,
+  .scenario-operation-grid > .asset-control-unavailable,
+  .scenario-operation-grid > .scenario-history {
+    grid-column: 1;
+  }
   .equipment-overview {
     padding: 14px;
   }
@@ -534,10 +658,6 @@
   }
   .equipment-location-preview {
     min-height: 300px;
-  }
-  .scenario-runner-impact {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
   }
 }
 
