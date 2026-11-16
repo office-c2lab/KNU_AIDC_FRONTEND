@@ -24,3 +24,29 @@ body {
   /* Keep fixed panels within the same scaled viewport as page content. */
   transform: translateZ(0);
 }
+
+/* Fit the same panel layout to laptop screens, including short browser windows.
+   The compensated viewport above keeps fixed panels and the scene aligned. */
+@media (min-width: 1101px) and (max-width: 1600px), (min-width: 1101px) and (max-height: 900px) {
+  .digital-twin-root {
+    --ui-scale: 0.84;
+  }
+}
+
+@media (min-width: 1101px) and (max-width: 1440px), (min-width: 1101px) and (max-height: 800px) {
+  .digital-twin-root {
+    --ui-scale: 0.8;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 1100px) {
+  .digital-twin-root {
+    --ui-scale: 0.84;
+  }
+}
+
+@media (min-width: 931px) and (max-height: 740px) {
+  .digital-twin-root {
+    --ui-scale: 0.76;
+  }
+}

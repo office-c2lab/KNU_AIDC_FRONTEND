@@ -18,11 +18,15 @@ export function createRenderingCore({ THREE, OrbitControls, host, root, zones, g
 
     const highQuality = getHighQuality();
     const nativeDpr = window.devicePixelRatio || 1;
+    const displayScale = host.getBoundingClientRect().width / w || 1;
     // Avoid forced supersampling on standard 1x displays. A 1.6 minimum made
     // the whole scene render 2.56x as many pixels without a useful visual gain.
-    const requestedDpr = highQuality ? Math.min(nativeDpr, 1.5) : Math.min(nativeDpr, 1);
+    // Logical sizes grow when the UI is compacted; render for the physical screen,
+    // not that enlarged layout, to avoid extra supersampling on laptops.
+    const requestedDpr =
+      (highQuality ? Math.min(nativeDpr, 1.5) : Math.min(nativeDpr, 1)) * displayScale;
     const budgetDpr = Math.sqrt(maxRenderPixels / (w * h));
-    const chosenDpr = Math.max(0.75, Math.min(requestedDpr, budgetDpr));
+    const chosenDpr = Math.max(0.75 * displayScale, Math.min(requestedDpr, budgetDpr));
 
     renderer.setPixelRatio(chosenDpr);
     renderer.setSize(w, h, false);
