@@ -6,6 +6,7 @@ import { DEFAULT_ASSET_CATALOG } from '../digital-twin/scene/config/assetCatalog
 import { digitalTwinStore } from '../../stores/digitalTwinStore.js';
 import { createEquipmentLocationModel } from './createEquipmentLocationPreview.js';
 import { createCampusModel } from './createCampusPreview.js';
+import { createFacilityAlertOutline } from '../digital-twin/scene/systems/createFacilityAlertOutline.js';
 
 // Model construction needs text textures, not a browser or a WebGL context.
 function element() {
@@ -63,6 +64,24 @@ test('preview builds every real equipment model without changing application sta
       assert.equal(library.locations.get(id).parent, null);
       assert.ok(!new THREE.Box3().setFromObject(group, true).isEmpty());
       if (id.endsWith('F')) assert.equal(group.position.y, (Number(id[0]) - 1) * 7);
+      const beforeOutline = new THREE.Box3().setFromObject(group, true);
+      const outline = createFacilityAlertOutline(group, id);
+      assert.equal(outline.visible, false);
+      assert.equal(outline.material.depthTest, true, 'walls occlude the facility outline');
+      assert.equal(outline.geometry.attributes.position.count, 24, 'all twelve facility edges');
+      const outlineBounds = new THREE.Box3().setFromObject(outline, true);
+      assert.ok(outlineBounds.containsBox(beforeOutline), `${id}: outline encloses real facility`);
+      const originalPosition = outline.getWorldPosition(new THREE.Vector3());
+      group.position.y += 5;
+      const movedPosition = outline.getWorldPosition(new THREE.Vector3());
+      assert.ok(
+        Math.abs(movedPosition.y - originalPosition.y - 5) < 1e-8,
+        `${id}: follows floor movement`
+      );
+      group.position.y -= 5;
+      outline.removeFromParent();
+      outline.geometry.dispose();
+      outline.material.dispose();
     }
     assert.equal(
       digitalTwinStore.getState(),

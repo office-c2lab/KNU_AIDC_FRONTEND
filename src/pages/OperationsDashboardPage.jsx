@@ -379,7 +379,7 @@ export default function OperationsDashboardPage() {
               ))}
             </div>
             <Link className="dashboard-card-action ops-scenario-link" to="/scenario-control">
-              시나리오 제어 열기
+              시스템 제어 열기
             </Link>
           </Panel>
         </div>
@@ -535,7 +535,7 @@ export default function OperationsDashboardPage() {
                 <span>시나리오 실행·종료 이력이 이곳에 기록됩니다.</span>
               </div>
               <Link className="dashboard-card-action" to="/scenario-control">
-                시나리오 제어로 이동
+                시스템 제어로 이동
               </Link>
             </div>
           ) : (

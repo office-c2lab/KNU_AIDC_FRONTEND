@@ -155,7 +155,7 @@ export default function AppHeader() {
                 `${navItem}${isActive ? ' active' : ''} flex items-center`
               }
             >
-              시나리오 제어
+              시스템 제어
             </NavLink>
           </nav>
           <HeaderClock />

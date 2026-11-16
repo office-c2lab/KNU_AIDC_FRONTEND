@@ -31,11 +31,11 @@ export default function DashboardPage() {
   const resetIncidents = useDigitalTwinStore(state => state.resetIncidents);
   const selectVisualization = useDigitalTwinStore(state => state.selectVisualization);
 
-  const [selectedFacilityId, setSelectedFacilityId] = useState('3F');
+  const [selectedFacilityId, setSelectedFacilityId] = useState('all');
   const overview = selectedFacilityId === 'all';
   const [facilityListMode, setFacilityListMode] = useState(false);
   const showCatalog = overview || facilityListMode;
-  const [expandedFacilityId, setExpandedFacilityId] = useState('3F');
+  const [expandedFacilityId, setExpandedFacilityId] = useState(null);
   const [facilitySearch, setFacilitySearch] = useState('');
   const [catalogReturn, setCatalogReturn] = useState({
     facilityId: '3F',

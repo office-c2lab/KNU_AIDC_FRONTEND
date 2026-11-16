@@ -5,6 +5,7 @@ import OperationsSidebar from '../features/digital-twin/components/OperationsSid
 import SceneControls from '../features/digital-twin/components/SceneControls.jsx';
 import SceneViewport from '../features/digital-twin/components/SceneViewport.jsx';
 import useDigitalTwinScene from '../features/digital-twin/useDigitalTwinScene.js';
+import '../features/digital-twin/incident-alerts.css';
 
 export default function DigitalTwinPage() {
   const rootRef = useDigitalTwinScene();

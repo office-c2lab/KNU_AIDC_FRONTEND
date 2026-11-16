@@ -1,0 +1,46 @@
+.digital-twin-scene .world-alert.critical {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #ffb0b9;
+  border-radius: 50%;
+  background: #c62e47;
+  color: #fff4f5;
+  box-shadow:
+    0 0 0 4px #ff526b1f,
+    0 4px 14px #02071480;
+  animation: twin-fault-halo 2.4s ease-in-out infinite;
+}
+.digital-twin-scene .world-alert.critical:hover,
+.digital-twin-scene .world-alert.critical:focus-visible {
+  background: #e23d56;
+  outline: 2px solid #ffe2e6;
+  outline-offset: 3px;
+}
+.digital-twin-scene .world-alert-symbol {
+  color: #fff4f5;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 800;
+}
+@keyframes twin-fault-halo {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px #ff526b1f,
+      0 4px 14px #02071480;
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px #ff526b12,
+      0 0 17px #ff526b45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .digital-twin-scene .world-alert.critical {
+    animation: none;
+  }
+}

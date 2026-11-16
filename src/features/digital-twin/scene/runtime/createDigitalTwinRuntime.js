@@ -14,6 +14,7 @@ import { buildUtilityZones } from '../zones/buildUtilityZones.js';
 import { createGeometryToolkit } from '../core/createGeometryToolkit.js';
 import { createRenderingCore } from '../core/createRenderingCore.js';
 import { createIncidentSelectors } from '../systems/createIncidentSelectors.js';
+import { createFacilityAlertOutline } from '../systems/createFacilityAlertOutline.js';
 import { createAssetFactories } from '../assets/createAssetFactories.js';
 import { createHumanModelLoader } from '../assets/createHumanModelLoader.js';
 import { digitalTwinStore } from '../../../../stores/digitalTwinStore.js';
@@ -4308,31 +4309,12 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     const door = doors.find(d => d.id === id);
     if (door) door.open = !door.open;
   }
-  // V6 three-layer alert UI: physical device beacon, constant-size screen label, floor edge.
+  // Full floor/annex outlines respect occlusion and follow their parent.
   const floorAlertOutlines = new Map();
-  for (const key of floorList) {
-    const pts = [
-      [-12.0, 3.52, -9.4],
-      [12.0, 3.52, -9.4],
-      [12.0, 3.52, 9.3],
-      [-12.0, 3.52, 9.3],
-      [-12.0, 3.52, -9.4],
-    ].map(p => new THREE.Vector3(...p));
-    const geom = new THREE.BufferGeometry().setFromPoints(pts);
-    const strip = new THREE.Line(
-      geom,
-      new THREE.LineBasicMaterial({
-        color: 0xff697b,
-        transparent: true,
-        opacity: 0.85,
-        depthTest: true,
-        depthWrite: false,
-      })
-    );
-    strip.visible = false;
-    strip.renderOrder = 0;
-    floorGroups[key].add(strip);
-    floorAlertOutlines.set(key, strip);
+  const reduceAlertMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const key of [...floorList, 'power', 'cooling']) {
+    const group = floorGroups[key] ?? regionGroups[key];
+    floorAlertOutlines.set(key, createFacilityAlertOutline(group, key));
   }
   function updateZoneIncidentCounts() {
     const incidents = [...activeIncidents.values()];
@@ -4456,15 +4438,20 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
         new THREE.MeshBasicMaterial({ color, depthTest: true, depthWrite: false })
       );
       orb.position.y = tipY;
+      orb.visible = !isCritical;
       orb.renderOrder = 0;
       g.add(orb);
       if (a.markerLocal) g.position.set(...a.markerLocal);
       a.root.add(g);
       issueMeshes.set(a.id, { group: g, root: a.root, ring, orb, primary });
+      // Only critical faults receive screen-space markers; related warnings stay in 3D.
+      if (!isCritical) continue;
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `world-alert ${isCritical ? 'critical' : 'warning'} ${primary ? 'primary' : ''}`;
-      btn.innerHTML = `<i></i><span><b>${esc(a.id)}</b>${primary ? `<small>${esc(main.scenario.title)}</small>` : '<small>영향 가능 · 확인</small>'}</span>`;
+      btn.setAttribute('aria-label', `${a.id}, ${getAssetStatus(a)}, 설비 상세 보기`);
+      btn.title = `${a.id} · ${getAssetStatus(a)} · ${main.scenario.title}`;
+      btn.innerHTML = '<b class="world-alert-symbol" aria-hidden="true">!</b>';
       btn.addEventListener('click', e => {
         e.stopPropagation();
         focusAsset(a.id);
@@ -4498,12 +4485,12 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
         issueLinks.push({ line, primary, affected });
       }
     }
-    for (const key of floorList) {
-      const floorIssues = impacted.filter(a => a.floor === key);
+    for (const key of [...floorList, 'power', 'cooling']) {
+      const floorIssues = impacted.filter(a => a.floor === key || (!a.floor && a.zone === key));
       const outline = floorAlertOutlines.get(key);
       outline.visible = floorIssues.length > 0;
       outline.material.color.setHex(
-        floorIssues.some(a => severityRank(getAssetStatus(a)) === 3) ? 0xff697b : 0xf0b36e
+        floorIssues.some(a => severityRank(getAssetStatus(a)) === 3) ? 0xff526b : 0xf0b36e
       );
     }
     for (const l of leds) {
@@ -4520,7 +4507,8 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
         issue = issueMeshes.get(id);
       if (!a || !issue) continue;
       const isVisible = !activeFloor || a.floor === activeFloor;
-      const include = !activeFloor && distance > 56 ? issue.primary : true;
+      const isCritical = severityRank(getAssetStatus(a)) === 3;
+      const include = !activeFloor && distance > 56 ? issue.primary || isCritical : true;
       const pos = assetWorldPoint(a);
       pos.y += a.type.includes('PUMP') ? 2.05 : 3.0;
       const p = pos.clone().project(camera),
@@ -4533,7 +4521,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
           p.x < 0.93 &&
           p.y > -0.93 &&
           p.y < 0.9 &&
-          !isHiddenBehindArchitecture(pos);
+          (isCritical || !isHiddenBehindArchitecture(pos));
       btn.style.display = visible ? 'flex' : 'none';
       if (visible) {
         btn.style.left = `${(p.x * 0.5 + 0.5) * host.clientWidth}px`;
@@ -5370,7 +5358,8 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       o.ring.material.opacity = 0.66 + 0.2 * Math.sin(t * 3);
     }
     for (const strip of floorAlertOutlines.values())
-      if (strip.visible) strip.material.opacity = 0.53 + 0.34 * Math.sin(t * 2.7);
+      if (strip.visible)
+        strip.material.opacity = reduceAlertMotion ? 0.88 : 0.8 + 0.12 * Math.sin(t * 2);
     updateUtilityRisers(t); // Follow the current interpolated floor positions during the separation animation.
     if (currentMode === 'thermal' && activeIncidents.size) {
       for (const disk of heatDisks) {
@@ -5403,6 +5392,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   controls.autoRotate = autoRotate;
   $('#btn-auto').classList.toggle('is-on', autoRotate);
   renderScenarioPanel();
+  updateIssueVisuals();
   updateZoneIncidentCounts();
   updateNocWall();
   resize();
@@ -5425,6 +5415,12 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     window.removeEventListener('resize', resizeAssetPreview);
     resizeObserver.disconnect();
     unsubscribeTwinStore();
+    clearIssueMeshes();
+    for (const outline of floorAlertOutlines.values()) {
+      outline.removeFromParent();
+      outline.geometry.dispose();
+      outline.material.dispose();
+    }
     controls.dispose();
     renderer.dispose();
     modalPreviewControls?.dispose();
