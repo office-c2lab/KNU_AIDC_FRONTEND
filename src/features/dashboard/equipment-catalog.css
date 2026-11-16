@@ -2,6 +2,51 @@
   margin-top: 14px;
   margin-bottom: 4px;
 }
+
+.scenario-status-filters button {
+  padding: 3px 0 5px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-size: 12px;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.scenario-status-filters button.all {
+  color: #dce9f8;
+}
+.scenario-status-filters button.normal {
+  color: #73e1c0;
+}
+.scenario-status-filters button.warning {
+  color: #eac476;
+}
+.scenario-status-filters button.fault {
+  color: #ff8188;
+}
+.scenario-status-filters button[aria-pressed='true'] {
+  border-bottom-color: currentColor;
+}
+.scenario-status-filters button:hover {
+  background: #9bcaff0a;
+}
+.equipment-catalog-heading > .equipment-catalog-filter {
+  margin-left: auto;
+  padding: 3px 7px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+}
+.equipment-catalog-heading > .equipment-catalog-filter.normal {
+  color: #73e1c0;
+}
+.equipment-catalog-heading > .equipment-catalog-filter.warning {
+  color: #eac476;
+}
+.equipment-catalog-heading > .equipment-catalog-filter.fault {
+  color: #ff8188;
+}
 .dashboard-grid.catalog-mode {
   grid-template-columns: var(--left-w, 286px) minmax(0, 1fr);
 }

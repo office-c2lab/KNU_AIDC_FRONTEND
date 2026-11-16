@@ -2,6 +2,7 @@ import { ChevronDown, Search, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SCENARIOS } from '../digital-twin/scene/config/scenarioConfig.js';
 import { panelEntrance } from '../../utils/panelMotion.js';
+import { equipmentStatusLabels } from './equipmentStatus.js';
 import {
   floorButton,
   floorNumber,
@@ -26,6 +27,8 @@ export default function ScenarioFacilitySidebar({
   navigationRef,
   overview = false,
   onShowOverview,
+  statusFilter,
+  onStatusFilterChange,
 }) {
   const query = search.trim().toLocaleLowerCase();
   const groups = facilityGroups
@@ -53,21 +56,22 @@ export default function ScenarioFacilitySidebar({
       aria-label="시설 및 설비 탐색"
     >
       <div
-        className="relative z-[3] flex shrink-0 items-center justify-between gap-1 border-b border-[#45678d68] px-4 py-3.5 text-xs tabular-nums"
+        className="scenario-status-filters relative z-[3] flex shrink-0 items-center justify-between gap-1 border-b border-[#45678d68] px-4 py-3.5 text-xs tabular-nums"
         aria-label="전체 설비 운영 현황"
+        role="group"
       >
-        <span className="whitespace-nowrap text-[#dce9f8]">
-          전체 <strong>{summary.total}</strong>
-        </span>
-        <span className="whitespace-nowrap text-[#73e1c0]">
-          정상 <strong>{summary.normal}</strong>
-        </span>
-        <span className="whitespace-nowrap text-[#eac476]">
-          주의 <strong>{summary.warning}</strong>
-        </span>
-        <span className="whitespace-nowrap text-[#ff8188]">
-          장애 <strong>{summary.fault}</strong>
-        </span>
+        {['all', 'normal', 'warning', 'fault'].map(status => (
+          <button
+            key={status}
+            type="button"
+            className={status}
+            aria-pressed={statusFilter === status}
+            onClick={() => onStatusFilterChange(status)}
+          >
+            {equipmentStatusLabels[status]}{' '}
+            <strong>{summary[status === 'all' ? 'total' : status]}</strong>
+          </button>
+        ))}
       </div>
       <div className="relative z-[3] shrink-0 border-b border-[#45678d68] px-4 pt-4 pb-3">
         <label className="flex h-10 items-center gap-2 border border-[#43628b] bg-[#0a162b] px-3 focus-within:border-[#8fc3ff]">
@@ -179,7 +183,11 @@ export default function ScenarioFacilitySidebar({
                       );
                     })
                   ) : (
-                    <p className="dashboard-empty">등록된 설비가 없습니다.</p>
+                    <p className="dashboard-empty">
+                      {statusFilter === 'all'
+                        ? '등록된 설비가 없습니다.'
+                        : '선택한 상태의 설비가 없습니다.'}
+                    </p>
                   )}
                 </div>
               </div>

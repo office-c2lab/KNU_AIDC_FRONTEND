@@ -8,6 +8,8 @@ import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import '../features/dashboard/dashboard.css';
 import { panelEntrance } from '../utils/panelMotion.js';
+import { createIncidentSelectors } from '../features/digital-twin/scene/systems/createIncidentSelectors.js';
+import { equipmentStatusKey } from '../features/dashboard/equipmentStatus.js';
 
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
 const steps = ['감지', '확인', '원인 분석', '복구 조치', '정상 확인'];
@@ -23,7 +25,6 @@ const facilityGroups = [
 export default function DashboardPage() {
   const incidents = useDigitalTwinStore(state => state.incidents);
   const chosenScenarioId = useDigitalTwinStore(state => state.chosenScenarioId);
-  const assetSummary = useDigitalTwinStore(state => state.assetSummary);
   const assetCatalog = useDigitalTwinStore(state => state.assetCatalog);
   const setScenarioState = useDigitalTwinStore(state => state.setScenarioState);
   const runIncident = useDigitalTwinStore(state => state.runIncident);
@@ -37,11 +38,13 @@ export default function DashboardPage() {
   const showCatalog = overview || facilityListMode;
   const [expandedFacilityId, setExpandedFacilityId] = useState(null);
   const [facilitySearch, setFacilitySearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [catalogReturn, setCatalogReturn] = useState({
     facilityId: '3F',
     search: '',
     scrollTop: 0,
     expandedFacilityId: '3F',
+    statusFilter: 'all',
   });
   const workspaceRef = useRef(null);
   const facilityRef = useRef(null);
@@ -61,25 +64,28 @@ export default function DashboardPage() {
     : null;
   const runningIds = useMemo(() => new Set(incidents.map(incident => incident.id)), [incidents]);
 
-  const liveSummary = useMemo(() => {
-    const faultAssets = new Set();
-    const warningAssets = new Set();
-    incidents.forEach(incident => {
-      const scenario = scenarioById.get(incident.id);
-      if (!scenario) return;
-      faultAssets.add(scenario.asset);
-      scenario.related.forEach(asset => warningAssets.add(asset.id));
+  const assetStatuses = useMemo(() => {
+    const selectors = createIncidentSelectors({
+      clock: { elapsedTime: 0 },
+      activeIncidents: new Map(incidents.map(incident => [incident.id, incident])),
+      scenarioById,
     });
-    faultAssets.forEach(id => warningAssets.delete(id));
-    const fault = faultAssets.size;
-    const warning = warningAssets.size;
-    return {
-      total: assetSummary.total,
-      fault,
-      warning,
-      normal: Math.max(0, assetSummary.total - fault - warning),
-    };
-  }, [assetSummary.total, incidents]);
+    return new Map(
+      assetCatalog.map(asset => [asset.id, equipmentStatusKey(selectors.getAssetStatus(asset))])
+    );
+  }, [assetCatalog, incidents]);
+  const liveSummary = useMemo(() => {
+    const summary = { total: assetCatalog.length, normal: 0, warning: 0, fault: 0 };
+    assetStatuses.forEach(status => summary[status]++);
+    return summary;
+  }, [assetCatalog.length, assetStatuses]);
+  const statusFilteredAssets = useMemo(
+    () =>
+      assetCatalog.filter(
+        asset => statusFilter === 'all' || assetStatuses.get(asset.id) === statusFilter
+      ),
+    [assetCatalog, assetStatuses, statusFilter]
+  );
 
   const startSelectedScenario = () => {
     if (!selected) return;
@@ -102,6 +108,7 @@ export default function DashboardPage() {
         search: facilitySearch,
         scrollTop: workspaceRef.current?.scrollTop ?? 0,
         expandedFacilityId,
+        statusFilter,
       });
     } else {
       setCatalogReturn({
@@ -109,6 +116,7 @@ export default function DashboardPage() {
         search: facilitySearch,
         scrollTop: 0,
         expandedFacilityId: facilityId,
+        statusFilter,
       });
     }
     setFacilityListMode(false);
@@ -123,6 +131,7 @@ export default function DashboardPage() {
     setFacilityListMode(true);
     setFacilitySearch(catalogReturn.search);
     setExpandedFacilityId(catalogReturn.expandedFacilityId);
+    setStatusFilter(catalogReturn.statusFilter);
     requestAnimationFrame(() => {
       workspaceRef.current?.scrollTo({ top: catalogReturn.scrollTop });
       const card = [...(workspaceRef.current?.querySelectorAll('[data-asset-id]') ?? [])].find(
@@ -142,9 +151,11 @@ export default function DashboardPage() {
       search: '',
       scrollTop: 0,
       expandedFacilityId: facility.id,
+      statusFilter: 'all',
     });
     setFacilityListMode(false);
     setFacilitySearch('');
+    setStatusFilter('all');
     setExpandedFacilityId(facility.id);
     setSelectedFacilityId(facility.id);
     setSelectedAssetId(asset.id);
@@ -162,8 +173,17 @@ export default function DashboardPage() {
       <div className={`dashboard-grid${showCatalog ? ' catalog-mode' : ''}`}>
         <ScenarioFacilitySidebar
           facilityGroups={facilityGroups}
-          assetCatalog={assetCatalog}
+          assetCatalog={statusFilteredAssets}
           summary={liveSummary}
+          statusFilter={statusFilter}
+          onStatusFilterChange={filter => {
+            setStatusFilter(filter);
+            setSelectedFacilityId('all');
+            setFacilitySearch('');
+            setExpandedFacilityId(null);
+            setFacilityListMode(true);
+            requestAnimationFrame(() => workspaceRef.current?.scrollTo({ top: 0 }));
+          }}
           selectedAssetId={showCatalog ? null : selectedAsset?.id}
           selectedFacilityId={selectedFacilityId}
           runningIds={runningIds}
@@ -203,6 +223,8 @@ export default function DashboardPage() {
                 }
                 title={overview ? '전체 설비' : `${selectedFacility?.name} 설비`}
                 assets={assetCatalog}
+                visibleAssets={statusFilteredAssets}
+                statusFilter={statusFilter}
                 incidents={incidents}
                 search={facilitySearch}
                 onSelectAsset={openAsset}

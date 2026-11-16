@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SCENARIOS } from '../digital-twin/scene/config/scenarioConfig.js';
 import { createIncidentSelectors } from '../digital-twin/scene/systems/createIncidentSelectors.js';
 import './equipment-catalog.css';
+import { equipmentStatusLabels } from './equipmentStatus.js';
 
 const scenarioById = new Map(SCENARIOS.map(item => [item.id, item]));
 
@@ -12,6 +13,8 @@ export default function EquipmentCatalog({
   search,
   onSelectAsset,
   title = '전체 설비',
+  visibleAssets = assets,
+  statusFilter = 'all',
 }) {
   const [thumbnails, setThumbnails] = useState({});
   const [thumbnailState, setThumbnailState] = useState('loading');
@@ -27,7 +30,7 @@ export default function EquipmentCatalog({
   const query = search.trim().toLocaleLowerCase();
   const groups = facilityGroups.map(group => ({
     ...group,
-    assets: assets.filter(
+    assets: visibleAssets.filter(
       asset =>
         group.matches(asset) &&
         (!query ||
@@ -88,14 +91,19 @@ export default function EquipmentCatalog({
     <div className="equipment-catalog" aria-label="전체 층 및 시설별 설비">
       <div className="equipment-catalog-heading">
         <h2>{title}</h2>
+        {statusFilter !== 'all' && (
+          <span className={`equipment-catalog-filter ${statusFilter}`}>
+            {equipmentStatusLabels[statusFilter]} 설비
+          </span>
+        )}
         <span>
           {query
             ? `검색 결과 ${resultCount}개`
-            : `${facilityGroups.length}개 구역 · ${resultCount}개 설비`}
+            : `${statusFilter === 'all' ? facilityGroups.length : groups.filter(group => group.assets.length).length}개 구역 · ${resultCount}개 설비`}
         </span>
       </div>
       {groups
-        .filter(group => !query || group.assets.length)
+        .filter(group => (!query && statusFilter === 'all') || group.assets.length)
         .map(group => (
           <section
             className="equipment-catalog-group"
@@ -156,8 +164,12 @@ export default function EquipmentCatalog({
             </div>
           </section>
         ))}
-      {!resultCount && query && (
-        <p className="equipment-catalog-empty">검색 조건과 일치하는 설비가 없습니다.</p>
+      {!resultCount && (query || statusFilter !== 'all') && (
+        <p className="equipment-catalog-empty" role="status">
+          {query
+            ? '검색 조건과 일치하는 설비가 없습니다.'
+            : `선택한 구역에 ${equipmentStatusLabels[statusFilter]} 상태의 설비가 없습니다.`}
+        </p>
       )}
     </div>
   );
