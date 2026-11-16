@@ -1,3 +1,9 @@
+.digital-twin-scene .loading {
+  z-index: 5;
+  pointer-events: none;
+  background: #071024;
+}
+
 .digital-twin-scene .world-alert.critical {
   display: flex;
   align-items: center;

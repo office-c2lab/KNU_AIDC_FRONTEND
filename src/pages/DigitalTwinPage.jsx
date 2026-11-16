@@ -6,19 +6,20 @@ import SceneControls from '../features/digital-twin/components/SceneControls.jsx
 import SceneViewport from '../features/digital-twin/components/SceneViewport.jsx';
 import useDigitalTwinScene from '../features/digital-twin/useDigitalTwinScene.js';
 import '../features/digital-twin/incident-alerts.css';
-import { useOutletContext } from 'react-router-dom';
+import { useCallback, useState } from 'react';
 
 export default function DigitalTwinPage() {
-  const { sceneReady, onSceneSettled } = useOutletContext();
-  const rootRef = useDigitalTwinScene(onSceneSettled);
+  const [startScene, setStartScene] = useState(false);
+  const onInterfaceReady = useCallback(() => setStartScene(true), []);
+  const rootRef = useDigitalTwinScene(startScene);
 
   return (
     <div ref={rootRef} className="digital-twin-scene">
       <SceneViewport />
-      <BreadcrumbToolbar ready={sceneReady} />
-      <FacilitySidebar ready={sceneReady} />
-      <OperationsSidebar ready={sceneReady} />
-      <SceneControls ready={sceneReady} />
+      <BreadcrumbToolbar />
+      <FacilitySidebar />
+      <OperationsSidebar />
+      <SceneControls onEntranceComplete={onInterfaceReady} />
       <AssetModal />
     </div>
   );
