@@ -17,11 +17,15 @@ export default function ScenarioFacilitySidebar({
   selectedAssetId,
   runningIds,
   onSelectAsset,
+  selectedFacilityId,
+  onSelectFacility,
   expandedFacilityId,
   onExpandedFacilityChange: setExpandedFacilityId,
   search,
   onSearchChange: setSearch,
   navigationRef,
+  overview = false,
+  onShowOverview,
 }) {
   const query = search.trim().toLocaleLowerCase();
   const groups = facilityGroups
@@ -100,6 +104,18 @@ export default function ScenarioFacilitySidebar({
         className={`${panelScroll} grid min-h-0 grid-cols-1 content-start gap-1.5`}
         aria-label="층 및 지원 시설"
       >
+        <button
+          type="button"
+          className={`${floorButton} scenario-overview-button${overview ? ' active' : ''}`}
+          aria-pressed={overview}
+          onClick={onShowOverview}
+        >
+          <span className={floorNumber}>전체</span>
+          <span className="floor-copy">
+            <strong>전체 보기</strong>
+          </span>
+          <span className="text-xs text-[#b9cce6]">{summary.total}개</span>
+        </button>
         {groups.map(group => {
           const assets = group.assets;
           const expanded = query ? true : expandedFacilityId === group.id;
@@ -114,10 +130,12 @@ export default function ScenarioFacilitySidebar({
               )}
               <button
                 type="button"
-                className={`${floorButton}${expanded ? ' active' : ''}`}
+                className={`${floorButton}${selectedFacilityId === group.id ? ' active' : ''}`}
+                aria-pressed={selectedFacilityId === group.id}
                 aria-expanded={expanded}
                 aria-controls={`facility-assets-${group.id}`}
                 onClick={() => {
+                  onSelectFacility(group.id);
                   if (!query) setExpandedFacilityId(expanded ? null : group.id);
                 }}
               >
