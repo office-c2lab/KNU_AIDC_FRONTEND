@@ -4,11 +4,12 @@ import { SelectedOperatingMetrics } from './OperatingMetrics.jsx';
 import { instrumentCard, moduleReadout, panelBase, panelScroll, subTitle } from './uiStyles.js';
 import { panelEntrance } from '../../../utils/panelMotion.js';
 
-export default function OperationsSidebar() {
+export default function OperationsSidebar({ ready = true }) {
   return (
     <>
       <motion.aside
-        {...panelEntrance({ x: 28, delay: 0.12 })}
+        {...panelEntrance({ x: 28, y: 0, delay: 0.96, ready })}
+        style={{ willChange: 'transform, opacity' }}
         className={`${panelBase} right-panel right-[26px]`}
         aria-label="시설 상세 및 운영 안내"
       >

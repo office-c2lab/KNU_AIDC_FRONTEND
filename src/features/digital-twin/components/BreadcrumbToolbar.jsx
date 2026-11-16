@@ -42,7 +42,7 @@ function SelectedMark({ selected }) {
   return selected ? <Check size={13} aria-hidden="true" /> : <span aria-hidden="true" />;
 }
 
-export default function BreadcrumbToolbar() {
+export default function BreadcrumbToolbar({ ready = true }) {
   const [openMenu, setOpenMenu] = useState(null);
   const toolbarRef = useRef(null);
   const splitLevel = useDigitalTwinStore(state => state.splitLevel);
@@ -71,7 +71,7 @@ export default function BreadcrumbToolbar() {
   }, [openMenu]);
 
   return (
-    <motion.div {...panelEntrance({ y: -16, delay: 0.04 })} className="breadcrumbs">
+    <motion.div {...panelEntrance({ y: -16, delay: 1.44, ready })} className="breadcrumbs">
       <div className="crumb-path">
         <House size={14} aria-hidden="true" />
         <ChevronRight className="sep" size={12} aria-hidden="true" />

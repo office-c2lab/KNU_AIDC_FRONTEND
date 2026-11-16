@@ -15,7 +15,7 @@ import {
   subTitle,
 } from './uiStyles.js';
 
-export default function FacilitySidebar() {
+export default function FacilitySidebar({ ready = true }) {
   const assets = useDigitalTwinStore(state => state.assetCatalog);
   const incidents = useDigitalTwinStore(state => state.incidents);
   const simulationTime = useDigitalTwinStore(state => state.simulationTime);
@@ -29,7 +29,8 @@ export default function FacilitySidebar() {
   return (
     <>
       <motion.aside
-        {...panelEntrance({ x: -28, delay: 0.08 })}
+        {...panelEntrance({ x: -28, y: 0, delay: 0.48, ready })}
+        style={{ willChange: 'transform, opacity' }}
         className={`${panelBase} left-panel left-[26px]`}
         aria-label="시설 현황 및 층 탐색"
       >

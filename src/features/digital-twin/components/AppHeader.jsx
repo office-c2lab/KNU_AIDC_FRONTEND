@@ -29,14 +29,15 @@ function HeaderClock() {
   );
 }
 
-export default function AppHeader() {
+export default function AppHeader({ ready = true }) {
   const notificationsOpen = useDigitalTwinStore(state => state.notificationsOpen);
   const setNotificationsOpen = useDigitalTwinStore(state => state.setNotificationsOpen);
   const incidentCount = useDigitalTwinStore(state => state.incidents.length);
   return (
     <>
       <motion.header
-        {...panelEntrance({ y: -18 })}
+        {...panelEntrance({ y: -96, ready })}
+        style={{ willChange: 'transform, opacity' }}
         className="app-header fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959] max-[1250px]:grid-cols-[1fr_420px_1fr] max-[930px]:grid-cols-[1fr_330px_1fr] max-[700px]:grid-cols-[1fr_220px_1fr]"
       >
         <nav className="main-nav flex h-16 items-center gap-[30px] pl-7" aria-label="사용자 메뉴">

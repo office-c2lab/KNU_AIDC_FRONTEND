@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export default function useDigitalTwinScene() {
+export default function useDigitalTwinScene(onSettled) {
   const rootRef = useRef(null);
 
   useEffect(() => {
@@ -9,7 +9,10 @@ export default function useDigitalTwinScene() {
 
     import('./scene.js')
       .then(({ initDigitalTwin }) => {
-        if (active && rootRef.current) disposeScene = initDigitalTwin(rootRef.current);
+        if (active && rootRef.current) {
+          disposeScene = initDigitalTwin(rootRef.current);
+          onSettled?.();
+        }
       })
       .catch(error => {
         if (!active) return;
@@ -20,13 +23,14 @@ export default function useDigitalTwinScene() {
           loading.innerHTML = `<strong>3D 화면 초기화 실패</strong><span>${error.message}</span>`;
         }
         console.error('[KNU AIDC] Three.js scene initialization failed', error);
+        onSettled?.();
       });
 
     return () => {
       active = false;
       disposeScene?.();
     };
-  }, []);
+  }, [onSettled]);
 
   return rootRef;
 }

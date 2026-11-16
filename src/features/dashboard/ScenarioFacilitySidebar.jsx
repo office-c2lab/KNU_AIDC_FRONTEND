@@ -46,7 +46,7 @@ export default function ScenarioFacilitySidebar({
   const resultCount = groups.reduce((count, group) => count + group.assets.length, 0);
   return (
     <motion.aside
-      {...panelEntrance({ x: -24 })}
+      {...panelEntrance({ x: -24, y: 0, delay: 0.48 })}
       ref={navigationRef}
       className={`${panelBase} flex min-h-0 flex-col`}
       style={{ position: 'relative', top: 'auto', bottom: 'auto', zIndex: 'auto' }}

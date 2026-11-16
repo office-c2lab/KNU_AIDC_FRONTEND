@@ -185,7 +185,7 @@ export default function DashboardPage() {
           }}
         />
         <motion.section
-          {...panelEntrance({ y: 20, delay: 0.04 })}
+          {...panelEntrance({ y: 20, delay: 0.96 })}
           className="scenario-workspace flex min-h-0 min-w-0 flex-col overflow-hidden"
           aria-label={
             showCatalog

@@ -5,14 +5,14 @@ import { panelEntrance } from '../../../utils/panelMotion.js';
 
 const dockButton = 'dock-button';
 
-export default function SceneControls() {
+export default function SceneControls({ ready = true }) {
   const viewMode = useDigitalTwinStore(state => state.viewMode);
   const utilities = useDigitalTwinStore(state => state.utilities);
   const agentsVisible = useDigitalTwinStore(state => state.agentsVisible);
 
   return (
     <>
-      <motion.div {...panelEntrance({ y: 22, delay: 0.16 })} className="center-status">
+      <motion.div {...panelEntrance({ y: 22, delay: 1.52, ready })} className="center-status">
         <div className="control-dock" role="toolbar" aria-label="데이터센터 3D 관제 도구">
           <div className="dock-group dock-home-group">
             <button type="button" className={dockButton} id="btn-fit" title="전체 시설 보기">

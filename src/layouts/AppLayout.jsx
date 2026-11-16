@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MotionConfig } from 'framer-motion';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import AppHeader from '../features/digital-twin/components/AppHeader.jsx';
@@ -10,6 +10,11 @@ import '../features/dashboard/dashboard-theme.css';
 
 export default function AppLayout() {
   const location = useLocation();
+  const [settledSceneKey, setSettledSceneKey] = useState(null);
+  const sceneReady = settledSceneKey === location.key;
+  const onSceneSettled = useCallback(() => setSettledSceneKey(location.key), [location.key]);
+  const twinMode = location.pathname === '/';
+  const systemMode = location.pathname === '/scenario-control';
   const dashboardMode = ['/scenario-control', '/dashboard'].includes(location.pathname);
   const advanceSimulation = useDigitalTwinStore(state => state.advanceSimulation);
   useEffect(() => {
@@ -22,9 +27,12 @@ export default function AppLayout() {
       <div
         className={`digital-twin-root relative min-h-dvh w-full overflow-hidden bg-[#071024] text-slate-100${dashboardMode ? ' dashboard-root' : ''}`}
       >
-        <AppHeader />
+        <AppHeader
+          key={twinMode ? `twin-${location.key}` : systemMode ? `system-${location.key}` : 'app'}
+          ready={!twinMode || sceneReady}
+        />
         <NotificationsPanel dashboardMode={dashboardMode} />
-        <Outlet />
+        <Outlet context={{ sceneReady, onSceneSettled }} />
         <div className="scanlines" aria-hidden="true"></div>
         <div className="frame" aria-hidden="true"></div>
         <i className="corner tl" aria-hidden="true"></i>

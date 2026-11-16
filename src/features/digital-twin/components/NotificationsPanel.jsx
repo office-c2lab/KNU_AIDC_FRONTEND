@@ -45,11 +45,10 @@ export default function NotificationsPanel({ dashboardMode = false }) {
       initial={false}
       animate={open ? 'open' : 'closed'}
       variants={{
-        open: { opacity: 1, y: 0, scale: 1, visibility: 'visible' },
+        open: { opacity: 1, y: 0, visibility: 'visible' },
         closed: {
           opacity: 0,
           y: -14,
-          scale: 0.985,
           transitionEnd: { visibility: 'hidden' },
         },
       }}
