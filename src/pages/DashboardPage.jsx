@@ -113,15 +113,16 @@ export default function DashboardPage() {
           <div className="selected-scenario">
             <div className="selected-scenario-title">
               <div>
-                <small>{selectedAsset?.name ?? '설비를 선택하세요'}</small>
-                <h3>{selectedAsset?.id ?? '설비 연동 대기'}</h3>
+                <small>{selectedAsset?.id ?? '설비 연동 대기'}</small>
+                <h3>{selectedAsset?.name ?? '설비를 선택하세요'}</h3>
               </div>
               <span className={selectedAssetState !== '정상' ? 'critical' : ''}>
                 {selectedAssetState}
               </span>
             </div>
             <p>{selectedAsset?.summary ?? '디지털 트윈 화면에서 설비 정보를 먼저 불러오세요.'}</p>
-            <dl>
+            <h4 className="asset-info-heading">설비 정보</h4>
+            <dl className="asset-info-list">
               <div>
                 <dt>설치 위치</dt>
                 <dd>{selectedAsset?.location ?? '—'}</dd>
@@ -139,7 +140,7 @@ export default function DashboardPage() {
                 </dd>
               </div>
               <div>
-                <dt>현재 부하</dt>
+                <dt>소비 전력</dt>
                 <dd>
                   {selectedAsset
                     ? `${Math.max(0, (selectedAsset.power || 0) + (selectedIncident ? selected.power : 0)).toFixed(2)} kW`
