@@ -9,6 +9,9 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import { createIncidentSelectors } from '../features/digital-twin/scene/systems/createIncidentSelectors.js';
@@ -20,6 +23,7 @@ import CampusPreview from '../features/dashboard/CampusPreview.jsx';
 import '../features/dashboard/operations-dashboard.css';
 
 const scenarioById = new Map(SCENARIOS.map(item => [item.id, item]));
+const powerColors = ['#87bce9', '#73e1c0', '#eac476', '#9da9c9'];
 const tones = { normal: '#73e1c0', warning: '#eac476', fault: '#ff8188' };
 const groups = [
   ['1F', '1층', '보안·통신'],
@@ -92,7 +96,6 @@ export default function OperationsDashboardPage() {
       counts[item.status === '정상' ? 'normal' : item.status === '주의' ? 'warning' : 'fault']++
   );
   const total = readings.length;
-  const abnormalCount = counts.warning + counts.fault;
   const zoneData = groups.map(([id, label, description]) => {
     const members = readings.filter(item => item.floor === id || (!item.floor && item.zone === id));
     const faults = members.filter(item => !['정상', '주의'].includes(item.status)).length;
@@ -121,12 +124,6 @@ export default function OperationsDashboardPage() {
       activeFloor: selectedZone.id.endsWith('F') ? selectedZone.id : null,
       activeZone: selectedZone.id.endsWith('F') ? `f${selectedZone.id[0]}` : selectedZone.id,
       selectedId: null,
-    });
-  const focusAsset = asset =>
-    useDigitalTwinStore.getState().setNavigation({
-      selectedId: asset.id,
-      activeFloor: asset.floor ?? null,
-      activeZone: asset.floor ? `f${asset.floor[0]}` : asset.zone,
     });
   const trend = useMemo(
     () =>
@@ -305,72 +302,73 @@ export default function OperationsDashboardPage() {
             </div>
           </Panel>
           <Panel
-            title="운영 점검"
-            subtitle="진행 중 장애 및 전력 사용 구성"
-            className="ops-operations-panel"
+            title="전력 운영 현황"
+            subtitle="전체 소비 전력 및 설비별 사용 비중"
+            className="ops-power-panel"
             delay={0.1}
           >
-            <div className="ops-incident-heading">
-              <h3>진행 중 시나리오</h3>
-              <span className={incidents.length ? 'fault' : ''}>{incidents.length}건</span>
+            <div
+              className="ops-power-donut"
+              role="img"
+              aria-label={`총 소비 전력 ${power.totalKw.toFixed(1)} kW. ${power.rows.map(row => `${row.label} ${row.share.toFixed(1)}%`).join(', ')}`}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={
+                      power.totalKw > 0
+                        ? power.rows
+                        : [{ id: 'empty', label: '소비 전력 없음', kw: 1 }]
+                    }
+                    dataKey="kw"
+                    nameKey="label"
+                    innerRadius="72%"
+                    outerRadius="92%"
+                    startAngle={90}
+                    endAngle={-270}
+                    stroke="#101e32"
+                    strokeWidth={3}
+                    isAnimationActive={false}
+                  >
+                    {(power.totalKw > 0 ? power.rows : [{ id: 'empty' }]).map((row, index) => (
+                      <Cell
+                        key={row.id}
+                        fill={power.totalKw > 0 ? powerColors[index] : '#29405a'}
+                      />
+                    ))}
+                  </Pie>
+                  {power.totalKw > 0 && (
+                    <Tooltip
+                      formatter={(value, name) => [`${Number(value).toFixed(1)} kW`, name]}
+                      contentStyle={{
+                        border: '1px solid #5274a2',
+                        borderRadius: 4,
+                        background: '#10213a',
+                        color: '#edf5ff',
+                        fontSize: 11,
+                      }}
+                      itemStyle={{ color: '#edf5ff' }}
+                    />
+                  )}
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="ops-power-donut-total">
+                <span>총 소비 전력</span>
+                <strong>{power.totalKw.toFixed(1)}</strong>
+                <small>kW</small>
+              </div>
             </div>
-            <div className="ops-current-incidents">
-              {incidents.length ? (
-                incidents.map(incident => {
-                  const scenario = scenarioById.get(incident.id);
-                  const asset = readings.find(item => item.id === scenario?.asset);
-                  if (!scenario) return null;
-                  return (
-                    <Link
-                      to="/"
-                      onClick={() => asset && focusAsset(asset)}
-                      className="ops-current-incident"
-                      key={incident.id}
-                    >
-                      <div>
-                        <strong>{scenario.title}</strong>
-                        <span>{scenario.level}</span>
-                      </div>
-                      <p>
-                        {scenario.asset} · {scenario.condition}
-                      </p>
-                    </Link>
-                  );
-                })
-              ) : (
-                <div className="ops-no-incidents">
-                  <span>진행 중인 장애가 없습니다.</span>
-                  <small>
-                    {abnormalCount
-                      ? `주의·장애 설비 ${abnormalCount}대를 확인하세요.`
-                      : `전체 ${total}대 설비가 정상 상태입니다.`}
-                  </small>
-                </div>
-              )}
-            </div>
-            <div className="ops-power-heading">
-              <h3>전력 사용 구성</h3>
-              <span>
-                추정 PUE <b>{power.pueEstimate?.toFixed(2) ?? '—'}</b>
-              </span>
-            </div>
-            <div className="ops-power-breakdown">
+            <div className="ops-power-legend">
               {power.rows.map((row, index) => (
                 <div key={row.id}>
                   <span>
-                    <i
-                      style={{ background: ['#87bce9', '#73e1c0', '#eac476', '#9da9c9'][index] }}
-                    />
+                    <i style={{ background: powerColors[index] }} />
                     {row.label}
                   </span>
-                  <div className="ops-power-track">
-                    <i
-                      style={{
-                        width: `${row.share}%`,
-                        background: ['#87bce9', '#73e1c0', '#eac476', '#9da9c9'][index],
-                      }}
-                    />
-                  </div>
+                  <span className="ops-power-share">
+                    {row.share.toFixed(1)}
+                    <small>%</small>
+                  </span>
                   <strong>
                     {row.kw.toFixed(1)}
                     <small>kW</small>
@@ -378,9 +376,13 @@ export default function OperationsDashboardPage() {
                 </div>
               ))}
             </div>
-            <Link className="dashboard-card-action ops-scenario-link" to="/scenario-control">
-              시스템 제어 열기
-            </Link>
+            <div className="ops-power-pue">
+              <div>
+                <span>추정 PUE</span>
+                <small>전체 소비 전력 ÷ IT 소비 전력</small>
+              </div>
+              <strong>{power.pueEstimate?.toFixed(2) ?? '—'}</strong>
+            </div>
           </Panel>
         </div>
         <div className="ops-chart-row">
