@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
+import { calculateFacilityPower } from '../calculateFacilityPower.js';
 import {
   floorButton,
   floorList,
@@ -11,6 +14,12 @@ import {
 } from './uiStyles.js';
 
 export default function FacilitySidebar() {
+  const assets = useDigitalTwinStore(state => state.assetCatalog);
+  const incidents = useDigitalTwinStore(state => state.incidents);
+  const power = useMemo(() => calculateFacilityPower(assets, incidents), [assets, incidents]);
+  const pue = power.pueEstimate;
+  const pueMax = Math.max(2, Math.ceil(pue ?? 2));
+  const pueText = pue === null ? '—' : pue.toFixed(2);
   return (
     <>
       <aside className={`${panelBase} left-panel left-[26px]`} aria-label="시설 현황 및 층 탐색">
@@ -21,31 +30,40 @@ export default function FacilitySidebar() {
             </div>
             <div className={`${instrumentCard} pue-scale-card`}>
               <div className="pue-scale-value">
-                <strong aria-label="PUE 1.32">1.32</strong>
-                <span className="status-tag stable">효율 양호</span>
+                <strong aria-label={`추정 PUE ${pueText}`}>{pueText}</strong>
+                <span className={moduleReadout}>가상 추정 PUE</span>
               </div>
-              <div
-                className="pue-scale"
-                role="meter"
-                aria-label="전력 사용 효율 PUE"
-                aria-valuemin={1}
-                aria-valuemax={2}
-                aria-valuenow={1.32}
-                aria-valuetext="1.32, 효율 양호. 낮을수록 효율적입니다."
-                style={{ '--pue-position': '32%' }}
-              >
-                <div className="pue-scale-track" aria-hidden="true">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-                <span className="pue-scale-marker" aria-hidden="true"></span>
-              </div>
-              <div className="pue-scale-labels" aria-hidden="true">
-                <span>1.0 · 효율적</span>
-                <span>2.0 · 비효율적</span>
-              </div>
+              {pue !== null ? (
+                <>
+                  <div
+                    className="pue-scale"
+                    role="meter"
+                    aria-label="전력 사용 효율 PUE"
+                    aria-valuemin={1}
+                    aria-valuemax={pueMax}
+                    aria-valuenow={Number(pueText)}
+                    aria-valuetext={`${pueText}, 가상 소비 전력 기준 추정값. 낮을수록 효율적입니다.`}
+                    style={{
+                      '--pue-position': `${Math.min(100, Math.max(0, ((pue - 1) / (pueMax - 1)) * 100))}%`,
+                    }}
+                  >
+                    <div className="pue-scale-track" aria-hidden="true">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                    <span className="pue-scale-marker" aria-hidden="true"></span>
+                  </div>
+                  <div className="pue-scale-labels" aria-hidden="true">
+                    <span>1.0 · 효율적</span>
+                    <span>{pueMax.toFixed(1)} · 비효율적</span>
+                  </div>
+                </>
+              ) : (
+                <p className="pue-scale-note">IT 부하가 없어 산출할 수 없습니다.</p>
+              )}
+              <p className="pue-scale-note">총 소비 전력 ÷ IT 소비 전력 · 가상 데이터</p>
             </div>
           </section>
 
@@ -54,47 +72,26 @@ export default function FacilitySidebar() {
               <h2 id="power-heading">전력 사용 현황</h2>
               <span className={moduleReadout}>
                 <span className="power-total-label">총 전력</span>
-                <strong>5.84</strong>
-                <span className="unit">MW</span>
+                <strong>{power.totalKw.toFixed(2)}</strong>
+                <span className="unit">kW</span>
               </span>
             </div>
-            <div className={`${instrumentCard} power-list`}>
-              <div className="power-row">
-                <span>IT 부하</span>
-                <div className="bar blue" style={{ '--load': '63.7%' }} aria-hidden="true">
-                  <div className="bar-track">
-                    <i></i>
+            <div className={`${instrumentCard} power-list`} aria-label="분류별 소비 전력, 단위 kW">
+              {power.rows.map(row => (
+                <div className="power-row" key={row.id}>
+                  <span>{row.label}</span>
+                  <div
+                    className={`bar ${row.tone}`}
+                    style={{ '--load': `${row.share}%` }}
+                    aria-hidden="true"
+                  >
+                    <div className="bar-track">
+                      <i></i>
+                    </div>
                   </div>
+                  <b aria-label={`${row.kw.toFixed(2)} kW`}>{row.kw.toFixed(2)}</b>
                 </div>
-                <b>3.72</b>
-              </div>
-              <div className="power-row">
-                <span>냉각 부하</span>
-                <div className="bar" style={{ '--load': '20.7%' }} aria-hidden="true">
-                  <div className="bar-track">
-                    <i></i>
-                  </div>
-                </div>
-                <b>1.21</b>
-              </div>
-              <div className="power-row">
-                <span>전력 설비</span>
-                <div className="bar amber" style={{ '--load': '11.6%' }} aria-hidden="true">
-                  <div className="bar-track">
-                    <i></i>
-                  </div>
-                </div>
-                <b>0.68</b>
-              </div>
-              <div className="power-row">
-                <span>기타·예비</span>
-                <div className="bar" style={{ '--load': '3.9%' }} aria-hidden="true">
-                  <div className="bar-track">
-                    <i></i>
-                  </div>
-                </div>
-                <b>0.23</b>
-              </div>
+              ))}
             </div>
           </section>
 

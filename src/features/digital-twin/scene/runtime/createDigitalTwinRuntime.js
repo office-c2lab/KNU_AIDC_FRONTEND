@@ -1124,7 +1124,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     }
     ctx.fillStyle = '#a3efff';
     ctx.font = 'bold 13px monospace';
-    ctx.fillText('UTIL   72.5%  |  PUE 1.32  |  OK', 24, 250);
+    ctx.fillText('KNU AIDC  |  SIMULATION DISPLAY', 24, 250);
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());

@@ -333,6 +333,10 @@
   line-height: 1.7;
   word-break: keep-all;
 }
+.left-panel .power-row {
+  grid-template-columns: minmax(44px, 64px) minmax(12px, 1fr) max-content;
+  gap: 6px;
+}
 
 .notifications-panel {
   position: fixed;
