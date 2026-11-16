@@ -4544,7 +4544,6 @@ export function initDigitalTwin(root) {
   function updateInfrastructurePanel() {
     const idState = id => getAssetStatus(registry.get(id));
     const rank = id => severityRank(idState(id));
-    const formatState = r => (r >= 3 ? '장애' : r === 2 ? '주의' : '정상');
     const updateLed = (el, id) => {
       const r = rank(id);
       el.classList.toggle('fault', r >= 3);
@@ -4559,12 +4558,9 @@ export function initDigitalTwin(root) {
       ['power', powerRank],
       ['cooling', coolingRank],
     ]) {
-      const el = document.getElementById('infra-' + type + '-state');
-      el.textContent = formatState(r);
-      el.classList.toggle('fault', r >= 3);
-      el.classList.toggle('warning', r === 2);
       const sec = root.querySelector('[data-infra-panel="' + type + '"]');
       sec.classList.toggle('is-fault', r >= 3);
+      // Keep related facility readings available alongside the selected equipment.
       const chosen =
         type === 'power'
           ? activeZone === 'power'
@@ -4585,12 +4581,10 @@ export function initDigitalTwin(root) {
     document.getElementById('infra-ups-status').textContent =
       upsLabel(rank('UPS-01')) + ' / ' + upsLabel(rank('UPS-02'));
     document.getElementById('infra-battery').innerHTML = battery + '<em>%</em>';
-    document.getElementById('infra-power-load').innerHTML = powerLoad + '<em>%</em>';
     document.getElementById('infra-power-pct').textContent = powerLoad + '%';
     document.getElementById('infra-power-bar').style.width = powerLoad + '%';
     document.getElementById('infra-supply-temp').innerHTML = supply.toFixed(1) + '<em>°C</em>';
     document.getElementById('infra-cdu-flow').innerHTML = flow + '<em>L/min</em>';
-    document.getElementById('infra-cooling-load').innerHTML = coolingLoad + '<em>%</em>';
     document.getElementById('infra-cooling-pct').textContent = coolingLoad + '%';
     document.getElementById('infra-cooling-bar').style.width = coolingLoad + '%';
     for (const [led, id] of [
@@ -4630,8 +4624,8 @@ export function initDigitalTwin(root) {
     $('#device-kicker').textContent = !hasSelection
       ? '대상 선택'
       : activeAsset
-        ? assetTypeLabel(activeAsset.type) + ' / ' + activeAsset.id
-        : (zone.code || '캠퍼스') + ' / ' + (activeFloor || '시설');
+        ? assetTypeLabel(activeAsset.type)
+        : activeFloor ? '층 요약' : '시설 요약';
     $('#device-title').textContent = !hasSelection
       ? '층 또는 설비를 선택하세요'
       : activeAsset
@@ -4662,7 +4656,6 @@ export function initDigitalTwin(root) {
             ['장비 온도', sensor.temp.toFixed(1), '°C'],
             ['소비 전력', sensor.power.toFixed(1), 'kW'],
             ['가동 부하', String(activeAsset.capacity ?? 68), '%'],
-            ['상태', status, ''],
           ]
         : [
             ['설비 수', String(group.length), ''],
@@ -4735,7 +4728,7 @@ export function initDigitalTwin(root) {
     if (activeAsset?.type === 'AI AGENT') {
       const agent = aiAgents.get(activeAsset.id),
         busy = agentIsBusy(agent);
-      $('#device-kicker').textContent = 'AI 운영 요원 / ' + agent.id;
+      $('#device-kicker').textContent = 'AI 운영 요원';
       $('#device-title').textContent = agent.name;
       $('#device-location').textContent = agent.area;
       $('#device-id-short').textContent = agent.id;

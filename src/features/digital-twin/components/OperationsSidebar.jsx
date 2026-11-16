@@ -36,118 +36,86 @@ export default function OperationsSidebar() {
                   <ArrowUpRight size={16} aria-hidden="true" />
                 </span>
               </button>
-            </div>
-          </section>
-          <section
-            className="infra-section"
-            data-infra-panel="power"
-            aria-labelledby="infra-power-heading"
-            hidden
-          >
-            <div className="sub-title infra-title">
-              <h2 id="infra-power-heading">전력 설비 상세</h2>
-              <span
-                className="module-readout infra-state"
-                id="infra-power-state"
-                aria-live="polite"
+              <div
+                className="infra-section"
+                data-infra-panel="power"
+                aria-label="전력 시설 지표"
+                hidden
               >
-                정상
-              </span>
-            </div>
-            <div className="infra-card">
-              <div className="infra-metrics">
-                <div>
-                  <small>UPS A / B</small>
-                  <strong id="infra-ups-status">정상 / 정상</strong>
-                </div>
-                <div>
-                  <small>배터리 잔량</small>
-                  <strong id="infra-battery">
-                    96<em>%</em>
-                  </strong>
-                </div>
-                <div>
-                  <small>전력 부하</small>
-                  <strong id="infra-power-load">
-                    68<em>%</em>
-                  </strong>
+                <div className="infra-card">
+                  <div className="infra-metrics">
+                    <div>
+                      <small>UPS A / B</small>
+                      <strong id="infra-ups-status">정상 / 정상</strong>
+                    </div>
+                    <div>
+                      <small>배터리 잔량</small>
+                      <strong id="infra-battery">
+                        96<em>%</em>
+                      </strong>
+                    </div>
+                  </div>
+                  <div className="infra-progress">
+                    <span>UPS 부하율</span>
+                    <div className="infra-track">
+                      <i id="infra-power-bar" style={{ width: '68%' }}></i>
+                    </div>
+                    <b id="infra-power-pct">68%</b>
+                  </div>
+                  <div className="infra-equipment-row" aria-label="전력 주요 장비">
+                    <button type="button" data-infra-asset="UPS-01">
+                      <i id="infra-led-ups"></i>UPS-01
+                    </button>
+                    <button type="button" data-infra-asset="BAT-01">
+                      <i id="infra-led-bat"></i>BAT-01
+                    </button>
+                    <button type="button" data-infra-asset="ATS-01">
+                      <i id="infra-led-ats"></i>ATS-01
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="infra-progress">
-                <span>UPS 부하율</span>
-                <div className="infra-track">
-                  <i id="infra-power-bar" style={{ width: '68%' }}></i>
-                </div>
-                <b id="infra-power-pct">68%</b>
-              </div>
-              <div className="infra-equipment-row" aria-label="전력 주요 장비">
-                <button type="button" data-infra-asset="UPS-01">
-                  <i id="infra-led-ups"></i>UPS-01
-                </button>
-                <button type="button" data-infra-asset="BAT-01">
-                  <i id="infra-led-bat"></i>BAT-01
-                </button>
-                <button type="button" data-infra-asset="ATS-01">
-                  <i id="infra-led-ats"></i>ATS-01
-                </button>
-              </div>
-            </div>
-          </section>
 
-          <section
-            className="infra-section"
-            data-infra-panel="cooling"
-            aria-labelledby="infra-cooling-heading"
-            hidden
-          >
-            <div className="sub-title infra-title">
-              <h2 id="infra-cooling-heading">냉각 설비 상세</h2>
-              <span
-                className="module-readout infra-state"
-                id="infra-cooling-state"
-                aria-live="polite"
+              <div
+                className="infra-section"
+                data-infra-panel="cooling"
+                aria-label="냉각 시설 지표"
+                hidden
               >
-                정상
-              </span>
-            </div>
-            <div className="infra-card">
-              <div className="infra-metrics">
-                <div>
-                  <small>냉수 출수 온도</small>
-                  <strong id="infra-supply-temp">
-                    18.2<em>°C</em>
-                  </strong>
+                <div className="infra-card">
+                  <div className="infra-metrics">
+                    <div>
+                      <small>냉수 출수 온도</small>
+                      <strong id="infra-supply-temp">
+                        18.2<em>°C</em>
+                      </strong>
+                    </div>
+                    <div>
+                      <small>CDU 유량</small>
+                      <strong id="infra-cdu-flow">
+                        148<em>L/min</em>
+                      </strong>
+                    </div>
+                  </div>
+                  <div className="infra-progress cooling">
+                    <span>냉각 부하율</span>
+                    <div className="infra-track">
+                      <i id="infra-cooling-bar" style={{ width: '61%' }}></i>
+                    </div>
+                    <b id="infra-cooling-pct">61%</b>
+                  </div>
+                  <div className="infra-equipment-row" aria-label="냉각 주요 장비">
+                    <button type="button" data-infra-asset="CH-01">
+                      <i id="infra-led-ch"></i>CH-01
+                    </button>
+                    <button type="button" data-infra-asset="PUMP-01">
+                      <i id="infra-led-pump"></i>PUMP-01
+                    </button>
+                    <button type="button" data-infra-asset="CDU-01">
+                      <i id="infra-led-cdu"></i>CDU-01
+                    </button>
+                  </div>
                 </div>
-                <div>
-                  <small>CDU 유량</small>
-                  <strong id="infra-cdu-flow">
-                    148<em>L/min</em>
-                  </strong>
-                </div>
-                <div>
-                  <small>냉각 부하</small>
-                  <strong id="infra-cooling-load">
-                    61<em>%</em>
-                  </strong>
-                </div>
-              </div>
-              <div className="infra-progress cooling">
-                <span>냉각 부하율</span>
-                <div className="infra-track">
-                  <i id="infra-cooling-bar" style={{ width: '61%' }}></i>
-                </div>
-                <b id="infra-cooling-pct">61%</b>
-              </div>
-              <div className="infra-equipment-row" aria-label="냉각 주요 장비">
-                <button type="button" data-infra-asset="CH-01">
-                  <i id="infra-led-ch"></i>CH-01
-                </button>
-                <button type="button" data-infra-asset="PUMP-01">
-                  <i id="infra-led-pump"></i>PUMP-01
-                </button>
-                <button type="button" data-infra-asset="CDU-01">
-                  <i id="infra-led-cdu"></i>CDU-01
-                </button>
               </div>
             </div>
           </section>

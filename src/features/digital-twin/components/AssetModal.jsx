@@ -5,7 +5,7 @@ export default function AssetModal() {
   return (
     <>
       <div
-        className="asset-modal fixed inset-0 z-[110] flex items-center justify-center p-[clamp(12px,2vw,30px)] text-[#e8f3ff]"
+        className="asset-modal fixed inset-0 z-[110] flex items-center justify-center text-[#e8f3ff]"
         id="asset-modal"
         role="dialog"
         aria-modal="true"
@@ -16,7 +16,7 @@ export default function AssetModal() {
           className="asset-modal-backdrop absolute inset-0 bg-[#010817e3] backdrop-blur-[10px]"
           data-asset-modal-close
         ></div>
-        <div className="asset-modal-window relative flex h-[min(870px,calc(100dvh-40px))] min-h-[430px] w-[min(1510px,100%)] flex-col overflow-hidden border border-[#507aaac7] bg-[#071126] shadow-[0_24px_90px_#000b,0_0_0_1px_#9bcaff18]">
+        <div className="asset-modal-window relative flex w-[min(1510px,100%)] flex-col overflow-hidden border border-[#507aaac7] bg-[#071126] shadow-[0_24px_90px_#000b,0_0_0_1px_#9bcaff18]">
           <div className="asset-modal-top flex h-[70px] min-h-[70px] items-center justify-between gap-2.5 border-b border-[#466d9a7a] bg-[#132746] px-6">
             <div>
               <div className="asset-modal-sub">KNU AIDC / 설비 점검</div>
