@@ -1,4 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import AppHeader from '../features/digital-twin/components/AppHeader.jsx';
 import NotificationsPanel from '../features/digital-twin/components/NotificationsPanel.jsx';
 import '../features/digital-twin/digital-twin.css';
@@ -7,6 +9,11 @@ import '../features/digital-twin/typography.css';
 export default function AppLayout() {
   const location = useLocation();
   const dashboardMode = location.pathname === '/scenario-control';
+  const advanceSimulation = useDigitalTwinStore(state => state.advanceSimulation);
+  useEffect(() => {
+    const interval = setInterval(() => advanceSimulation(2), 2000);
+    return () => clearInterval(interval);
+  }, [advanceSimulation]);
 
   return (
     <div

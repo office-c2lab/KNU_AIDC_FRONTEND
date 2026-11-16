@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import AssetTrendChart from './AssetTrendChart.jsx';
+import { AssetOperatingMetrics } from './OperatingMetrics.jsx';
 
 export default function AssetModal() {
   return (
@@ -41,7 +42,6 @@ export default function AssetModal() {
             <section className="asset-modal-card asset-model-pane" aria-label="선택 설비 3D 모델">
               <div className="asset-pane-heading">
                 <span id="asset-modal-device-id">설비</span>
-                
               </div>
               <div className="asset-modal-stage" id="asset-modal-stage">
                 <canvas
@@ -139,6 +139,7 @@ export default function AssetModal() {
                   </div>
                 </div>
               </div>
+              <AssetOperatingMetrics />
               <div className="asset-modal-panels">
                 <section className="asset-modal-card asset-chart-card">
                   <div className="asset-chart-title">
@@ -161,7 +162,6 @@ export default function AssetModal() {
               </div>
             </div>
           </div>
-          
         </div>
       </div>
     </>

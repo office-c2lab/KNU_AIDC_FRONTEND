@@ -1,5 +1,9 @@
 import { create } from 'zustand';
 import { DEFAULT_ASSET_CATALOG } from '../features/digital-twin/scene/config/assetCatalog.js';
+import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
+import { createIncidentSelectors } from '../features/digital-twin/scene/systems/createIncidentSelectors.js';
+
+const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
 
 const initialState = {
   activeZone: 'overview',
@@ -24,12 +28,32 @@ const initialState = {
   auditEvents: [],
   notificationsOpen: false,
   assetDetail: null,
+  simulationTime: 0,
+  energyKwhByAsset: {},
 };
 
 export const useDigitalTwinStore = create(set => ({
   ...initialState,
 
   setNavigation: navigation => set(navigation),
+  advanceSimulation: (seconds = 2) =>
+    set(state => {
+      if (!Number.isFinite(seconds) || seconds <= 0) return state;
+      const { getSensor } = createIncidentSelectors({
+        clock: { elapsedTime: state.simulationTime + seconds / 2 },
+        activeIncidents: new Map(state.incidents.map(item => [item.id, item])),
+        scenarioById,
+      });
+      const energyKwhByAsset = { ...state.energyKwhByAsset };
+      for (const asset of state.assetCatalog) {
+        if (asset.type === 'AI AGENT') continue;
+        const powerKw = getSensor(asset).power;
+        if (Number.isFinite(powerKw))
+          energyKwhByAsset[asset.id] =
+            (energyKwhByAsset[asset.id] ?? 0) + (powerKw * seconds) / 3600;
+      }
+      return { simulationTime: state.simulationTime + seconds, energyKwhByAsset };
+    }),
   setNotificationsOpen: notificationsOpen => set({ notificationsOpen }),
   setAssetDetail: assetDetail => set({ assetDetail }),
   setSplitLevel: splitLevel =>

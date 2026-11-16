@@ -1,6 +1,12 @@
 import { assertContext } from '../core/assertContext.js';
+import { createOperatingTelemetry } from './createOperatingTelemetry.js';
 
-export function createIncidentSelectors({ clock, activeIncidents, scenarioById }) {
+export function createIncidentSelectors({
+  clock,
+  activeIncidents,
+  scenarioById,
+  getEnergyKwh = () => 0,
+}) {
   assertContext(
     { clock, activeIncidents, scenarioById },
     ['clock', 'activeIncidents', 'scenarioById'],
@@ -10,6 +16,7 @@ export function createIncidentSelectors({ clock, activeIncidents, scenarioById }
     const result = [];
     for (const incident of activeIncidents.values()) {
       const scenario = scenarioById.get(incident.id);
+      if (!scenario) continue;
       if (scenario.asset === id) {
         result.push({
           scenario,
@@ -63,8 +70,23 @@ export function createIncidentSelectors({ clock, activeIncidents, scenarioById }
 
     return {
       temp: (asset.temp || 22) + tempDelta + Math.sin(time * 0.24 + asset.id.length) * 0.16,
-      power: Math.max(0, (asset.power || 0) + powerDelta),
+      power: Math.max(
+        0,
+        (asset.power || 0) *
+          (1 + 0.025 * Math.sin(time * 0.09 + asset.id.length) * Math.sin(time * 0.04)) +
+          powerDelta
+      ),
     };
+  }
+
+  function getOperatingData(asset) {
+    return createOperatingTelemetry(asset, {
+      time: clock.elapsedTime,
+      sensor: getSensor(asset),
+      status: getAssetStatus(asset),
+      issues: getAssetIssues(asset.id),
+      energyKwh: getEnergyKwh(asset.id),
+    });
   }
 
   function statusHtml(status) {
@@ -80,5 +102,5 @@ export function createIncidentSelectors({ clock, activeIncidents, scenarioById }
     return `<span class="state-pill ${className}">${label}</span>`;
   }
 
-  return { getAssetIssues, severityRank, getAssetStatus, getSensor, statusHtml };
+  return { getAssetIssues, severityRank, getAssetStatus, getSensor, getOperatingData, statusHtml };
 }

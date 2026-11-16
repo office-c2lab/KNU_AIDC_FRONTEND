@@ -1,40 +1,24 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
-import { SCENARIOS } from '../digital-twin/scene/config/scenarioConfig.js';
-import { createIncidentSelectors } from '../digital-twin/scene/systems/createIncidentSelectors.js';
-import { createAssetTrendData } from '../digital-twin/createAssetTrendData.js';
+import { lazy, Suspense, useState } from 'react';
+import useAssetTelemetry from '../digital-twin/useAssetTelemetry.js';
+import OperatingMetrics from '../digital-twin/components/OperatingMetrics.jsx';
 import './equipment-overview.css';
 import EquipmentModelPreview from './EquipmentModelPreview.jsx';
 import EquipmentLocationPreview from './EquipmentLocationPreview.jsx';
 
 const TrendChart = lazy(() => import('../digital-twin/components/AssetTrendChartView.jsx'));
-const scenarioById = new Map(SCENARIOS.map(s => [s.id, s]));
 
-export default function EquipmentOverview({ asset, incidents, stage }) {
+export default function EquipmentOverview({ asset, stage }) {
   const [kind, setKind] = useState('temp');
   const [range, setRange] = useState(60);
   const [modelSource, setModelSource] = useState(null);
-  const detail = useMemo(() => {
-    if (!asset) return null;
-    const selectors = createIncidentSelectors({
-      clock: { elapsedTime: 0 },
-      activeIncidents: new Map(incidents.map(item => [item.id, item])),
-      scenarioById,
-    });
-    const sensor = selectors.getSensor(asset);
-    return {
-      ...asset,
-      ...sensor,
-      status: selectors.getAssetStatus(asset),
-      trend: createAssetTrendData(asset.id, sensor),
-    };
-  }, [asset, incidents]);
+  const detail = useAssetTelemetry(asset);
   if (!detail) return <div className="equipment-overview">설비를 선택하세요.</div>;
   const severity =
     detail.status === '정상' ? 'normal' : detail.status === '주의' ? 'warning' : 'fault';
   const metrics = [
     { label: '온도', value: `${detail.temp.toFixed(1)} °C` },
     { label: '소비 전력', value: `${detail.power.toFixed(2)} kW` },
-    { label: '운영 용량', value: `${detail.capacity ?? 0}%` },
+    { label: '가동 부하', value: `${detail.operatingData.values.loadPercent.toFixed(1)}%` },
     { label: '대응 단계', value: stage ?? '미실행' },
   ];
   return (
@@ -107,6 +91,7 @@ export default function EquipmentOverview({ asset, incidents, stage }) {
           <EquipmentLocationPreview source={modelSource} asset={detail} />
         </div>
       </div>
+      <OperatingMetrics data={detail.operatingData} />
     </section>
   );
 }

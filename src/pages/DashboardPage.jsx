@@ -127,7 +127,6 @@ export default function DashboardPage() {
           <div className="scenario-workspace-scroll" ref={workspaceRef}>
             <EquipmentOverview
               asset={selectedAsset}
-              incidents={incidents}
               stage={selectedIncident ? steps[selectedIncident.stage] : null}
             />
             <div className="scenario-operation-grid">

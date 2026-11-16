@@ -3496,11 +3496,12 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     for (const r of s.related)
       if (!registry.has(r.id)) console.warn('[KNU AIDC] 존재하지 않는 영향 설비', r.id);
   }
-  const { getAssetIssues, severityRank, getAssetStatus, getSensor, statusHtml } =
+  const { getAssetIssues, severityRank, getAssetStatus, getSensor, getOperatingData, statusHtml } =
     createIncidentSelectors({
-      clock,
+      clock: { get elapsedTime() { return digitalTwinStore.getState().simulationTime; } },
       activeIncidents,
       scenarioById: SCENARIO_BY_ID,
+      getEnergyKwh: id => digitalTwinStore.getState().energyKwhByAsset[id] ?? 0,
     });
   function writeEvent(message, kind = 'info') {
     eventLog.unshift({
@@ -3975,7 +3976,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     const sensor = getSensor(asset),
       status = getAssetStatus(asset);
     const issues = getAssetIssues(asset.id),
-      util = clamp(asset.capacity ?? 68, 0, 100);
+      util = getOperatingData(asset).values.loadPercent;
     $('#asset-modal-title').textContent =
       `${asset.floor ? asset.floor + ' · ' : ''}${asset.name} / ${asset.id}`;
     $('#asset-modal-device-id').textContent = asset.id + ' · ' + assetTypeLabel(asset.type);
@@ -4005,6 +4006,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       name: asset.name,
       temp: sensor.temp,
       power: sensor.power,
+      operatingData: getOperatingData(asset),
       trend: createAssetTrendData(asset.id, sensor),
     });
     const events = issues.length
@@ -4268,6 +4270,16 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   }
 
   const unsubscribeTwinStore = digitalTwinStore.subscribe((state, previous) => {
+    if (state.incidents !== previous.incidents) {
+      activeIncidents.clear();
+      for (const incident of state.incidents) {
+        if (SCENARIO_BY_ID.has(incident.id)) activeIncidents.set(incident.id, { ...incident });
+      }
+      refreshIncidents();
+    } else if (state.simulationTime !== previous.simulationTime) {
+      updateAIDCPanel();
+      updateAssetModal();
+    }
     if (state.splitLevel !== previous.splitLevel) {
       splitLevel = state.splitLevel;
       // Utility risers telescope between live floor heights, so keep active layers connected.
@@ -4694,7 +4706,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
         ? [
             ['장비 온도', sensor.temp.toFixed(1), '°C'],
             ['소비 전력', sensor.power.toFixed(1), 'kW'],
-            ['가동 부하', String(activeAsset.capacity ?? 68), '%'],
+            ['가동 부하', getOperatingData(activeAsset)?.values.loadPercent.toFixed(1) ?? '—', '%'],
           ]
         : [
             ['설비 수', String(group.length), ''],

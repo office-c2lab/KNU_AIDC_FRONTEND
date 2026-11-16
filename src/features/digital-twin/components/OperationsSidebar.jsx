@@ -1,4 +1,5 @@
 import { ArrowUpRight, Circle } from 'lucide-react';
+import { SelectedOperatingMetrics } from './OperatingMetrics.jsx';
 import { instrumentCard, moduleReadout, panelBase, panelScroll, subTitle } from './uiStyles.js';
 
 export default function OperationsSidebar() {
@@ -30,6 +31,7 @@ export default function OperationsSidebar() {
                 <p id="device-location">왼쪽 시설 목록이나 3D 모델에서 선택할 수 있습니다.</p>
               </div>
               <div className="device-grid" id="device-grid"></div>
+              <SelectedOperatingMetrics />
               <button className="asset-detail-trigger" id="open-asset-modal" type="button" disabled>
                 <span>설비를 선택하면 상세 보기</span>
                 <span>

@@ -16,7 +16,11 @@ import {
 export default function FacilitySidebar() {
   const assets = useDigitalTwinStore(state => state.assetCatalog);
   const incidents = useDigitalTwinStore(state => state.incidents);
-  const power = useMemo(() => calculateFacilityPower(assets, incidents), [assets, incidents]);
+  const simulationTime = useDigitalTwinStore(state => state.simulationTime);
+  const power = useMemo(
+    () => calculateFacilityPower(assets, incidents, simulationTime),
+    [assets, incidents, simulationTime]
+  );
   const pue = power.pueEstimate;
   const pueMax = Math.max(2, Math.ceil(pue ?? 2));
   const pueText = pue === null ? '—' : pue.toFixed(2);

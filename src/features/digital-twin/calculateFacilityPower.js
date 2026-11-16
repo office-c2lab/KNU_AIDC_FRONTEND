@@ -30,9 +30,9 @@ const groups = [
   { id: 'other', label: '기타·지원', tone: '', types: new Set() },
 ];
 
-export function calculateFacilityPower(assets, incidents) {
+export function calculateFacilityPower(assets, incidents, simulationTime = 0) {
   const { getSensor } = createIncidentSelectors({
-    clock: { elapsedTime: 0 },
+    clock: { elapsedTime: simulationTime },
     activeIncidents: new Map(
       incidents.filter(item => scenarioById.has(item.id)).map(item => [item.id, item])
     ),
