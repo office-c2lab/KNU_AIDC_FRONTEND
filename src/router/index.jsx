@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout.jsx';
 import DigitalTwinPage from '../pages/DigitalTwinPage.jsx';
 import DashboardPage from '../pages/DashboardPage.jsx';
@@ -18,7 +18,9 @@ const router = createBrowserRouter([
       },
       {
         path: 'dashboard',
-        element: <Navigate to="/scenario-control" replace />,
+        lazy: async () => ({
+          Component: (await import('../pages/OperationsDashboardPage.jsx')).default,
+        }),
       },
     ],
   },

@@ -1,7 +1,6 @@
 import { useDigitalTwinStore } from '../../stores/digitalTwinStore.js';
-import { motion } from 'framer-motion';
+import DashboardPanel from './DashboardPanel.jsx';
 import { SCENARIOS } from '../digital-twin/scene/config/scenarioConfig.js';
-import { panelEntrance } from '../../utils/panelMotion.js';
 
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
 const timeFormat = new Intl.DateTimeFormat('ko-KR', {
@@ -20,15 +19,13 @@ export default function ScenarioHistory() {
     event => event.scenarioId || /^(전체 초기화|모든 시나리오 종료)/.test(event.action ?? '')
   );
   return (
-    <motion.section
-      {...panelEntrance({ y: 22, delay: 0.18 })}
+    <DashboardPanel
+      title="시나리오 이력"
+      titleId="scenario-history-title"
+      extra={<span>최근 {events.length}건</span>}
+      delay={0.18}
       className="scenario-history"
-      aria-labelledby="scenario-history-title"
     >
-      <header>
-        <h2 id="scenario-history-title">시나리오 이력</h2>
-        <span>최근 {events.length}건</span>
-      </header>
       <div className="scenario-history-body">
         {events.length ? (
           <ol className="scenario-history-list">
@@ -64,6 +61,6 @@ export default function ScenarioHistory() {
           </p>
         )}
       </div>
-    </motion.section>
+    </DashboardPanel>
   );
 }

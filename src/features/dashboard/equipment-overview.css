@@ -17,10 +17,10 @@
 .scenario-runner,
 .scenario-history {
   min-width: 0;
-  border: 1px solid #324f72;
-  border-radius: 12px;
-  background: #101e32;
-  box-shadow: 0 12px 32px #0207144d;
+  border: 1px solid var(--dashboard-border);
+  border-radius: var(--dashboard-radius);
+  background: var(--dashboard-surface);
+  box-shadow: var(--dashboard-shadow);
 }
 
 .equipment-overview {
@@ -98,10 +98,10 @@
   flex-direction: column;
   min-width: 0;
   align-self: start;
-  padding: 14px;
-  border: 1px solid #324f72;
-  border-radius: 8px;
-  background: #101e32;
+  padding: var(--dashboard-instrument-padding);
+  border: 1px solid var(--dashboard-border);
+  border-radius: var(--dashboard-instrument-radius);
+  background: var(--dashboard-surface);
 }
 .equipment-identity .equipment-model-preview {
   flex: none;
@@ -198,10 +198,10 @@
 .equipment-trend {
   min-width: 0;
   flex: 1;
-  padding: 14px;
-  border: 1px solid #324f72;
-  border-radius: 8px;
-  background: #101e32;
+  padding: var(--dashboard-instrument-padding);
+  border: 1px solid var(--dashboard-border);
+  border-radius: var(--dashboard-instrument-radius);
+  background: var(--dashboard-surface);
 }
 .equipment-trend-heading {
   display: flex;
@@ -373,7 +373,7 @@
   width: 100%;
   justify-self: start;
   gap: 20px;
-  padding: 22px;
+  padding: var(--dashboard-padding);
 }
 .scenario-operation-grid {
   display: grid;
@@ -390,7 +390,7 @@
   grid-column: 2;
   display: flex;
   flex-direction: column;
-  padding: 22px;
+  padding: var(--dashboard-padding);
   min-width: 0;
   min-height: 0;
 }

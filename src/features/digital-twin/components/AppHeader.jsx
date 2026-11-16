@@ -19,6 +19,12 @@ export default function AppHeader() {
       >
         <nav className="main-nav flex h-16 items-center gap-[30px] pl-7" aria-label="주 메뉴">
           <NavLink
+            to="/dashboard"
+            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
+          >
+            대시보드
+          </NavLink>
+          <NavLink
             to="/"
             end
             className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
