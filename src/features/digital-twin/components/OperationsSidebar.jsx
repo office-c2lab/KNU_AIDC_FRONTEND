@@ -1,11 +1,14 @@
 import { ArrowUpRight, Circle } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { SelectedOperatingMetrics } from './OperatingMetrics.jsx';
 import { instrumentCard, moduleReadout, panelBase, panelScroll, subTitle } from './uiStyles.js';
+import { panelEntrance } from '../../../utils/panelMotion.js';
 
 export default function OperationsSidebar() {
   return (
     <>
-      <aside
+      <motion.aside
+        {...panelEntrance({ x: 28, delay: 0.12 })}
         className={`${panelBase} right-panel right-[26px]`}
         aria-label="시설 상세 및 운영 안내"
       >
@@ -106,7 +109,7 @@ export default function OperationsSidebar() {
             <div id="scenario-view"></div>
           </div>
         </div>
-      </aside>
+      </motion.aside>
     </>
   );
 }

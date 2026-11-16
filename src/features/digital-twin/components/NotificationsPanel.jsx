@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { SCENARIOS } from '../scene/config/scenarioConfig.js';
+import { panelEntrance } from '../../../utils/panelMotion.js';
 
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
 
@@ -38,13 +40,27 @@ export default function NotificationsPanel({ dashboardMode = false }) {
   }, [open, setOpen]);
 
   return (
-    <section
+    <motion.section
+      {...panelEntrance({ y: -14 })}
+      initial={false}
+      animate={open ? 'open' : 'closed'}
+      variants={{
+        open: { opacity: 1, y: 0, scale: 1, visibility: 'visible' },
+        closed: {
+          opacity: 0,
+          y: -14,
+          scale: 0.985,
+          transitionEnd: { visibility: 'hidden' },
+        },
+      }}
+      style={{ pointerEvents: open ? 'auto' : 'none' }}
+      aria-hidden={!open}
+      inert={!open}
       ref={panelRef}
       id="notifications-panel"
       className="notifications-panel"
       role="region"
       aria-labelledby="alarm-heading"
-      hidden={!open}
     >
       <div className="notifications-heading">
         <h2 id="alarm-heading">알림 및 이벤트</h2>
@@ -92,6 +108,6 @@ export default function NotificationsPanel({ dashboardMode = false }) {
           <li className="dashboard-empty">진행 중인 알림이 없습니다.</li>
         )}
       </ul>
-    </section>
+    </motion.section>
   );
 }

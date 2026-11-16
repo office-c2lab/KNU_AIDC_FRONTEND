@@ -1,5 +1,7 @@
 import { ChevronDown, Search, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { SCENARIOS } from '../digital-twin/scene/config/scenarioConfig.js';
+import { panelEntrance } from '../../utils/panelMotion.js';
 import {
   floorButton,
   floorNumber,
@@ -39,7 +41,8 @@ export default function ScenarioFacilitySidebar({
     .filter(group => !query || group.assets.length);
   const resultCount = groups.reduce((count, group) => count + group.assets.length, 0);
   return (
-    <aside
+    <motion.aside
+      {...panelEntrance({ x: -24 })}
       ref={navigationRef}
       className={`${panelBase} flex min-h-0 flex-col`}
       style={{ position: 'relative', top: 'auto', bottom: 'auto', zIndex: 'auto' }}
@@ -173,6 +176,6 @@ export default function ScenarioFacilitySidebar({
           </p>
         )}
       </nav>
-    </aside>
+    </motion.aside>
   );
 }

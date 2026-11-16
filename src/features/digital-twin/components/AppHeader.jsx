@@ -1,6 +1,8 @@
 import { Bell } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
+import { panelEntrance } from '../../../utils/panelMotion.js';
 
 const navItem =
   'nav-item relative h-16 border-0 bg-transparent px-0.5 font-semibold tracking-[0.15px] text-[#a8b9d2] transition-colors hover:text-[#f0f7ff]';
@@ -11,7 +13,10 @@ export default function AppHeader() {
   const incidentCount = useDigitalTwinStore(state => state.incidents.length);
   return (
     <>
-      <header className="app-header fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959] max-[1250px]:grid-cols-[1fr_420px_1fr] max-[930px]:grid-cols-[1fr_330px_1fr] max-[700px]:grid-cols-[1fr_220px_1fr]">
+      <motion.header
+        {...panelEntrance({ y: -18 })}
+        className="app-header fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959] max-[1250px]:grid-cols-[1fr_420px_1fr] max-[930px]:grid-cols-[1fr_330px_1fr] max-[700px]:grid-cols-[1fr_220px_1fr]"
+      >
         <nav className="main-nav flex h-16 items-center gap-[30px] pl-7" aria-label="주 메뉴">
           <NavLink
             to="/"
@@ -138,7 +143,7 @@ export default function AppHeader() {
             </span>
           </button>
         </div>
-      </header>
+      </motion.header>
     </>
   );
 }

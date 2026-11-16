@@ -1,9 +1,11 @@
 import { lazy, Suspense, useState } from 'react';
+import { motion } from 'framer-motion';
 import useAssetTelemetry from '../digital-twin/useAssetTelemetry.js';
 import OperatingMetrics from '../digital-twin/components/OperatingMetrics.jsx';
 import './equipment-overview.css';
 import EquipmentModelPreview from './EquipmentModelPreview.jsx';
 import EquipmentLocationPreview from './EquipmentLocationPreview.jsx';
+import { panelEntrance } from '../../utils/panelMotion.js';
 
 const TrendChart = lazy(() => import('../digital-twin/components/AssetTrendChartView.jsx'));
 
@@ -12,7 +14,12 @@ export default function EquipmentOverview({ asset, stage }) {
   const [range, setRange] = useState(60);
   const [modelSource, setModelSource] = useState(null);
   const detail = useAssetTelemetry(asset);
-  if (!detail) return <div className="equipment-overview">설비를 선택하세요.</div>;
+  if (!detail)
+    return (
+      <motion.div {...panelEntrance({ delay: 0.06 })} className="equipment-overview">
+        설비를 선택하세요.
+      </motion.div>
+    );
   const severity =
     detail.status === '정상' ? 'normal' : detail.status === '주의' ? 'warning' : 'fault';
   const metrics = [
@@ -22,7 +29,11 @@ export default function EquipmentOverview({ asset, stage }) {
     { label: '대응 단계', value: stage ?? '미실행' },
   ];
   return (
-    <section className="equipment-overview" aria-label="선택 설비 현황">
+    <motion.section
+      {...panelEntrance({ delay: 0.06 })}
+      className="equipment-overview"
+      aria-label="선택 설비 현황"
+    >
       <header className="equipment-overview-heading">
         <div className="equipment-heading-name">
           <h2>{detail.id}</h2>
@@ -92,6 +103,6 @@ export default function EquipmentOverview({ asset, stage }) {
         </div>
       </div>
       <OperatingMetrics data={detail.operatingData} />
-    </section>
+    </motion.section>
   );
 }

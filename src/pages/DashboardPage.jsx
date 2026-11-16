@@ -2,9 +2,11 @@ import ScenarioFacilitySidebar from '../features/dashboard/ScenarioFacilitySideb
 import EquipmentOverview from '../features/dashboard/EquipmentOverview.jsx';
 import ScenarioHistory from '../features/dashboard/ScenarioHistory.jsx';
 import { useMemo, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import '../features/dashboard/dashboard.css';
+import { panelEntrance } from '../utils/panelMotion.js';
 
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
 const steps = ['감지', '확인', '원인 분석', '복구 조치', '정상 확인'];
@@ -120,7 +122,8 @@ export default function DashboardPage() {
             selectAsset(asset);
           }}
         />
-        <section
+        <motion.section
+          {...panelEntrance({ y: 20, delay: 0.04 })}
           className="scenario-workspace flex min-h-0 min-w-0 flex-col overflow-hidden"
           aria-label="선택 설비 상세"
         >
@@ -131,7 +134,11 @@ export default function DashboardPage() {
             />
             <div className="scenario-operation-grid">
               {selected ? (
-                <section className="scenario-runner" aria-labelledby="scenario-runner-title">
+                <motion.section
+                  {...panelEntrance({ y: 22, delay: 0.12 })}
+                  className="scenario-runner"
+                  aria-labelledby="scenario-runner-title"
+                >
                   <h2 id="scenario-runner-title">시나리오 실행</h2>
                   <div className="scenario-runner-name">
                     <h3>{selected.title.replace(selected.asset, '').trim()}</h3>
@@ -177,7 +184,7 @@ export default function DashboardPage() {
                       </button>
                     )}
                   </div>
-                </section>
+                </motion.section>
               ) : (
                 <div className="asset-control-unavailable">
                   이 설비에는 실행 가능한 가상 장애 시나리오가 등록되어 있지 않습니다.
@@ -186,10 +193,14 @@ export default function DashboardPage() {
               <ScenarioHistory />
             </div>
           </div>
-        </section>
+        </motion.section>
 
         <div className="dashboard-side-stack">
-          <section className="dashboard-panel active-scenarios" aria-labelledby="active-heading">
+          <motion.section
+            {...panelEntrance({ x: 24, delay: 0.1 })}
+            className="dashboard-panel active-scenarios"
+            aria-labelledby="active-heading"
+          >
             <header className="dashboard-panel-heading">
               <div>
                 <h2 id="active-heading">진행 중 시나리오</h2>
@@ -242,7 +253,7 @@ export default function DashboardPage() {
                 모든 시나리오 종료
               </button>
             )}
-          </section>
+          </motion.section>
         </div>
       </div>
     </main>

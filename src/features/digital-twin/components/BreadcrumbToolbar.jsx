@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Check, ChevronDown, ChevronRight, House, RotateCcw, RotateCw } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
+import { panelEntrance } from '../../../utils/panelMotion.js';
 
 const chip = 'chip control-menu-trigger';
 const menuItem = 'control-menu-item';
@@ -69,7 +71,7 @@ export default function BreadcrumbToolbar() {
   }, [openMenu]);
 
   return (
-    <div className="breadcrumbs">
+    <motion.div {...panelEntrance({ y: -16, delay: 0.04 })} className="breadcrumbs">
       <div className="crumb-path">
         <House size={14} aria-hidden="true" />
         <ChevronRight className="sep" size={12} aria-hidden="true" />
@@ -170,6 +172,6 @@ export default function BreadcrumbToolbar() {
           </button>
         </Menu>
       </div>
-    </div>
+    </motion.div>
   );
 }

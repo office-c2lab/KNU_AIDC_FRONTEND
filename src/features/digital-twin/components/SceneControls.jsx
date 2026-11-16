@@ -1,5 +1,7 @@
 import { House } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
+import { panelEntrance } from '../../../utils/panelMotion.js';
 
 const dockButton = 'dock-button';
 
@@ -10,7 +12,7 @@ export default function SceneControls() {
 
   return (
     <>
-      <div className="center-status">
+      <motion.div {...panelEntrance({ y: 22, delay: 0.16 })} className="center-status">
         <div className="control-dock" role="toolbar" aria-label="데이터센터 3D 관제 도구">
           <div className="dock-group dock-home-group">
             <button type="button" className={dockButton} id="btn-fit" title="전체 시설 보기">
@@ -64,7 +66,7 @@ export default function SceneControls() {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
       <div id="floor-separation-hint" hidden></div>
       <div className="v9-logic" aria-hidden="true">
         <span id="stat-assets"></span>

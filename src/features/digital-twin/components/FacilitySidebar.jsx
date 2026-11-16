@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
+import { panelEntrance } from '../../../utils/panelMotion.js';
 import { calculateFacilityPower } from '../calculateFacilityPower.js';
 import {
   floorButton,
@@ -26,7 +28,11 @@ export default function FacilitySidebar() {
   const pueText = pue === null ? '—' : pue.toFixed(2);
   return (
     <>
-      <aside className={`${panelBase} left-panel left-[26px]`} aria-label="시설 현황 및 층 탐색">
+      <motion.aside
+        {...panelEntrance({ x: -28, delay: 0.08 })}
+        className={`${panelBase} left-panel left-[26px]`}
+        aria-label="시설 현황 및 층 탐색"
+      >
         <div className={panelScroll}>
           <section className="facility-section" aria-labelledby="facility-heading">
             <div className={subTitle}>
@@ -173,7 +179,7 @@ export default function FacilitySidebar() {
             </div>
           </section>
         </div>
-      </aside>
+      </motion.aside>
     </>
   );
 }
