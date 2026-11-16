@@ -1,7 +1,7 @@
 import ScenarioFacilitySidebar from '../features/dashboard/ScenarioFacilitySidebar.jsx';
 import EquipmentOverview from '../features/dashboard/EquipmentOverview.jsx';
-import { useMemo, useState } from 'react';
-import { ChevronDown, ClipboardList, Flame, Info, Play, RotateCcw, X } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { RotateCcw } from 'lucide-react';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import '../features/dashboard/dashboard.css';
@@ -29,6 +29,10 @@ export default function DashboardPage() {
   const selectVisualization = useDigitalTwinStore(state => state.selectVisualization);
 
   const [selectedFacilityId, setSelectedFacilityId] = useState('3F');
+  const [expandedFacilityId, setExpandedFacilityId] = useState('3F');
+  const [facilitySearch, setFacilitySearch] = useState('');
+  const workspaceRef = useRef(null);
+  const facilityRef = useRef(null);
   const [selectedAssetId, setSelectedAssetId] = useState(
     () => scenarioById.get(chosenScenarioId)?.asset ?? null
   );
@@ -73,24 +77,28 @@ export default function DashboardPage() {
     }
   };
 
-  const selectedAssetState = useMemo(() => {
-    if (!selectedAsset) return '연동 대기';
-    for (const incident of incidents) {
-      const scenario = scenarioById.get(incident.id);
-      if (scenario?.asset === selectedAsset.id) return scenario.status;
-    }
-    for (const incident of incidents) {
-      const scenario = scenarioById.get(incident.id);
-      const related = scenario?.related.find(asset => asset.id === selectedAsset.id);
-      if (related) return related.state;
-    }
-    return '정상';
-  }, [incidents, selectedAsset]);
-
   const selectAsset = asset => {
     setSelectedAssetId(asset.id);
     const scenario = SCENARIOS.find(item => item.asset === asset.id);
     if (scenario) setScenarioState({ chosenScenarioId: scenario.id });
+  };
+
+  const focusIncident = incident => {
+    const scenario = scenarioById.get(incident.id);
+    const asset = assetCatalog.find(item => item.id === scenario?.asset);
+    const facility = asset && facilityGroups.find(group => group.matches(asset));
+    if (!facility) return;
+    setFacilitySearch('');
+    setExpandedFacilityId(facility.id);
+    setSelectedFacilityId(facility.id);
+    setSelectedAssetId(asset.id);
+    setScenarioState({ chosenScenarioId: scenario.id, selectedIncidentId: incident.id });
+    requestAnimationFrame(() => {
+      workspaceRef.current?.scrollTo({ top: 0 });
+      facilityRef.current
+        ?.querySelector('.scenario-facility-assets .selected')
+        ?.scrollIntoView({ block: 'nearest' });
+    });
   };
 
   return (
@@ -102,6 +110,11 @@ export default function DashboardPage() {
           summary={liveSummary}
           selectedAssetId={selectedAsset?.id}
           runningIds={runningIds}
+          expandedFacilityId={expandedFacilityId}
+          onExpandedFacilityChange={setExpandedFacilityId}
+          search={facilitySearch}
+          onSearchChange={setFacilitySearch}
+          navigationRef={facilityRef}
           onSelectAsset={(facilityId, asset) => {
             setSelectedFacilityId(facilityId);
             selectAsset(asset);
@@ -111,42 +124,21 @@ export default function DashboardPage() {
           className="scenario-workspace flex min-h-0 min-w-0 flex-col overflow-hidden"
           aria-label="선택 설비 상세"
         >
-          <div className="scenario-workspace-scroll">
+          <div className="scenario-workspace-scroll" ref={workspaceRef}>
             <EquipmentOverview
               asset={selectedAsset}
               incidents={incidents}
-              facilityName={selectedFacility?.name}
-              facilityAssets={facilityAssets}
               stage={selectedIncident ? steps[selectedIncident.stage] : null}
             />
             {selected ? (
               <section className="scenario-runner" aria-labelledby="scenario-runner-title">
-                <h2 id="scenario-runner-title">
-                  <Play size={20} aria-hidden="true" />
-                  시나리오 실행
-                </h2>
-                <div className="scenario-runner-select">
-                  <label htmlFor="selected-equipment-scenario">실행 시나리오</label>
-                  <div>
-                    <Flame size={17} aria-hidden="true" />
-                    <select
-                      id="selected-equipment-scenario"
-                      value={selected.id}
-                      onChange={event => setScenarioState({ chosenScenarioId: event.target.value })}
-                    >
-                      {SCENARIOS.filter(item => item.asset === selectedAsset.id).map(item => (
-                        <option key={item.id} value={item.id}>
-                          {item.title}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <h2 id="scenario-runner-title">시나리오 실행</h2>
+                <div className="scenario-runner-name">
+                  <h3>{selected.title.replace(selected.asset, '').trim()}</h3>
+                  <span>시나리오 등급 · {selected.level}</span>
                 </div>
                 <div className="scenario-runner-impact">
-                  <h3>
-                    <Info size={17} aria-hidden="true" />
-                    예상 영향
-                  </h3>
+                  <h3>예상 영향</h3>
                   <div>
                     <p>{selected.condition}</p>
                     <p>{selected.impact}</p>
@@ -154,9 +146,13 @@ export default function DashboardPage() {
                 </div>
                 <details className="scenario-runner-procedure" key={selected.id}>
                   <summary>
-                    <ClipboardList size={17} aria-hidden="true" />
                     <span>점검 절차 및 대응 체크포인트</span>
-                    <ChevronDown size={16} aria-hidden="true" />
+                    <span className="procedure-toggle-closed" aria-hidden="true">
+                      펼치기
+                    </span>
+                    <span className="procedure-toggle-open" aria-hidden="true">
+                      접기
+                    </span>
                   </summary>
                   <p>{selected.cause}</p>
                   <ol>
@@ -165,21 +161,13 @@ export default function DashboardPage() {
                     ))}
                   </ol>
                 </details>
-                <div className="scenario-runner-context">
-                  <span
-                    className={`equipment-status ${selectedAssetState === '정상' ? 'normal' : selectedAssetState === '주의' ? 'warning' : 'fault'}`}
-                  >
-                    {selectedAssetState}
-                  </span>
-                  <span>시나리오 등급 · {selected.level}</span>
-                </div>
                 {selectedIncident ? (
                   <button
                     type="button"
                     className="scenario-runner-action stop"
                     onClick={() => endIncident(selected.id)}
                   >
-                    <X size={18} aria-hidden="true" /> 시나리오 종료
+                    시나리오 종료
                   </button>
                 ) : (
                   <button
@@ -187,7 +175,7 @@ export default function DashboardPage() {
                     className="scenario-runner-action"
                     onClick={startSelectedScenario}
                   >
-                    <Play size={18} aria-hidden="true" /> 시나리오 실행
+                    시나리오 실행
                   </button>
                 )}
               </section>
@@ -214,89 +202,33 @@ export default function DashboardPage() {
                   if (!scenario) return null;
                   return (
                     <article key={incident.id} aria-label={scenario.title}>
-                      <details className="active-scenario-disclosure">
-                        <summary>
-                          <div>
-                            <div className="active-scenario-title-row">
-                              <strong>{scenario.title}</strong>
-                              <span className="active-scenario-state">
-                                {scenario.status} · {scenario.level}
-                              </span>
-                            </div>
-                            <small>
-                              {scenario.asset} · {steps[incident.stage]}
-                            </small>
-                          </div>
-                          <ChevronDown
-                            className="active-scenario-chevron"
-                            size={16}
-                            aria-hidden="true"
-                          />
-                        </summary>
-                        <div className="active-scenario-content">
-                          <p className="active-scenario-condition">{scenario.condition}</p>
-                          <dl className="active-scenario-details">
-                            <div>
-                              <dt>현재 대응 단계</dt>
-                              <dd className="active-scenario-stage">
-                                {incident.stage + 1} / {steps.length} · {steps[incident.stage]}
-                              </dd>
-                            </div>
-                            <div>
-                              <dt>시작 시각</dt>
-                              <dd>
-                                <time dateTime={new Date(incident.started).toISOString()}>
-                                  {new Intl.DateTimeFormat('ko-KR', {
-                                    timeZone: 'Asia/Seoul',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    second: '2-digit',
-                                  }).format(new Date(incident.started))}
-                                </time>
-                              </dd>
-                            </div>
-                            <div>
-                              <dt>예상 영향</dt>
-                              <dd>{scenario.impact}</dd>
-                            </div>
-                            <div>
-                              <dt>점검 방향</dt>
-                              <dd>{scenario.cause}</dd>
-                            </div>
-                          </dl>
-                          <div className="active-scenario-checks">
-                            <h3>대응 체크포인트</h3>
-                            <ol>
-                              {scenario.checks.map(check => (
-                                <li key={check}>{check}</li>
-                              ))}
-                            </ol>
-                          </div>
-                          {scenario.related.length > 0 && (
-                            <div className="active-scenario-related">
-                              <h3>연관 설비</h3>
-                              <ul>
-                                {scenario.related.map(asset => (
-                                  <li key={asset.id}>
-                                    <span>
-                                      {asset.id} · {asset.state}
-                                    </span>
-                                    <p>{asset.why}</p>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          <button
-                            className="active-scenario-end"
-                            type="button"
-                            onClick={() => endIncident(incident.id)}
-                            aria-label={`${scenario.title} 종료`}
-                          >
-                            <X size={14} aria-hidden="true" /> 시나리오 종료
-                          </button>
+                      <button
+                        type="button"
+                        className={`active-scenario-summary${selectedAsset?.id === scenario.asset ? ' selected' : ''}`}
+                        aria-pressed={selectedAsset?.id === scenario.asset}
+                        aria-label={`${scenario.title}, ${scenario.asset} 설비 보기`}
+                        onClick={() => focusIncident(incident)}
+                      >
+                        <div className="active-scenario-title-row">
+                          <strong>{scenario.title.replace(scenario.asset, '').trim()}</strong>
+                          <span className="active-scenario-state">
+                            {scenario.status} · {scenario.level}
+                          </span>
                         </div>
-                      </details>
+                        <div className="active-scenario-summary-meta">
+                          <small>
+                            {scenario.asset} · {steps[incident.stage]}
+                          </small>
+                          <time dateTime={new Date(incident.started).toISOString()}>
+                            시작{' '}
+                            {new Intl.DateTimeFormat('ko-KR', {
+                              timeZone: 'Asia/Seoul',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }).format(new Date(incident.started))}
+                          </time>
+                        </div>
+                      </button>
                     </article>
                   );
                 })

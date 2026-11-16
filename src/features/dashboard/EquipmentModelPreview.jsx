@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-export default function EquipmentModelPreview({ asset }) {
+export default function EquipmentModelPreview({ asset, onLayout }) {
   const canvasRef = useRef(null);
   const viewerRef = useRef(null);
   const assetIdRef = useRef(asset.id);
@@ -27,6 +27,7 @@ export default function EquipmentModelPreview({ asset }) {
         if (cancelled) return;
         const viewer = createEquipmentPreview(canvasRef.current);
         viewerRef.current = viewer;
+        onLayout?.(viewer.modelSource);
         viewer.setAsset(assetIdRef.current);
         setState('ready');
       })
@@ -34,6 +35,7 @@ export default function EquipmentModelPreview({ asset }) {
         if (cancelled) return;
         viewerRef.current?.dispose();
         viewerRef.current = null;
+        onLayout?.(null);
         console.error('설비 3D 미리보기 초기화 실패', error);
         setState('error');
       });
@@ -42,13 +44,13 @@ export default function EquipmentModelPreview({ asset }) {
       viewerRef.current?.dispose();
       viewerRef.current = null;
     };
-  }, []);
+  }, [onLayout]);
 
   return (
     <div className="equipment-model-preview">
-      <canvas
+      <div
+        className="equipment-model-canvas"
         ref={canvasRef}
-        tabIndex={0}
         aria-label={`${asset.name} 3D 모델. 드래그로 회전, 휠로 확대할 수 있습니다.`}
       />
       {state !== 'ready' && (

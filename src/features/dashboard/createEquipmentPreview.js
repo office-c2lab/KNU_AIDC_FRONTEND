@@ -2,8 +2,12 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { initDigitalTwin } from '../digital-twin/scene/runtime/createDigitalTwinRuntime.js';
 
-export function createEquipmentPreview(canvas) {
+export function createEquipmentPreview(host) {
+  const canvas = document.createElement('canvas');
+  canvas.tabIndex = 0;
+  canvas.setAttribute('aria-label', '설비 3D 모델. 드래그로 회전, 휠로 확대');
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  host.appendChild(canvas);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -14,6 +18,7 @@ export function createEquipmentPreview(canvas) {
     library = initDigitalTwin(document.createElement('div'), { modelsOnly: true });
   } catch (error) {
     renderer.dispose();
+    canvas.remove();
     throw error;
   }
   const scene = new THREE.Scene();
@@ -43,10 +48,31 @@ export function createEquipmentPreview(canvas) {
   const fit = () => {
     const vertical = THREE.MathUtils.degToRad(camera.fov);
     const horizontal = 2 * Math.atan(Math.tan(vertical / 2) * camera.aspect);
-    const distance = (radius / Math.sin(Math.min(vertical, horizontal) / 2)) * 1.08;
-    camera.position.copy(new THREE.Vector3(0.7, 0.38, 1).normalize().multiplyScalar(distance));
+    const direction = new THREE.Vector3(0.7, 0.38, 1).normalize();
+    const initialDistance = radius * 4;
+    camera.position.copy(direction.clone().multiplyScalar(initialDistance));
+    camera.lookAt(0, 0, 0);
+    camera.updateMatrixWorld(true);
+    const bounds = new THREE.Box3().setFromObject(model, true);
+    let distance = radius;
+    for (const x of [bounds.min.x, bounds.max.x])
+      for (const y of [bounds.min.y, bounds.max.y])
+        for (const z of [bounds.min.z, bounds.max.z]) {
+          const point = new THREE.Vector3(x, y, z).applyMatrix4(camera.matrixWorldInverse);
+          distance = Math.max(
+            distance,
+            point.z +
+              initialDistance +
+              1.12 *
+                Math.max(
+                  Math.abs(point.x) / Math.tan(horizontal / 2),
+                  Math.abs(point.y) / Math.tan(vertical / 2)
+                )
+          );
+        }
+    camera.position.copy(direction.multiplyScalar(distance));
     controls.target.set(0, 0, 0);
-    controls.minDistance = radius * 1.3;
+    controls.minDistance = Math.min(radius * 1.3, distance * 0.8);
     controls.maxDistance = distance * 2.5;
     controls.update();
   };
@@ -63,6 +89,7 @@ export function createEquipmentPreview(canvas) {
   };
   render();
   return {
+    modelSource: { layout: library.layout, locations: library.locations },
     setAsset(id) {
       if (model) scene.remove(model);
       model = library.models.get(id);
@@ -86,6 +113,7 @@ export function createEquipmentPreview(canvas) {
       scene.clear();
       renderer.dispose();
       renderer.forceContextLoss();
+      canvas.remove();
     },
   };
 }

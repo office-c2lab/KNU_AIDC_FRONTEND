@@ -820,6 +820,45 @@
   background: #3b2a3b;
   color: #ffb2b7;
 }
+.active-scenario-list .active-scenario-summary {
+  display: grid;
+  justify-items: stretch;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  height: auto;
+  padding: 12px 10px;
+  border-radius: 7px;
+  background: transparent;
+  color: #d4e1f0;
+  text-align: left;
+  transition: background-color 0.16s;
+}
+.active-scenario-list .active-scenario-summary:hover {
+  background: #9bcaff12;
+  color: #d4e1f0;
+}
+.active-scenario-list .active-scenario-summary.selected {
+  background: #7cbaff24;
+}
+.active-scenario-list .active-scenario-summary.selected:hover {
+  background: #7cbaff30;
+}
+.active-scenario-summary-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.active-scenario-summary-meta small {
+  margin: 0;
+}
+.active-scenario-summary-meta time {
+  color: #a5bad2;
+  font-size: 11px;
+  white-space: nowrap;
+}
 .active-scenario-list .active-scenario-end {
   display: inline-flex;
   align-items: center;

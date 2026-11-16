@@ -19,7 +19,7 @@ const valueDomain = [
   max => Math.ceil((max + Math.max(0.1, Math.abs(max) * 0.01)) * 10) / 10,
 ];
 
-export default function AssetTrendChartView({ kind, detail }) {
+export default function AssetTrendChartView({ kind, detail, range = 60 }) {
   const gradientId = useId().replace(/:/g, '');
   if (!detail) return null;
   const { label, unit, color } = configuration[kind];
@@ -28,10 +28,13 @@ export default function AssetTrendChartView({ kind, detail }) {
     <div
       className="asset-trend-chart"
       role="img"
-      aria-label={`${detail.name} ${label} 최근 60분 추세. 현재 ${detail[kind].toFixed(1)} ${unit}`}
+      aria-label={`${detail.name} ${label} 최근 ${range}분 추세. 현재 ${detail[kind].toFixed(1)} ${unit}`}
     >
       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-        <AreaChart data={detail.trend} margin={{ top: 12, right: 14, bottom: 4, left: 0 }}>
+        <AreaChart
+          data={detail.trend.filter(point => point.minute >= -range)}
+          margin={{ top: 12, right: 14, bottom: 4, left: 0 }}
+        >
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={color} stopOpacity={0.28} />
@@ -42,8 +45,8 @@ export default function AssetTrendChartView({ kind, detail }) {
           <XAxis
             dataKey="minute"
             type="number"
-            domain={[-60, 0]}
-            ticks={[-60, -30, 0]}
+            domain={[-range, 0]}
+            ticks={[-range, -range / 2, 0]}
             tickFormatter={timeLabel}
             tick={{ fill: '#b8cce3', fontSize: 10 }}
             axisLine={false}

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { SCENARIOS } from '../digital-twin/scene/config/scenarioConfig.js';
 import {
@@ -16,9 +15,12 @@ export default function ScenarioFacilitySidebar({
   selectedAssetId,
   runningIds,
   onSelectAsset,
+  expandedFacilityId,
+  onExpandedFacilityChange: setExpandedFacilityId,
+  search,
+  onSearchChange: setSearch,
+  navigationRef,
 }) {
-  const [expandedFacilityId, setExpandedFacilityId] = useState('3F');
-  const [search, setSearch] = useState('');
   const query = search.trim().toLocaleLowerCase();
   const groups = facilityGroups
     .map(group => ({
@@ -38,6 +40,7 @@ export default function ScenarioFacilitySidebar({
   const resultCount = groups.reduce((count, group) => count + group.assets.length, 0);
   return (
     <aside
+      ref={navigationRef}
       className={`${panelBase} flex min-h-0 flex-col`}
       style={{ position: 'relative', top: 'auto', bottom: 'auto', zIndex: 'auto' }}
       aria-label="시설 및 설비 탐색"

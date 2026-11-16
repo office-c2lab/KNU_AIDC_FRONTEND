@@ -2407,6 +2407,18 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     // Reuse the exact equipment builders without starting the twin's renderer,
     // simulation, DOM controls, store writes or animation loop.
     const models = new Map([...registry].map(([id, asset]) => [id, asset.root]));
+    const locations = new Map(
+      [...Object.entries(floorGroups), ...Object.entries(regionGroups).filter(([id]) => id === 'power' || id === 'cooling')]
+        .map(([id, group]) => [id, group.clone(true)])
+    );
+    scene.updateMatrixWorld(true);
+    const layout = [...registry.values()].map(asset => {
+      const bounds = new THREE.Box3().setFromObject(asset.root, true);
+      const center = bounds.getCenter(new THREE.Vector3());
+      const size = bounds.getSize(new THREE.Vector3());
+      return { id: asset.id, floor: asset.floor, zone: asset.zone,
+        x: center.x, z: center.z, width: size.x, depth: size.z };
+    });
     const retained = new Set();
     const resources = object => {
       const result = new Set();
@@ -2420,6 +2432,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       return result;
     };
     for (const model of models.values()) for (const resource of resources(model)) retained.add(resource);
+    for (const location of locations.values()) for (const resource of resources(location)) retained.add(resource);
     for (const resource of resources(scene)) if (!retained.has(resource)) resource.dispose();
     for (const model of models.values()) {
       model.removeFromParent();
@@ -2430,7 +2443,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     }
     scene.clear();
     labelsHost.replaceChildren();
-    return { models, dispose: () => { for (const resource of retained) resource.dispose(); } };
+    return { models, locations, layout, dispose: () => { for (const resource of retained) resource.dispose(); } };
   }
 
   const AI_AGENT_CONFIG = [
