@@ -5,6 +5,7 @@ import { initDigitalTwin } from '../digital-twin/scene/runtime/createDigitalTwin
 import { DEFAULT_ASSET_CATALOG } from '../digital-twin/scene/config/assetCatalog.js';
 import { digitalTwinStore } from '../../stores/digitalTwinStore.js';
 import { createEquipmentLocationModel } from './createEquipmentLocationPreview.js';
+import { createCampusModel } from './createCampusPreview.js';
 
 // Model construction needs text textures, not a browser or a WebGL context.
 function element() {
@@ -53,6 +54,21 @@ test('preview builds every real equipment model without changing application sta
     assert.ok(Math.abs(gpu3.x - gpu1.x - 5) < 1e-6, 'GPU row spacing matches the scene');
     assert.ok(Math.abs(gpu4.z - gpu1.z - 8.3) < 1e-6, 'GPU aisle spacing matches the scene');
     assert.equal(library.locations.size, 6);
+    const campus = createCampusModel(library);
+    assert.equal(campus.zones.size, 6);
+    assert.equal(campus.root.children.length, 6);
+    for (const [id, group] of campus.zones) {
+      assert.equal(group.userData.previewZone, id);
+      assert.notEqual(group, library.locations.get(id));
+      assert.equal(library.locations.get(id).parent, null);
+      assert.ok(!new THREE.Box3().setFromObject(group, true).isEmpty());
+      if (id.endsWith('F')) assert.equal(group.position.y, (Number(id[0]) - 1) * 7);
+    }
+    assert.equal(
+      digitalTwinStore.getState(),
+      before,
+      'campus preview does not update shared state'
+    );
     for (const id of ['GATE-01', 'SRV-04', 'GPU-03', 'NOC-NET-01', 'UPS-01', 'CH-01']) {
       const miniature = createEquipmentLocationModel(library, id);
       miniature.root.updateMatrixWorld(true);

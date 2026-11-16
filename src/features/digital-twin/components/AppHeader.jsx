@@ -1,4 +1,5 @@
 import { Bell } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
@@ -6,6 +7,27 @@ import { panelEntrance } from '../../../utils/panelMotion.js';
 
 const navItem =
   'nav-item relative h-16 border-0 bg-transparent px-0.5 font-semibold tracking-[0.15px] text-[#a8b9d2] transition-colors hover:text-[#f0f7ff]';
+
+const clockFormatter = new Intl.DateTimeFormat('ko-KR', {
+  timeZone: 'Asia/Seoul',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+});
+
+function HeaderClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+  return (
+    <time className="clock" id="clock" dateTime={now.toISOString()} title="한국 표준시 (KST)">
+      {clockFormatter.format(now)}
+    </time>
+  );
+}
 
 export default function AppHeader() {
   const notificationsOpen = useDigitalTwinStore(state => state.notificationsOpen);
@@ -17,7 +39,7 @@ export default function AppHeader() {
         {...panelEntrance({ y: -18 })}
         className="app-header fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959] max-[1250px]:grid-cols-[1fr_420px_1fr] max-[930px]:grid-cols-[1fr_330px_1fr] max-[700px]:grid-cols-[1fr_220px_1fr]"
       >
-        <nav className="main-nav flex h-16 items-center gap-[30px] pl-7" aria-label="주 메뉴">
+        <nav className="main-nav flex h-16 items-center gap-[30px] pl-7" aria-label="사용자 메뉴">
           <NavLink
             to="/dashboard"
             className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
@@ -30,12 +52,6 @@ export default function AppHeader() {
             className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
           >
             디지털 트윈
-          </NavLink>
-          <NavLink
-            to="/scenario-control"
-            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
-          >
-            시나리오 제어
           </NavLink>
         </nav>
         <div className="system-title relative grid h-[66px] place-items-center text-center">
@@ -132,7 +148,17 @@ export default function AppHeader() {
         </div>
 
         <div className="header-tools flex h-16 items-center justify-end gap-[18px] pr-7 text-[#9dafc4]">
-          <span className="operator-name text-[#b4c6de]">ADMIN</span>
+          <nav className="admin-nav flex h-16 items-center" aria-label="관리자 메뉴">
+            <NavLink
+              to="/scenario-control"
+              className={({ isActive }) =>
+                `${navItem}${isActive ? ' active' : ''} flex items-center`
+              }
+            >
+              시나리오 제어
+            </NavLink>
+          </nav>
+          <HeaderClock />
           <button
             type="button"
             className="tool-icon relative grid h-[29px] w-[29px] place-items-center rounded-sm border border-[#3a5279] bg-[#16243d] text-[#bdd3ed]"

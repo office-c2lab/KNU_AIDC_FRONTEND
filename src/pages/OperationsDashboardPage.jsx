@@ -16,6 +16,7 @@ import { calculateFacilityPower } from '../features/digital-twin/calculateFacili
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { panelEntrance } from '../utils/panelMotion.js';
 import DashboardPanel from '../features/dashboard/DashboardPanel.jsx';
+import CampusPreview from '../features/dashboard/CampusPreview.jsx';
 import '../features/dashboard/operations-dashboard.css';
 
 const scenarioById = new Map(SCENARIOS.map(item => [item.id, item]));
@@ -71,8 +72,7 @@ function Panel({ title, subtitle, extra, className = '', delay = 0, children }) 
 
 export default function OperationsDashboardPage() {
   const [range, setRange] = useState(60);
-  const [mapMode, setMapMode] = useState('status');
-  const [inspectedId, setInspectedId] = useState(null);
+  const [selectedZoneId, setSelectedZoneId] = useState('3F');
   const chartId = useId().replace(/:/g, '');
   const assets = useDigitalTwinStore(state => state.assetCatalog);
   const incidents = useDigitalTwinStore(state => state.incidents);
@@ -93,11 +93,6 @@ export default function OperationsDashboardPage() {
   );
   const total = readings.length;
   const abnormalCount = counts.warning + counts.fault;
-  const statusData = [
-    { name: '정상', value: counts.normal, color: tones.normal },
-    { name: '주의', value: counts.warning, color: tones.warning },
-    { name: '장애', value: counts.fault, color: tones.fault },
-  ];
   const zoneData = groups.map(([id, label, description]) => {
     const members = readings.filter(item => item.floor === id || (!item.floor && item.zone === id));
     const faults = members.filter(item => !['정상', '주의'].includes(item.status)).length;
@@ -113,10 +108,20 @@ export default function OperationsDashboardPage() {
       temp: members.length ? average(members.map(item => item.temp)) : null,
     };
   });
-  const inspected =
-    readings.find(item => item.id === inspectedId) ??
-    readings.find(item => !['정상', '주의'].includes(item.status)) ??
-    readings[0];
+  const selectedZone = zoneData.find(zone => zone.id === selectedZoneId) ?? zoneData[0];
+  const issues = useMemo(
+    () =>
+      new Map(
+        readings.filter(asset => asset.status !== '정상').map(asset => [asset.id, asset.status])
+      ),
+    [readings]
+  );
+  const selectZoneForTwin = () =>
+    useDigitalTwinStore.getState().setNavigation({
+      activeFloor: selectedZone.id.endsWith('F') ? selectedZone.id : null,
+      activeZone: selectedZone.id.endsWith('F') ? `f${selectedZone.id[0]}` : selectedZone.id,
+      selectedId: null,
+    });
   const focusAsset = asset =>
     useDigitalTwinStore.getState().setNavigation({
       selectedId: asset.id,
@@ -216,6 +221,167 @@ export default function OperationsDashboardPage() {
               </motion.section>
             );
           })}
+        </div>
+        <div className="ops-campus-row">
+          <Panel
+            title="시설 운영 현황"
+            subtitle="본관 4개 층 · 전력·냉각 설비동"
+            className="ops-campus-panel"
+            delay={0.06}
+            extra={
+              <Link to="/" onClick={selectZoneForTwin} className="dashboard-card-action">
+                3D 관제 화면 열기
+              </Link>
+            }
+          >
+            <div className="ops-campus-body">
+              <CampusPreview
+                zone={selectedZoneId}
+                onSelectZone={setSelectedZoneId}
+                issues={issues}
+              />
+              <nav className="ops-campus-floors" aria-label="시설 개요 구역 선택">
+                {[...zoneData]
+                  .sort((a, b) => {
+                    const order = ['4F', '3F', '2F', '1F', 'power', 'cooling'];
+                    return order.indexOf(a.id) - order.indexOf(b.id);
+                  })
+                  .map(zone => {
+                    const tone = zone.faults ? 'fault' : zone.warnings ? 'warning' : 'normal';
+                    return (
+                      <button
+                        key={zone.id}
+                        type="button"
+                        className={`ops-campus-floor ${tone}`}
+                        aria-pressed={selectedZoneId === zone.id}
+                        onClick={() => setSelectedZoneId(zone.id)}
+                      >
+                        <b>{zone.id.endsWith('F') ? zone.id : zone.id === 'power' ? 'P' : 'C'}</b>
+                        <span>
+                          {zone.description}
+                          <small>{zone.members.length}대 관리</small>
+                        </span>
+                        <i style={{ background: tones[tone] }} />
+                      </button>
+                    );
+                  })}
+              </nav>
+            </div>
+            <div className="ops-campus-readings">
+              <div>
+                <span>선택 구역</span>
+                <strong>
+                  {selectedZone.label} · {selectedZone.description}
+                </strong>
+              </div>
+              <div>
+                <span>소비 전력</span>
+                <strong>
+                  {selectedZone.power.toFixed(1)}
+                  <small>kW</small>
+                </strong>
+              </div>
+              <div>
+                <span>평균 장비 온도</span>
+                <strong>
+                  {selectedZone.temp === null ? '—' : selectedZone.temp.toFixed(1)}
+                  <small>°C</small>
+                </strong>
+              </div>
+              <div>
+                <span>설비 상태</span>
+                <strong
+                  className={
+                    selectedZone.faults ? 'fault' : selectedZone.warnings ? 'warning' : 'normal'
+                  }
+                >
+                  {selectedZone.faults
+                    ? `장애 ${selectedZone.faults}대`
+                    : selectedZone.warnings
+                      ? `주의 ${selectedZone.warnings}대`
+                      : '정상 운영'}
+                </strong>
+              </div>
+            </div>
+          </Panel>
+          <Panel
+            title="운영 점검"
+            subtitle="진행 중 장애 및 전력 사용 구성"
+            className="ops-operations-panel"
+            delay={0.1}
+          >
+            <div className="ops-incident-heading">
+              <h3>진행 중 시나리오</h3>
+              <span className={incidents.length ? 'fault' : ''}>{incidents.length}건</span>
+            </div>
+            <div className="ops-current-incidents">
+              {incidents.length ? (
+                incidents.map(incident => {
+                  const scenario = scenarioById.get(incident.id);
+                  const asset = readings.find(item => item.id === scenario?.asset);
+                  if (!scenario) return null;
+                  return (
+                    <Link
+                      to="/"
+                      onClick={() => asset && focusAsset(asset)}
+                      className="ops-current-incident"
+                      key={incident.id}
+                    >
+                      <div>
+                        <strong>{scenario.title}</strong>
+                        <span>{scenario.level}</span>
+                      </div>
+                      <p>
+                        {scenario.asset} · {scenario.condition}
+                      </p>
+                    </Link>
+                  );
+                })
+              ) : (
+                <div className="ops-no-incidents">
+                  <span>진행 중인 장애가 없습니다.</span>
+                  <small>
+                    {abnormalCount
+                      ? `주의·장애 설비 ${abnormalCount}대를 확인하세요.`
+                      : `전체 ${total}대 설비가 정상 상태입니다.`}
+                  </small>
+                </div>
+              )}
+            </div>
+            <div className="ops-power-heading">
+              <h3>전력 사용 구성</h3>
+              <span>
+                추정 PUE <b>{power.pueEstimate?.toFixed(2) ?? '—'}</b>
+              </span>
+            </div>
+            <div className="ops-power-breakdown">
+              {power.rows.map((row, index) => (
+                <div key={row.id}>
+                  <span>
+                    <i
+                      style={{ background: ['#87bce9', '#73e1c0', '#eac476', '#9da9c9'][index] }}
+                    />
+                    {row.label}
+                  </span>
+                  <div className="ops-power-track">
+                    <i
+                      style={{
+                        width: `${row.share}%`,
+                        background: ['#87bce9', '#73e1c0', '#eac476', '#9da9c9'][index],
+                      }}
+                    />
+                  </div>
+                  <strong>
+                    {row.kw.toFixed(1)}
+                    <small>kW</small>
+                  </strong>
+                </div>
+              ))}
+            </div>
+            <Link className="dashboard-card-action ops-scenario-link" to="/scenario-control">
+              시나리오 제어 열기
+            </Link>
+          </Panel>
         </div>
         <div className="ops-chart-row">
           <Panel
@@ -333,115 +499,6 @@ export default function OperationsDashboardPage() {
               ))}
             </div>
           </Panel>
-          <Panel
-            title="자산 운영 상태"
-            subtitle={`${total}대 · 구역별 장비 맵`}
-            delay={0.12}
-            className={`ops-host-panel ${abnormalCount ? 'attention' : ''}`}
-            extra={
-              <div className="ops-range" role="group" aria-label="장비 맵 표시 기준">
-                {[
-                  ['status', '상태'],
-                  ['load', '부하'],
-                ].map(([mode, label]) => (
-                  <button
-                    type="button"
-                    key={mode}
-                    aria-pressed={mapMode === mode}
-                    onClick={() => setMapMode(mode)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            }
-          >
-            <div className="ops-host-map" aria-label="구역별 장비 상태 맵">
-              {zoneData.map(zone => (
-                <div className="ops-host-group" key={zone.id}>
-                  <div className="ops-host-group-title">
-                    <span>{zone.label}</span>
-                    <small>{zone.members.length}대</small>
-                  </div>
-                  <div className="ops-host-cells">
-                    {zone.members.map(asset => {
-                      const status =
-                        asset.status === '정상'
-                          ? 'normal'
-                          : asset.status === '주의'
-                            ? 'warning'
-                            : 'fault';
-                      const load = asset.values.loadPercent;
-                      const color =
-                        mapMode === 'status'
-                          ? { normal: '#3c988a', warning: '#eac476', fault: '#ff8188' }[status]
-                          : load >= 85
-                            ? '#d5a451'
-                            : load >= 60
-                              ? '#4ca399'
-                              : '#315972';
-                      return (
-                        <Link
-                          to="/"
-                          key={asset.id}
-                          className={`ops-host-cell ${inspected?.id === asset.id ? 'inspected' : ''}`}
-                          style={{ '--cell-color': color }}
-                          aria-label={`${asset.id}, ${asset.status}, 부하 ${load.toFixed(1)}%, 3D에서 보기`}
-                          title={`${asset.id} · ${asset.status} · ${load.toFixed(1)}%`}
-                          onMouseEnter={() => setInspectedId(asset.id)}
-                          onFocus={() => setInspectedId(asset.id)}
-                          onClick={() => focusAsset(asset)}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="ops-map-legend">
-              {mapMode === 'status' ? (
-                statusData.map(item => (
-                  <span key={item.name}>
-                    <i style={{ background: item.color }} />
-                    {item.name}
-                    <b>{item.value}</b>
-                  </span>
-                ))
-              ) : (
-                <>
-                  <span>
-                    <i style={{ background: '#315972' }} />
-                    0–60%
-                  </span>
-                  <span>
-                    <i style={{ background: '#4ca399' }} />
-                    60–85%
-                  </span>
-                  <span>
-                    <i style={{ background: '#d5a451' }} />
-                    85–100%
-                  </span>
-                </>
-              )}
-            </div>
-            {inspected && (
-              <div className="ops-host-inspector">
-                <span>
-                  <strong>{inspected.id}</strong>
-                  <small>{inspected.name.replace(inspected.id, '').trim()}</small>
-                </span>
-                <span>
-                  <b>
-                    {inspected.temp.toFixed(1)}
-                    <small>°C</small>
-                  </b>
-                  <small>{inspected.power.toFixed(1)} kW</small>
-                </span>
-              </div>
-            )}
-          </Panel>
-        </div>
-        <div className="ops-facility-row">
           <Panel title="시설·환경 운영" subtitle="전력 및 냉각 인프라 현황" delay={0.16}>
             <div className="ops-facility-grid">
               {facilities.map(([label, value, unit, color]) => {
@@ -462,85 +519,6 @@ export default function OperationsDashboardPage() {
               })}
             </div>
             <p className="ops-footnote">전력 부하: 서버·GPU 장비 평균 가동 부하</p>
-          </Panel>
-          <Panel
-            title="구역별 운영 현황"
-            subtitle="전체 6개 구역의 설비 상태"
-            extra={
-              <Link className="dashboard-card-action" to="/">
-                3D 보기
-              </Link>
-            }
-            delay={0.2}
-          >
-            <div className="ops-table-scroll">
-              <table className="ops-zone-table">
-                <thead>
-                  <tr>
-                    <th>구역</th>
-                    <th>장비</th>
-                    <th>소비 전력</th>
-                    <th>평균 온도</th>
-                    <th>상태</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...zoneData]
-                    .sort((a, b) => b.faults - a.faults || b.warnings - a.warnings)
-                    .map(zone => {
-                      const tone = zone.faults ? 'fault' : zone.warnings ? 'warning' : 'normal';
-                      return (
-                        <tr key={zone.id} className={tone}>
-                          <td>
-                            <Link
-                              to="/"
-                              onClick={() =>
-                                useDigitalTwinStore.getState().setNavigation({
-                                  activeFloor: zone.id.endsWith('F') ? zone.id : null,
-                                  activeZone: zone.id.endsWith('F') ? `f${zone.id[0]}` : zone.id,
-                                })
-                              }
-                            >
-                              <strong>{zone.label}</strong>
-                              <small>{zone.description}</small>
-                            </Link>
-                          </td>
-                          <td>
-                            {zone.members.length}
-                            <small>대</small>
-                          </td>
-                          <td>
-                            <div className="ops-power-cell">
-                              <span>
-                                {zone.power.toFixed(1)}
-                                <small>kW</small>
-                              </span>
-                              <i
-                                style={{
-                                  '--power-share': `${power.totalKw ? (zone.power / power.totalKw) * 100 : 0}%`,
-                                }}
-                              />
-                            </div>
-                          </td>
-                          <td>
-                            {zone.temp === null ? '—' : zone.temp.toFixed(1)}
-                            <small>°C</small>
-                          </td>
-                          <td>
-                            <span className={`ops-zone-status ${tone}`}>
-                              {zone.faults
-                                ? `장애 ${zone.faults}`
-                                : zone.warnings
-                                  ? `주의 ${zone.warnings}`
-                                  : '정상'}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
           </Panel>
         </div>
         <Panel

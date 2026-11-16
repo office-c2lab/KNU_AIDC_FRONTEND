@@ -1,4 +1,65 @@
 /* Shared typography for Korean, Latin labels, identifiers and numeric readouts. */
+/* Anchor navigation to the central title; retain the clock and alarm at the outer edge. */
+.app-header .main-nav {
+  justify-content: flex-end;
+  padding-left: 12px;
+  /* 19px offset + 52px ticks + skew + separation from the menu. */
+  padding-right: 88px;
+}
+.app-header .header-tools {
+  padding-left: 88px;
+}
+.app-header .admin-nav {
+  flex-shrink: 0;
+  margin-right: auto;
+}
+.app-header .nav-item {
+  white-space: nowrap;
+}
+@media (max-width: 1450px) {
+  .app-header .title-ticks {
+    display: none;
+  }
+  .app-header .main-nav {
+    padding-right: 28px;
+  }
+  .app-header .header-tools {
+    padding-left: 28px;
+    padding-right: 16px;
+    gap: 10px;
+  }
+}
+/* Keep the administrator navigation available alongside user navigation on small screens. */
+@media (max-width: 700px) {
+  .app-header .main-nav {
+    padding-right: 12px;
+  }
+  .app-header .header-tools {
+    display: flex;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .app-header .clock {
+    min-width: 58px;
+    font-size: 10px;
+  }
+  .app-header .admin-nav .nav-item {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 560px) {
+  .digital-twin-root .app-header {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .app-header .system-title {
+    display: none;
+  }
+  .app-header .main-nav {
+    justify-content: flex-start;
+  }
+}
+
 .digital-twin-root {
   --ui-font: 'Noto Sans KR Variable', 'Noto Sans KR', sans-serif;
   --readout-font: var(--ui-font);
