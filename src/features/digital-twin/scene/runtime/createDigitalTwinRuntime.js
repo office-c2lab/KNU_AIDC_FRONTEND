@@ -4592,12 +4592,6 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   function updateInfrastructurePanel() {
     const idState = id => getAssetStatus(registry.get(id));
     const rank = id => severityRank(idState(id));
-    const updateLed = (el, id) => {
-      const r = rank(id);
-      el.classList.toggle('fault', r >= 3);
-      el.classList.toggle('warning', r === 2);
-      el.parentElement.title = id + ' · ' + idState(id);
-    };
     const powerIds = ['UPS-01', 'UPS-02', 'BAT-01', 'ATS-01', 'SWGR-01', 'GEN-01'];
     const coolingIds = ['CH-01', 'CH-02', 'PUMP-01', 'PUMP-02', 'HEX-01', 'CDU-01', 'CDU-02'];
     const powerRank = Math.max(...powerIds.map(rank));
@@ -4638,15 +4632,6 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     document.getElementById('infra-cdu-flow').innerHTML = flow + '<em>L/min</em>';
     document.getElementById('infra-cooling-pct').textContent = coolingLoad + '%';
     document.getElementById('infra-cooling-bar').style.width = coolingLoad + '%';
-    for (const [led, id] of [
-      ['infra-led-ups', 'UPS-01'],
-      ['infra-led-bat', 'BAT-01'],
-      ['infra-led-ats', 'ATS-01'],
-      ['infra-led-ch', 'CH-01'],
-      ['infra-led-pump', 'PUMP-01'],
-      ['infra-led-cdu', 'CDU-01'],
-    ])
-      updateLed(document.getElementById(led), id);
   }
 
   // v9 adaptation layer for original AIDC v4 HTML panels.
@@ -5019,11 +5004,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   });
   root.querySelector('.right-panel').addEventListener('click', e => {
     const zoneButton = e.target.closest('[data-infra-focus]');
-    const assetButton = e.target.closest('[data-infra-asset]');
     if (zoneButton) setZone(zoneButton.dataset.infraFocus);
-    else if (assetButton) {
-      focusAsset(assetButton.dataset.infraAsset);
-    }
   });
   $('#alarm-list').addEventListener('click', e => {
     const item = e.target.closest('[data-scenario-focus]');

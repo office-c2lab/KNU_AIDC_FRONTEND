@@ -64,17 +64,6 @@ export default function OperationsSidebar() {
                     </div>
                     <b id="infra-power-pct">68%</b>
                   </div>
-                  <div className="infra-equipment-row" aria-label="전력 주요 장비">
-                    <button type="button" data-infra-asset="UPS-01">
-                      <i id="infra-led-ups"></i>UPS-01
-                    </button>
-                    <button type="button" data-infra-asset="BAT-01">
-                      <i id="infra-led-bat"></i>BAT-01
-                    </button>
-                    <button type="button" data-infra-asset="ATS-01">
-                      <i id="infra-led-ats"></i>ATS-01
-                    </button>
-                  </div>
                 </div>
               </div>
 
@@ -105,17 +94,6 @@ export default function OperationsSidebar() {
                       <i id="infra-cooling-bar" style={{ width: '61%' }}></i>
                     </div>
                     <b id="infra-cooling-pct">61%</b>
-                  </div>
-                  <div className="infra-equipment-row" aria-label="냉각 주요 장비">
-                    <button type="button" data-infra-asset="CH-01">
-                      <i id="infra-led-ch"></i>CH-01
-                    </button>
-                    <button type="button" data-infra-asset="PUMP-01">
-                      <i id="infra-led-pump"></i>PUMP-01
-                    </button>
-                    <button type="button" data-infra-asset="CDU-01">
-                      <i id="infra-led-cdu"></i>CDU-01
-                    </button>
                   </div>
                 </div>
               </div>
