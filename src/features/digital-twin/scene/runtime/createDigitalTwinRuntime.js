@@ -667,11 +667,12 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   }
   function serviceDrawer(root, id, gpu, door) {
     const assembly = new THREE.Group();
-    assembly.position.set(0, 1.252, 0);
+    const height = gpu ? 1.7085 : 1.9085;
+    assembly.position.set(0, height, 0);
     root.add(assembly);
     // Two vacant U slots used by a slide-out service sled; telescopic steel guide rails.
     for (const sx of [-0.47, 0.47]) {
-      box(root, 0.035, 0.025, 0.85, sx, 1.12, 0.14, engineeringMats.silver, { cast: false });
+      box(root, 0.035, 0.025, 0.85, sx, height - 0.132, 0.14, engineeringMats.silver, { cast: false });
       box(assembly, 0.039, 0.06, 0.77, sx, -0.03, 0.15, engineeringMats.titanium, { cast: false });
     }
     box(assembly, 1.04, 0.056, 0.82, 0, -0.086, 0.16, engineeringMats.blackAnodized, {
@@ -739,7 +740,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     }
     textPlate(
       assembly,
-      gpu ? 'GPU SLED / 2U' : 'CPU SLED / 2U',
+      gpu ? 'GPU SLED / 2U' : 'SERVER / 2U',
       0,
       0,
       0.646,
@@ -760,7 +761,89 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     );
     indicator.material = indicator.material.clone(); // independent status material (glowStrip normally shares a colour cache)
     engineeringDetails.push({ group: assembly, root, id, kind: 'drawer' });
-    const rec = { group: assembly, door, id, indicator };
+    const rec = { group: assembly, door, id, indicator, open: false };
+    engineeringDrawers.push(rec);
+  }
+  function kvmConsoleDrawer(root, id, gpu, door) {
+    const assembly = new THREE.Group();
+    assembly.position.set(0, 0.9305, 0);
+    root.add(assembly);
+    // One rack-mounted LCD KVM console per rack. The drawer carries the keyboard and
+    // touchpad; its display stays folded flat until the tray has cleared the rack.
+    for (const sx of [-0.47, 0.47]) {
+      box(root, 0.035, 0.025, 0.85, sx, 0.8255, 0.14, engineeringMats.silver, { cast: false });
+      box(assembly, 0.039, 0.06, 0.77, sx, -0.03, 0.15, engineeringMats.titanium, { cast: false });
+    }
+    box(assembly, 1.04, 0.07, 0.82, 0, -0.086, 0.16, engineeringMats.blackAnodized, {
+      cast: false,
+    });
+    box(assembly, 0.95, 0.025, 0.68, 0, -0.038, 0.13, engineeringMats.graphite, { cast: false });
+
+    // Compact keyboard, function strip and touchpad. Keys are instanced to keep all
+    // rack consoles inexpensive enough to render in the full-building view.
+    const keys = [];
+    for (let row = 0; row < 4; row++)
+      for (let column = 0; column < 11; column++)
+        keys.push([-0.42 + column * 0.065, 0.005, 0.15 + row * 0.055]);
+    instanceBoxes(assembly, 0.052, 0.018, 0.038, keys, engineeringMats.plastic);
+    const functionKeys = Array.from({ length: 12 }, (_, index) => [
+      -0.43 + index * 0.069,
+      0.005,
+      0.09,
+    ]);
+    instanceBoxes(assembly, 0.045, 0.014, 0.025, functionKeys, engineeringMats.titanium);
+    box(assembly, 0.31, 0.016, 0.11, 0.24, 0.004, 0.42, engineeringMats.blackAnodized, {
+      cast: false,
+    });
+    box(assembly, 0.13, 0.014, 0.06, -0.28, 0.004, 0.42, engineeringMats.plastic, {
+      cast: false,
+    });
+
+    // The screen pivots along its lower edge. +90 degrees is folded into the tray;
+    // zero degrees is the upright operator position.
+    const screenPivot = new THREE.Group();
+    screenPivot.position.set(0, 0.012, -0.205);
+    screenPivot.rotation.x = Math.PI / 2;
+    assembly.add(screenPivot);
+    box(screenPivot, 0.94, 0.54, 0.045, 0, 0.27, 0, engineeringMats.blackAnodized, {
+      cast: false,
+    });
+    box(screenPivot, 0.82, 0.42, 0.012, 0, 0.285, 0.029, M.screen, { cast: false });
+    box(screenPivot, 0.2, 0.018, 0.014, 0, 0.515, 0.03, engineeringMats.titanium, {
+      cast: false,
+    });
+    const screenLed = glowStrip(
+      screenPivot,
+      0.024,
+      0.024,
+      0.012,
+      0.425,
+      0.035,
+      0.03,
+      gpu ? 0x9ca7ff : 0x67e8c3
+    );
+    screenLed.material = screenLed.material.clone();
+
+    // Front fascia remains identifiable while the console is stowed.
+    box(assembly, 1.08, 0.18, 0.065, 0, -0.003, 0.605, engineeringMats.titanium, { cast: false });
+    for (const x of [-0.46, 0.46]) {
+      box(assembly, 0.12, 0.07, 0.09, x, 0, 0.666, engineeringMats.silver, { cast: false });
+      tubeCylinder(assembly, 0.019, 0.027, x, 0, 0.715, engineeringMats.graphite, 'z', 8);
+    }
+    textPlate(assembly, 'LCD KVM CONSOLE / 1U', 0, 0, 0.646, 0.66, 0.1, '#c8eff6', '#1b354a');
+    const indicator = glowStrip(
+      assembly,
+      0.032,
+      0.035,
+      0.018,
+      -0.38,
+      0.04,
+      0.65,
+      gpu ? 0x8ebaf5 : 0x69e4b5
+    );
+    indicator.material = indicator.material.clone(); // independent status material (glowStrip normally shares a colour cache)
+    engineeringDetails.push({ group: assembly, root, id, kind: 'kvm-console' });
+    const rec = { group: assembly, screenPivot, screenLed, door, id, indicator };
     engineeringDrawers.push(rec);
   }
   function engineeringRack(root, id, gpu, door) {
@@ -851,6 +934,8 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     }
     engineeringDetails.push({ group: detail, root, id, kind: 'rack' });
     serviceDrawer(root, id, gpu, door);
+    if (gpu) serviceDrawer(root, id, false, door);
+    kvmConsoleDrawer(root, id, gpu, door);
   }
   function engineeringCdu(root, id) {
     const d = new THREE.Group();
@@ -3809,18 +3894,34 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     if (node !== sourceRoot) return null;
     return path.reverse().reduce((current, index) => current?.children[index] || null, clonedRoot);
   }
-  // Physical sequence: open the door before extending the drawer; retract the
-  // drawer before closing the door. Used by BOTH the main scene and the modal.
-  function animateRackMechanism(hinge, drawerGroups, open, dt) {
+  // Physical sequence: open the door, extend the drawer, then raise the LCD.
+  // Closing reverses that order. Used by BOTH the main scene and the modal.
+  function animateRackMechanism(hinge, drawerRecords, open, dt) {
     if (!hinge) return;
     const safeDt = Math.min(Math.max(dt || 0, 0), 0.05);
-    const hasExtendedDrawer = drawerGroups.some(group => group.position.z > 0.035);
+    const records = drawerRecords.map(record => (record?.group ? record : { group: record }));
+    const hasExtendedDrawer = records.some(record => record.group.position.z > 0.035);
     const doorTarget = open || hasExtendedDrawer ? -(Math.PI * 0.62) : 0;
     hinge.rotation.y = THREE.MathUtils.damp(hinge.rotation.y, doorTarget, 8, safeDt);
-    const mayExtend = open && Math.abs(hinge.rotation.y) > 1.03;
-    const drawerTarget = mayExtend ? 0.65 : 0;
-    for (const group of drawerGroups) {
-      group.position.z = THREE.MathUtils.damp(group.position.z, drawerTarget, 7.5, safeDt);
+    for (const record of records) {
+      const screen = record.screenPivot;
+      const requestedOpen = open && (screen ? true : (record.source || record).open === true);
+      const mayExtend = requestedOpen && Math.abs(hinge.rotation.y) > 1.03;
+      // LCD hinge starts at z=-0.205; clear the front door plane (z=0.735)
+      // before unfolding it. GPU/CPU maintenance sleds retain their original travel.
+      const clearance = screen ? 1.04 : 0.54;
+      const screenTarget = requestedOpen && record.group.position.z > clearance ? -0.08 : Math.PI / 2;
+      if (screen)
+        screen.rotation.x = THREE.MathUtils.damp(screen.rotation.x, screenTarget, 7.5, safeDt);
+      const screenFolded = !screen || Math.abs(screen.rotation.x - Math.PI / 2) < 0.08;
+      const keepOutWhileFolding = !requestedOpen && !screenFolded && record.group.position.z > clearance;
+      const drawerTarget = mayExtend || keepOutWhileFolding ? (screen ? 1.15 : 0.65) : 0;
+      record.group.position.z = THREE.MathUtils.damp(
+        record.group.position.z,
+        drawerTarget,
+        7.5,
+        safeDt
+      );
     }
   }
   function ensureModalPreview() {
@@ -3944,8 +4045,14 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       modalPreviewDoor = mirrorPreviewNode(door.hinge, asset.root, device);
       modalPreviewDrawers = engineeringDrawers
         .filter(entry => entry.id === asset.id)
-        .map(entry => mirrorPreviewNode(entry.group, asset.root, device))
-        .filter(Boolean);
+        .map(entry => ({
+          source: entry,
+          group: mirrorPreviewNode(entry.group, asset.root, device),
+          screenPivot: entry.screenPivot
+            ? mirrorPreviewNode(entry.screenPivot, asset.root, device)
+            : null,
+        }))
+        .filter(entry => entry.group);
       if (modalPreviewDoor) modalPreviewDoor.rotation.y = door.hinge.rotation.y;
     }
   }
@@ -4031,10 +4138,10 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     const doorButton = $('#asset-modal-door');
     doorButton.hidden = !door;
     if (door) {
-      doorButton.textContent = door.open ? '도어·서비스 서랍 닫기' : '도어·서비스 서랍 열기';
+      doorButton.textContent = door.open ? '도어·KVM 콘솔 닫기' : '도어·KVM 콘솔 열기';
       doorButton.setAttribute('aria-pressed', String(door.open));
       $('#asset-modal-view-note').textContent =
-        '드래그: 회전 · 휠: 확대 · 더블클릭: 도어·서랍 ' + (door.open ? '닫기' : '열기');
+        '장비 서랍 클릭: 개폐 · 드래그: 회전 · 더블클릭: 도어·KVM 콘솔 ' + (door.open ? '닫기' : '열기');
     } else {
       doorButton.removeAttribute('aria-pressed');
       const modalAgent = asset.type === 'AI AGENT' ? aiAgents.get(asset.id) : null;
@@ -4099,11 +4206,48 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     toggleDoor(assetModalId);
     updateAssetModal();
   }
+  // Hit the visible drawer itself, so dragging the model or clicking a closed
+  // rack door cannot accidentally open a compute tray behind it.
+  function pickComputeDrawer(event, viewCamera, canvas, mount, records) {
+    if (!viewCamera || !mount) return null;
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    const picker = new THREE.Raycaster();
+    picker.setFromCamera(new THREE.Vector2(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1
+    ), viewCamera);
+    mount.updateMatrixWorld(true);
+    const hit = picker.intersectObject(mount, true).find(item => isActuallyVisible(item.object));
+    if (!hit) return null;
+    let node = hit.object;
+    while (node) {
+      const record = records.find(entry => entry.group === node && !entry.screenPivot);
+      if (record) return record.source || record;
+      node = node.parent;
+    }
+    return null;
+  }
+  let previewPointerDown = null;
+  $('#asset-preview-canvas').addEventListener('pointerdown', e => {
+    if (e.button === 0) previewPointerDown = { x: e.clientX, y: e.clientY };
+  });
+  $('#asset-preview-canvas').addEventListener('pointerup', e => {
+    const down = previewPointerDown;
+    previewPointerDown = null;
+    if (!down || e.button !== 0 || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 7) return;
+    const record = pickComputeDrawer(
+      e, modalPreviewCamera, e.currentTarget, modalPreviewMount, modalPreviewDrawers
+    );
+    if (record && e.detail < 2) record.open = !record.open;
+  });
+  $('#asset-preview-canvas').addEventListener('pointercancel', () => { previewPointerDown = null; });
   // A double-click on the orbitable 3D model restores the original rack interaction.
   // This is deliberately separate from the main-scene double-click that opens the modal.
   $('#asset-preview-canvas').addEventListener('dblclick', e => {
     e.preventDefault();
     e.stopPropagation();
+    if (pickComputeDrawer(e, modalPreviewCamera, e.currentTarget, modalPreviewMount, modalPreviewDrawers)) return;
     toggleModalRack();
   });
   $('#asset-preview-canvas').addEventListener('keydown', e => {
@@ -4307,7 +4451,11 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   });
   function toggleDoor(id) {
     const door = doors.find(d => d.id === id);
-    if (door) door.open = !door.open;
+    if (door) {
+      door.open = !door.open;
+      if (!door.open)
+        engineeringDrawers.filter(entry => entry.door === door).forEach(entry => { entry.open = false; });
+    }
   }
   // Full floor/annex outlines respect occlusion and follow their parent.
   const floorAlertOutlines = new Map();
@@ -4867,6 +5015,12 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       lastEquipmentTap = null;
       return;
     }
+    const drawer = pickComputeDrawer(e, camera, renderer.domElement, scene, engineeringDrawers);
+    if (drawer) {
+      if (e.detail < 2) drawer.open = !drawer.open;
+      lastEquipmentTap = null;
+      return;
+    }
     const now = performance.now();
     const repeated =
       lastEquipmentTap &&
@@ -4899,6 +5053,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   });
   renderer.domElement.addEventListener('dblclick', e => {
     e.preventDefault();
+    if (pickComputeDrawer(e, camera, renderer.domElement, scene, engineeringDrawers)) return;
     const hit = hitTest(e);
     const last = lastEquipmentTap;
     const fromFirstTap =
@@ -5342,9 +5497,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     }
     controls.update();
     for (const d of doors) {
-      const drawers = engineeringDrawers
-        .filter(entry => entry.door === d)
-        .map(entry => entry.group);
+      const drawers = engineeringDrawers.filter(entry => entry.door === d);
       animateRackMechanism(d.hinge, drawers, d.open, dt);
     }
     for (const agent of aiAgents.values())

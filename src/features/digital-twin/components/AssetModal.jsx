@@ -47,10 +47,10 @@ export default function AssetModal() {
                 <canvas
                   id="asset-preview-canvas"
                   tabIndex="0"
-                  aria-label="설비 3D 모델. 드래그로 회전, 휠로 확대. 랙은 더블클릭으로 도어와 서랍 개폐"
+                  aria-label="설비 3D 모델. 드래그로 회전, 휠로 확대. 랙은 더블클릭으로 도어와 KVM 콘솔 개폐. GPU와 서버 서랍은 각각 클릭하여 개폐"
                 ></canvas>
                 <div className="asset-modal-view-note" id="asset-modal-view-note">
-                  드래그로 회전 · 휠로 확대 · 랙 더블클릭으로 도어·서랍 개폐
+                  드래그로 회전 · 휠로 확대 · 랙 더블클릭으로 도어·KVM 콘솔 개폐
                 </div>
               </div>
               <div className="asset-modal-meta">

@@ -69,37 +69,24 @@ export function createAssetFactories(context) {
     box(rackRoot, 0.08, h, 0.13, -0.64, h / 2 + 0.13, 0, M.edge);
     box(rackRoot, 0.08, h, 0.13, 0.64, h / 2 + 0.13, 0, M.edge);
     box(rackRoot, 1.12, 2.06, 0.1, 0, 1.33, -0.63, mat(0x19293a, 0.3, 0.5));
-    // Individual hot-swappable server drawers; vent slits share a single draw call.
+    // Populate unused bays while leaving clearance around the moving trays.
+    // GPU racks reserve the upper bay for their additional compute drawer.
+    const fixedServerHeights = [
+      0.36, 0.523, 0.686,
+      1.17, 1.333, 1.496,
+      ...(!gpu ? [1.659] : []),
+    ];
     const frontSlits = [];
-    for (let i = 0; i < 12; i++) {
-      if (i === 5 || i === 6) continue; // service sled occupies two contiguous U slots
-      const y = 0.36 + i * 0.163;
-      const caseMesh = box(
-        rackRoot,
-        1.12,
-        0.134,
-        0.68,
-        0,
-        y,
-        0.19,
-        i % 4 === 0 ? M.cabinet : M.server
-      );
+    for (const y of fixedServerHeights) {
+      box(rackRoot, 1.12, 0.134, 0.68, 0, y, 0.19, M.server);
       box(rackRoot, 1.085, 0.11, 0.026, 0, y, 0.55, M.black, { cast: false });
       for (let j = 0; j < 10; j++) frontSlits.push([-0.44 + j * 0.095, y, 0.571]);
-      box(rackRoot, 0.095, 0.076, 0.027, 0.43, y, 0.575, M.brushed, { cast: false });
+      for (const x of [-0.535, 0.535])
+        box(rackRoot, 0.043, 0.07, 0.045, x, y, 0.58, M.brushed, { cast: false });
       const led = glowStrip(
-        rackRoot,
-        0.037,
-        0.037,
-        0.017,
-        -0.53,
-        y,
-        0.579,
-        gpu ? 0x9ca7ff : 0x67e8c3
+        rackRoot, 0.037, 0.037, 0.017, -0.48, y, 0.579, gpu ? 0x9ca7ff : 0x67e8c3
       );
-      if (i % 3 === 0) leds.push({ mesh: led, id, type: 'rack' });
-      // Pull handles on the edges.
-      box(rackRoot, 0.043, 0.07, 0.045, -0.535, y, 0.58, M.brushed, { cast: false });
+      leds.push({ mesh: led, id, type: 'rack' });
     }
     instanceBoxes(rackRoot, 0.053, 0.044, 0.014, frontSlits, M.vent);
     // Side vent slits + realistic fan silhouettes on the back.
