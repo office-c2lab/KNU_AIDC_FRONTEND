@@ -15,6 +15,8 @@ import { createGeometryToolkit } from '../core/createGeometryToolkit.js';
 import { createRenderingCore } from '../core/createRenderingCore.js';
 import { createIncidentSelectors } from '../systems/createIncidentSelectors.js';
 import { createFacilityAlertOutline } from '../systems/createFacilityAlertOutline.js';
+import { createFloorIncidentLabels } from '../systems/createFloorIncidentLabels.js';
+import { animateRackMechanism, syncRackPreview } from '../systems/rackMechanism.js';
 import { createAssetFactories } from '../assets/createAssetFactories.js';
 import { createHumanModelLoader } from '../assets/createHumanModelLoader.js';
 import { digitalTwinStore } from '../../../../stores/digitalTwinStore.js';
@@ -3897,36 +3899,6 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     if (node !== sourceRoot) return null;
     return path.reverse().reduce((current, index) => current?.children[index] || null, clonedRoot);
   }
-  // Physical sequence: open the door, extend the drawer, then raise the LCD.
-  // Closing reverses that order. Used by BOTH the main scene and the modal.
-  function animateRackMechanism(hinge, drawerRecords, open, dt) {
-    if (!hinge) return;
-    const safeDt = Math.min(Math.max(dt || 0, 0), 0.05);
-    const records = drawerRecords.map(record => (record?.group ? record : { group: record }));
-    const hasExtendedDrawer = records.some(record => record.group.position.z > 0.035);
-    const doorTarget = open || hasExtendedDrawer ? -(Math.PI * 0.62) : 0;
-    hinge.rotation.y = THREE.MathUtils.damp(hinge.rotation.y, doorTarget, 8, safeDt);
-    for (const record of records) {
-      const screen = record.screenPivot;
-      const requestedOpen = open && (screen ? true : (record.source || record).open === true);
-      const mayExtend = requestedOpen && Math.abs(hinge.rotation.y) > 1.03;
-      // LCD hinge starts at z=-0.205; clear the front door plane (z=0.735)
-      // before unfolding it. GPU/CPU maintenance sleds retain their original travel.
-      const clearance = screen ? 1.04 : 0.54;
-      const screenTarget = requestedOpen && record.group.position.z > clearance ? -0.08 : Math.PI / 2;
-      if (screen)
-        screen.rotation.x = THREE.MathUtils.damp(screen.rotation.x, screenTarget, 7.5, safeDt);
-      const screenFolded = !screen || Math.abs(screen.rotation.x - Math.PI / 2) < 0.08;
-      const keepOutWhileFolding = !requestedOpen && !screenFolded && record.group.position.z > clearance;
-      const drawerTarget = mayExtend || keepOutWhileFolding ? (screen ? 1.15 : 0.65) : 0;
-      record.group.position.z = THREE.MathUtils.damp(
-        record.group.position.z,
-        drawerTarget,
-        7.5,
-        safeDt
-      );
-    }
-  }
   function ensureModalPreview() {
     if (modalPreviewRenderer) return;
     const canvas = $('#asset-preview-canvas');
@@ -4056,7 +4028,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
             : null,
         }))
         .filter(entry => entry.group);
-      if (modalPreviewDoor) modalPreviewDoor.rotation.y = door.hinge.rotation.y;
+      syncRackPreview(door, modalPreviewDoor, modalPreviewDrawers);
     }
   }
   function resizeAssetPreview() {
@@ -4195,8 +4167,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       else if (agent && clone)
         animateOperatorRig(clone, agent, clock.elapsedTime, agentIsBusy(agent));
     }
-    if (modalPreviewDoor && d)
-      animateRackMechanism(modalPreviewDoor, modalPreviewDrawers, d.open, dt);
+    syncRackPreview(d, modalPreviewDoor, modalPreviewDrawers);
     modalPreviewControls.update();
     modalPreviewRenderer.render(modalPreviewScene, modalPreviewCamera);
   }
@@ -4237,7 +4208,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     if (record.terminalRackId) {
       const rack = registry.get(record.terminalRackId);
       if (rack) twinActions.openRackTerminal(rack);
-    } else record.open = !record.open;
+    } else if (record.door?.open) record.open = !record.open;
   }
   let previewPointerDown = null;
   $('#asset-preview-canvas').addEventListener('pointerdown', e => {
@@ -4475,6 +4446,22 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     const group = floorGroups[key] ?? regionGroups[key];
     floorAlertOutlines.set(key, createFacilityAlertOutline(group, key));
   }
+  const floorIncidentLabels = createFloorIncidentLabels({
+    host,
+    container: $('#floor-incident-labels'),
+    groups: { ...floorGroups, power: regionGroups.power, cooling: regionGroups.cooling },
+    outlines: floorAlertOutlines,
+    getScenario: id => SCENARIO_BY_ID.get(id),
+    getAsset: id => registry.get(id),
+    leftPanel: root.querySelector('.left-panel'),
+    onSelect: scenario => {
+      chosenScenarioId = scenario.id;
+      selectedIncidentId = scenario.id;
+      twinActions.setScenarioState({ chosenScenarioId, selectedIncidentId });
+      focusAsset(scenario.asset);
+      setInspectorTab('asset');
+    },
+  });
   function updateZoneIncidentCounts() {
     const incidents = [...activeIncidents.values()];
     root.querySelectorAll('.zone-nav [data-zone]').forEach(b => {
@@ -4551,6 +4538,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     issueLinks.length = 0;
   }
   function updateIssueVisuals() {
+    floorIncidentLabels.sync(activeIncidents.values());
     clearIssueMeshes();
     const impacted = [...registry.values()].filter(a => getAssetStatus(a) !== '정상');
     for (const a of impacted) {
@@ -4608,6 +4596,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `world-alert ${isCritical ? 'critical' : 'warning'} ${primary ? 'primary' : ''}`;
+      btn.style.display = 'none';
       btn.setAttribute('aria-label', `${a.id}, ${getAssetStatus(a)}, 설비 상세 보기`);
       btn.title = `${a.id} · ${getAssetStatus(a)} · ${main.scenario.title}`;
       btn.innerHTML = '<b class="world-alert-symbol" aria-hidden="true">!</b>';
@@ -4660,20 +4649,20 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     updateNocWall();
   }
   function updateAlertLabels() {
-    const distance = camera.position.distanceTo(controls.target);
+    floorIncidentLabels.update(camera, activeFloor);
     for (const [id, btn] of issueLabels) {
       const a = registry.get(id),
         issue = issueMeshes.get(id);
       if (!a || !issue) continue;
-      const isVisible = !activeFloor || a.floor === activeFloor;
+      const isVisible = a.floor
+        ? activeFloor === a.floor
+        : !activeFloor && ['power', 'cooling'].includes(a.zone) && activeZone === a.zone;
       const isCritical = severityRank(getAssetStatus(a)) === 3;
-      const include = !activeFloor && distance > 56 ? issue.primary || isCritical : true;
       const pos = assetWorldPoint(a);
       pos.y += a.type.includes('PUMP') ? 2.05 : 3.0;
       const p = pos.clone().project(camera),
         visible =
           isVisible &&
-          include &&
           p.z > -0.95 &&
           p.z < 1 &&
           p.x > -0.93 &&
@@ -5580,6 +5569,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     window.removeEventListener('resize', resizeAssetPreview);
     resizeObserver.disconnect();
     unsubscribeTwinStore();
+    floorIncidentLabels.dispose();
     clearIssueMeshes();
     for (const outline of floorAlertOutlines.values()) {
       outline.removeFromParent();

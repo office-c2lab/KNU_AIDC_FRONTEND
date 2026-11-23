@@ -14,6 +14,12 @@ export default function SceneViewport() {
         <div className="hover-tooltip" id="hover-tooltip"></div>
         <div className="world-labels" id="world-labels"></div>
         <div className="world-alerts" id="world-alerts" aria-label="3D 설비 장애 위치"></div>
+        <div
+          className="floor-incident-labels"
+          id="floor-incident-labels"
+          role="group"
+          aria-label="층별 발생 시나리오"
+        ></div>
       </div>
       <div className="scene-vignette"></div>
     </>

@@ -48,17 +48,17 @@ export default function AppHeader({ ready = true }) {
             대시보드
           </NavLink>
           <NavLink
+            to="/ai-network"
+            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
+          >
+            AI 통신 지도
+          </NavLink>
+          <NavLink
             to="/"
             end
             className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
           >
             디지털 트윈
-          </NavLink>
-          <NavLink
-            to="/ai-network"
-            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
-          >
-            AI 통신 지도
           </NavLink>
         </nav>
         <div className="system-title relative grid h-[66px] place-items-center text-center">
