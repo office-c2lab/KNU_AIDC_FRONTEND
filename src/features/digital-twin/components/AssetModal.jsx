@@ -1,8 +1,14 @@
 import { X } from 'lucide-react';
 import AssetTrendChart from './AssetTrendChart.jsx';
 import { AssetOperatingMetrics } from './OperatingMetrics.jsx';
+import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 
 export default function AssetModal() {
+  const detail = useDigitalTwinStore(state => state.assetDetail);
+  const catalog = useDigitalTwinStore(state => state.assetCatalog);
+  const openTerminal = useDigitalTwinStore(state => state.openRackTerminal);
+  const rack = catalog.find(asset => asset.id === detail?.id);
+  const hasConsole = ['SERVER RACK', 'GPU SERVER RACK'].includes(rack?.type);
   return (
     <>
       <div
@@ -70,6 +76,15 @@ export default function AssetModal() {
                 >
                   도어 열기
                 </button>
+                {hasConsole && (
+                  <button
+                    type="button"
+                    className="asset-modal-open-door"
+                    onClick={() => openTerminal(rack)}
+                  >
+                    터미널 열기
+                  </button>
+                )}
               </div>
             </section>
             <div

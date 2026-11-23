@@ -28,6 +28,7 @@ const initialState = {
   auditEvents: [],
   notificationsOpen: false,
   assetDetail: null,
+  terminalRack: null,
   simulationTime: 0,
   energyKwhByAsset: {},
 };
@@ -56,6 +57,8 @@ export const useDigitalTwinStore = create(set => ({
     }),
   setNotificationsOpen: notificationsOpen => set({ notificationsOpen }),
   setAssetDetail: assetDetail => set({ assetDetail }),
+  openRackTerminal: rack => set({ terminalRack: { id: rack.id, name: rack.name, type: rack.type } }),
+  closeRackTerminal: () => set({ terminalRack: null }),
   setSplitLevel: splitLevel =>
     set({ splitLevel: Math.max(0, Math.min(2, Math.trunc(splitLevel))) }),
   selectVisualization: (mode, forceOn = false) =>

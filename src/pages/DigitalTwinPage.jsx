@@ -1,4 +1,5 @@
 import AssetModal from '../features/digital-twin/components/AssetModal.jsx';
+import RackTerminalModal from '../features/digital-twin/components/RackTerminalModal.jsx';
 import BreadcrumbToolbar from '../features/digital-twin/components/BreadcrumbToolbar.jsx';
 import FacilitySidebar from '../features/digital-twin/components/FacilitySidebar.jsx';
 import OperationsSidebar from '../features/digital-twin/components/OperationsSidebar.jsx';
@@ -21,6 +22,7 @@ export default function DigitalTwinPage() {
       <OperationsSidebar />
       <SceneControls onEntranceComplete={onInterfaceReady} />
       <AssetModal />
+      <RackTerminalModal />
     </div>
   );
 }

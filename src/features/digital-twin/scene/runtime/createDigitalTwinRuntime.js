@@ -802,6 +802,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     // The screen pivots along its lower edge. +90 degrees is folded into the tray;
     // zero degrees is the upright operator position.
     const screenPivot = new THREE.Group();
+    screenPivot.userData.terminalRackId = id;
     screenPivot.position.set(0, 0.012, -0.205);
     screenPivot.rotation.x = Math.PI / 2;
     assembly.add(screenPivot);
@@ -809,6 +810,8 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       cast: false,
     });
     box(screenPivot, 0.82, 0.42, 0.012, 0, 0.285, 0.029, M.screen, { cast: false });
+    textPlate(screenPivot, 'KVM TERMINAL', 0, 0.34, 0.038, 0.7, 0.12, '#79e3c6', '#071321');
+    textPlate(screenPivot, 'CLICK TO CONNECT', 0, 0.19, 0.038, 0.7, 0.08, '#9ac2dd', '#071321');
     box(screenPivot, 0.2, 0.018, 0.014, 0, 0.515, 0.03, engineeringMats.titanium, {
       cast: false,
     });
@@ -4222,11 +4225,19 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     if (!hit) return null;
     let node = hit.object;
     while (node) {
+      if (node.userData.terminalRackId && Math.abs(node.rotation.x) < 0.2)
+        return { terminalRackId: node.userData.terminalRackId };
       const record = records.find(entry => entry.group === node && !entry.screenPivot);
       if (record) return record.source || record;
       node = node.parent;
     }
     return null;
+  }
+  function activateRackControl(record) {
+    if (record.terminalRackId) {
+      const rack = registry.get(record.terminalRackId);
+      if (rack) twinActions.openRackTerminal(rack);
+    } else record.open = !record.open;
   }
   let previewPointerDown = null;
   $('#asset-preview-canvas').addEventListener('pointerdown', e => {
@@ -4239,7 +4250,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     const record = pickComputeDrawer(
       e, modalPreviewCamera, e.currentTarget, modalPreviewMount, modalPreviewDrawers
     );
-    if (record && e.detail < 2) record.open = !record.open;
+    if (record && e.detail < 2) activateRackControl(record);
   });
   $('#asset-preview-canvas').addEventListener('pointercancel', () => { previewPointerDown = null; });
   // A double-click on the orbitable 3D model restores the original rack interaction.
@@ -5017,7 +5028,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     }
     const drawer = pickComputeDrawer(e, camera, renderer.domElement, scene, engineeringDrawers);
     if (drawer) {
-      if (e.detail < 2) drawer.open = !drawer.open;
+      if (e.detail < 2) activateRackControl(drawer);
       lastEquipmentTap = null;
       return;
     }
@@ -5180,6 +5191,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     }
   });
   const handleGlobalKeydown = e => {
+    if (digitalTwinStore.getState().terminalRack) return;
     if (digitalTwinStore.getState().notificationsOpen || e.defaultPrevented) return;
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
     if (assetModalId) {
