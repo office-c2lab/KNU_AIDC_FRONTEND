@@ -1,9 +1,12 @@
 import { useMemo } from 'react';
+import { Server } from 'lucide-react';
 import { geoDistance, geoInterpolate } from 'd3-geo';
-import { connections, origin } from './networkData.js';
+import { connections, origin, getConnectionStatus } from './networkData.js';
 
-function globeArc(projection, destination, rotation) {
-  const interpolate = geoInterpolate(origin.coordinates, destination);
+function globeArc(projection, destination, rotation, inbound) {
+  const interpolate = inbound
+    ? geoInterpolate(destination, origin.coordinates)
+    : geoInterpolate(origin.coordinates, destination);
   const distance = geoDistance(origin.coordinates, destination);
   let drawing = false;
   let result = '';
@@ -25,9 +28,9 @@ function globeArc(projection, destination, rotation) {
 
 // Map links are conceptual connections, not geographic cable routes. Draw in
 // projected space so an antimeridian cut cannot split a visible endpoint pair.
-function mapArc(projection, destination) {
-  const [x1, y1] = projection(origin.coordinates);
-  const [x2, y2] = projection(destination);
+function mapArc(projection, destination, inbound) {
+  const [x1, y1] = projection(inbound ? destination : origin.coordinates);
+  const [x2, y2] = projection(inbound ? origin.coordinates : destination);
   const bend = Math.min(55, Math.hypot(x2 - x1, y2 - y1) * 0.14);
   return `M${x1.toFixed(2)},${y1.toFixed(2)}Q${((x1 + x2) / 2).toFixed(2)},${((y1 + y2) / 2 - bend).toFixed(2)},${x2.toFixed(2)},${y2.toFixed(2)}`;
 }
@@ -55,43 +58,22 @@ function NetworkPoint({
       style={{ '--connection-color': color }}
     >
       <circle r="20" fill="transparent" className="network-point-target" />
-      <circle
-        className="network-node-pulse"
-        r={hub ? 18 : 13}
-        fill="none"
-        stroke={color}
-        strokeOpacity=".3"
-        strokeWidth=".8"
-      />
-      <circle
-        r={hub ? 13 : 9}
-        fill="#071423"
-        stroke={color}
-        strokeOpacity={hub || selected ? '.95' : '.65'}
-        strokeWidth="1"
-      />
       {hub ? (
-        <>
+        <g className="network-origin-server" transform={`scale(${labelScale})`}>
           <rect
-            x="-5"
-            y="-5"
-            width="10"
-            height="10"
-            rx="1.5"
-            transform="rotate(45)"
-            fill="#c5efff"
+            x="-15"
+            y="-15"
+            width="30"
+            height="30"
+            rx="6"
+            fill="#071423"
+            stroke={color}
+            strokeWidth="1"
           />
-          <circle r="2.4" fill="#2a6a8d" />
-          <path d="M-18 0h3M15 0h3M0-18v3M0 15v3" fill="none" stroke="#bce8ff" strokeWidth="1" />
-        </>
+          <Server x={-10} y={-10} size={20} color={color} strokeWidth={1.5} />
+        </g>
       ) : (
-        <>
-          <circle r="4" fill={color} />
-          <circle cx="-1" cy="-1" r="1.2" fill="#fff" fillOpacity=".85" />
-          {selected && (
-            <circle r="13" fill="none" stroke={color} strokeWidth="1" strokeDasharray="3 3" />
-          )}
-        </>
+        <circle r="5" fill={color} transform={`scale(${labelScale})`} />
       )}
       <g
         className="network-point-label"
@@ -128,6 +110,7 @@ export default function ConnectionOverlay({
   onSelect,
   idPrefix,
   screenScale = 1,
+  onSelectOrigin,
 }) {
   const originPoint = projection(origin.coordinates);
   const visible = coordinates =>
@@ -139,8 +122,8 @@ export default function ConnectionOverlay({
       point: projection(item.coordinates),
       path:
         mode === 'globe'
-          ? globeArc(projection, item.coordinates, rotation)
-          : mapArc(projection, item.coordinates),
+          ? globeArc(projection, item.coordinates, rotation, item.flow === 'inbound')
+          : mapArc(projection, item.coordinates, item.flow === 'inbound'),
     }));
   }, [projection, mode, rotation]);
 
@@ -152,14 +135,18 @@ export default function ConnectionOverlay({
             key={item.id}
             id={`${idPrefix}-route-${item.id}`}
             gradientUnits="userSpaceOnUse"
-            x1={originPoint[0]}
-            y1={originPoint[1]}
-            x2={point[0]}
-            y2={point[1]}
+            x1={item.flow === 'inbound' ? point[0] : originPoint[0]}
+            y1={item.flow === 'inbound' ? point[1] : originPoint[1]}
+            x2={item.flow === 'inbound' ? originPoint[0] : point[0]}
+            y2={item.flow === 'inbound' ? originPoint[1] : point[1]}
           >
-            <stop stopColor="#a8ddff" stopOpacity=".65" />
-            <stop offset=".35" stopColor={item.color} stopOpacity=".8" />
-            <stop offset="1" stopColor={item.color} />
+            <stop stopColor={getConnectionStatus(item.status).color} stopOpacity=".65" />
+            <stop
+              offset=".35"
+              stopColor={getConnectionStatus(item.status).color}
+              stopOpacity=".8"
+            />
+            <stop offset="1" stopColor={getConnectionStatus(item.status).color} />
           </linearGradient>
         ))}
       </defs>
@@ -174,7 +161,7 @@ export default function ConnectionOverlay({
               opacity={!selectedId || selected ? 1 : 0.24}
               onClick={() => onSelect(item)}
               style={{
-                '--connection-color': item.color,
+                '--connection-color': getConnectionStatus(item.status).color,
                 '--flow-duration': `${3.2 + index * 0.5}s`,
                 '--flow-delay': `${-index * 0.7}s`,
               }}
@@ -196,7 +183,7 @@ export default function ConnectionOverlay({
               <path
                 d={path}
                 fill="none"
-                stroke={item.color}
+                stroke={getConnectionStatus(item.status).color}
                 strokeWidth={selected ? 5 : 3}
                 strokeOpacity={selected ? '.15' : '.08'}
               />
@@ -215,7 +202,7 @@ export default function ConnectionOverlay({
                     d={path}
                     fill="none"
                     pathLength="100"
-                    stroke={item.color}
+                    stroke={getConnectionStatus(item.status).color}
                     strokeWidth="3.5"
                     strokeOpacity=".35"
                     strokeDasharray="4 96"
@@ -225,10 +212,22 @@ export default function ConnectionOverlay({
                     d={path}
                     fill="none"
                     pathLength="100"
-                    stroke="#edfbff"
+                    stroke={getConnectionStatus(item.status).color}
                     strokeWidth={selected ? 1.8 : 1.4}
                     strokeDasharray="1 99"
                   />
+                  {item.flow === 'bidirectional' && (
+                    <path
+                      className="network-route-flow network-route-reverse"
+                      d={path}
+                      fill="none"
+                      pathLength="100"
+                      stroke={getConnectionStatus(item.status).color}
+                      strokeOpacity=".8"
+                      strokeWidth="1.2"
+                      strokeDasharray="1 99"
+                    />
+                  )}
                 </>
               )}
             </g>
@@ -249,8 +248,8 @@ export default function ConnectionOverlay({
               <NetworkPoint
                 point={point}
                 label={item.city}
-                detail={`${item.latency} ms${item.status === 'warning' ? ' · 지연 주의' : ' · 연결됨'}`}
-                color={item.color}
+                detail={`${item.latency} ms · ${item.status === 'warning' ? '지연 주의' : item.flow === 'inbound' ? '수신' : item.flow === 'outbound' ? '송신' : '송수신'}`}
+                color={getConnectionStatus(item.status).color}
                 selected={item.id === selectedId}
                 compact={mode === 'map'}
                 screenScale={screenScale}
@@ -258,15 +257,17 @@ export default function ConnectionOverlay({
             </g>
           ))}
         {visible(origin.coordinates) && (
-          <NetworkPoint
-            point={originPoint}
-            label="KNU AIDC"
-            detail="출발지 · 대구"
-            color="#9fdcff"
-            hub
-            compact={mode === 'map'}
-            screenScale={screenScale}
-          />
+          <g className="network-origin-point" onClick={onSelectOrigin}>
+            <NetworkPoint
+              point={originPoint}
+              label={origin.name}
+              detail={`출발지 · ${origin.city}`}
+              color="#9fdcff"
+              hub
+              compact={mode === 'map'}
+              screenScale={screenScale}
+            />
+          </g>
         )}
       </g>
     </>

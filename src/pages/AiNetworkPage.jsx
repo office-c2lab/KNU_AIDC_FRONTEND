@@ -1,18 +1,22 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import {
-  geoDistance,
-  geoGraticule10,
-  geoInterpolate,
-  geoMercator,
-  geoOrthographic,
-  geoPath,
-} from 'd3-geo';
-import { ArrowLeft, ArrowUpRight, Globe2, Map, Minus, Plus, RotateCcw, Search } from 'lucide-react';
+import { geoContains, geoGraticule10, geoMercator, geoOrthographic, geoPath } from 'd3-geo';
+import { ArrowUpRight, Globe2, Map, Minus, Plus, RotateCcw, Search } from 'lucide-react';
 import land from '../features/communication/land.json';
 import countries from '../features/communication/countries.json';
 import NetworkSurface from '../features/communication/NetworkSurface.jsx';
 import ConnectionOverlay from '../features/communication/ConnectionOverlay.jsx';
-import { connections, origin } from '../features/communication/networkData.js';
+import CountryConnectionDetails from '../features/communication/CountryConnectionDetails.jsx';
+import {
+  countryByCode,
+  countryFeatures,
+  countryView,
+} from '../features/communication/countryGeography.js';
+import {
+  connections,
+  origin,
+  connectionStatuses,
+  getConnectionStatus,
+} from '../features/communication/networkData.js';
 import '../features/communication/network.css';
 
 const geography = { type: 'MultiPolygon', coordinates: land };
@@ -28,7 +32,6 @@ const graticule = geoGraticule10();
 const MIN_ZOOM = 0.8;
 const MAX_ZOOM = 1.6;
 const clampZoom = value => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, value));
-const format = value => new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 1 }).format(value);
 const countryLabels = [
   ['대한민국', [127.5, 37.5]],
   ['중국', [101, 35]],
@@ -58,6 +61,8 @@ const stars = Array.from({ length: 80 }, (_, i) => ({
 export default function AiNetworkPage() {
   const clipId = useId().replace(/:/g, '');
   const [selectedId, setSelectedId] = useState(null);
+  const [selectedCountryCode, setSelectedCountryCode] = useState(null);
+  const [originFocused, setOriginFocused] = useState(false);
   const [mode, setMode] = useState('globe');
   const [rotation, setRotation] = useState([-112, -23]);
   const [zoom, setZoom] = useState(1);
@@ -108,9 +113,31 @@ export default function AiNetworkPage() {
     };
   }, []);
   const selected = connections.find(item => item.id === selectedId);
+  const selectedCountry = countryByCode.get(selectedCountryCode);
+  const countrySites = connections.filter(item => item.countryCode === selectedCountryCode);
   const filtered = connections.filter(item =>
-    `${item.city} ${item.country} ${item.service}`.includes(query.trim())
+    `${item.city} ${item.country} ${item.region} ${item.service}`.includes(query.trim())
   );
+  const countryGroups = [
+    ...new Set([origin.countryCode, ...filtered.map(item => item.countryCode)]),
+  ]
+    .filter(
+      code =>
+        code !== origin.countryCode ||
+        !query.trim() ||
+        `${origin.country} ${origin.city} ${origin.region}`.includes(query.trim())
+    )
+    .map(code => ({
+      country: countryByCode.get(code),
+      sites: filtered.filter(item => item.countryCode === code),
+      status: getConnectionStatus(
+        code === origin.countryCode
+          ? origin.status
+          : connections.some(item => item.countryCode === code && item.status === 'warning')
+            ? 'warning'
+            : 'normal'
+      ),
+    }));
   const projection = useMemo(() => {
     if (mode === 'globe') {
       const spanX = Math.max(960, 660 * mapAspect);
@@ -127,11 +154,10 @@ export default function AiNetworkPage() {
     }
     let midpoint;
     let scale;
-    if (selected) {
-      midpoint = geoInterpolate(origin.coordinates, selected.coordinates)(0.5);
-      scale =
-        Math.min(450, 210 / Math.max(0.5, geoDistance(origin.coordinates, selected.coordinates))) *
-        Math.min(1, mapAspect / (960 / 660));
+    if (selectedCountry) {
+      const view = countryView(selectedCountry, mapAspect, mapSideInset);
+      midpoint = view.center;
+      scale = view.scale;
     } else {
       const reference = geoMercator().rotate([-37, 0]).scale(1).translate([0, 0]);
       const bounds = geoPath(reference).bounds({
@@ -156,8 +182,12 @@ export default function AiNetworkPage() {
       .translate([480, 330])
       .scale(scale * zoom)
       .rotate([-center[0], 0])
-      .center([0, center[1]]);
-  }, [mode, rotation, zoom, selected, mapAspect, mapCenter, mapSideInset]);
+      .center([0, center[1]])
+      .clipExtent([
+        [480 - Math.min(960, 660 * mapAspect) / 2, 330 - Math.min(660, 960 / mapAspect) / 2],
+        [480 + Math.min(960, 660 * mapAspect) / 2, 330 + Math.min(660, 960 / mapAspect) / 2],
+      ]);
+  }, [mode, rotation, zoom, selectedCountry, mapAspect, mapCenter, mapSideInset]);
   const outlines = useMemo(() => {
     const draw = geoPath(projection);
     return {
@@ -169,14 +199,32 @@ export default function AiNetworkPage() {
   }, [projection, mode, surfaceReady]);
   const select = item => {
     setSelectedId(item.id);
+    setSelectedCountryCode(item.countryCode);
+    setOriginFocused(false);
     setMode('map');
     setMapCenter(null);
     setZoom(1);
+  };
+  const selectCountry = code => {
+    if (!countryByCode.has(code)) return;
+    setSelectedCountryCode(code);
+    setSelectedId(null);
+    setOriginFocused(false);
+    setMode('map');
+    setMapCenter(null);
+    setZoom(1);
+    setQuery('');
+  };
+  const selectOrigin = () => {
+    selectCountry(origin.countryCode);
+    setOriginFocused(true);
   };
   const showAll = () => {
     setRotation([-112, -23]);
     setZoom(1);
     setSelectedId(null);
+    setSelectedCountryCode(null);
+    setOriginFocused(false);
     setMapCenter(null);
     setQuery('');
   };
@@ -287,6 +335,23 @@ export default function AiNetworkPage() {
                   dragRef.current = null;
                 }
               }}
+              onClick={event => {
+                if (event.target.closest('[data-destination], .network-origin-point')) return;
+                const matrix = event.currentTarget.getScreenCTM();
+                if (!matrix) return;
+                const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+                  matrix.inverse()
+                );
+                if (
+                  mode === 'globe' &&
+                  Math.hypot(point.x - 480, point.y - 330) > projection.scale()
+                )
+                  return;
+                const coordinates = projection.invert([point.x, point.y]);
+                if (!coordinates || coordinates.some(value => !Number.isFinite(value))) return;
+                const country = countryFeatures.find(feature => geoContains(feature, coordinates));
+                if (country) selectCountry(country.properties.code);
+              }}
             >
               <defs>
                 <clipPath id={clipId}>
@@ -350,6 +415,16 @@ export default function AiNetworkPage() {
                   strokeWidth=".55"
                   strokeDasharray={mode === 'map' ? '2 2' : undefined}
                 />
+                {mode === 'map' && selectedCountry && (
+                  <path
+                    d={geoPath(projection)(selectedCountry)}
+                    className="network-country-highlight"
+                    fill="#78bbf11a"
+                    stroke="#9dd6ff"
+                    strokeWidth=".9"
+                    pointerEvents="none"
+                  />
+                )}
                 {mode === 'map' && (
                   <g className="network-country-labels" aria-hidden="true">
                     {countryLabels.map(([name, coordinates]) => {
@@ -379,6 +454,7 @@ export default function AiNetworkPage() {
                   rotation={rotation}
                   selectedId={selectedId}
                   onSelect={select}
+                  onSelectOrigin={selectOrigin}
                   idPrefix={clipId}
                   screenScale={
                     mode === 'map'
@@ -418,21 +494,19 @@ export default function AiNetworkPage() {
             </div>
           </div>
           <div className="network-legend">
-            <span>
-              <i />
-              통신 연결
-            </span>
-            <span>
-              <i className="warning" />
-              지연 주의
-            </span>
+            {Object.entries(connectionStatuses).map(([status, { label, color }]) => (
+              <span key={status}>
+                <i style={{ background: color }} />
+                {label}
+              </span>
+            ))}
             <span className="network-geography-credit">NASA / Natural Earth · 개략적 위치</span>
           </div>
         </section>
         <aside className="network-destinations network-info-panel" aria-label="통신 목적지">
           <header>
-            <h2>통신 목적지</h2>
-            <span>{filtered.length}개 지역</span>
+            <h2>국가 · 통신 지점</h2>
+            <span>{countryGroups.length}개 국가</span>
           </header>
           <label className="network-search">
             <Search size={16} aria-hidden="true" />
@@ -446,99 +520,84 @@ export default function AiNetworkPage() {
           <button
             type="button"
             className="network-overview-button"
-            aria-pressed={!selectedId}
+            aria-pressed={!selectedCountryCode}
             onClick={showAll}
           >
             <Globe2 size={17} aria-hidden="true" />
             <span>전체 보기</span>
-            <small>{connections.length}개 지역</small>
+            <small>
+              {new Set([origin.countryCode, ...connections.map(item => item.countryCode)]).size}개
+              국가
+            </small>
           </button>
-          <div className="network-destination-list">
-            {filtered.map(item => (
-              <button
-                type="button"
-                key={item.id}
-                aria-pressed={selectedId === item.id}
-                onClick={() => select(item)}
-              >
-                <i style={{ background: item.color }} />
-                <span>
-                  <strong>
-                    {item.city}
-                    <small>{item.country}</small>
-                  </strong>
-                  <span>{item.service}</span>
-                </span>
-                <span className={item.status === 'warning' ? 'network-amber' : ''}>
-                  {item.latency}
-                  <small>ms</small>
+          <div className="network-destination-list network-country-list">
+            {countryGroups.map(({ country, sites, status }) => (
+              <section key={country.properties.code} className="network-country-group">
+                <button
+                  type="button"
+                  className="network-country-trigger"
+                  aria-pressed={selectedCountryCode === country.properties.code}
+                  onClick={() => selectCountry(country.properties.code)}
+                >
+                  <i style={{ background: status.color }} aria-hidden="true" />
+                  <span>
+                    <strong>{country.properties.name}</strong>
+                    <span>
+                      {country.properties.code === origin.countryCode
+                        ? `${origin.city} 출발지`
+                        : `${sites.length}개 통신 지점`}
+                      {' · '}
+                      <span style={{ color: status.color }}>{status.label}</span>
+                    </span>
+                  </span>
                   <ArrowUpRight size={14} />
-                </span>
-              </button>
+                </button>
+                {(selectedCountryCode === country.properties.code || query.trim()) && (
+                  <div className="network-country-locations">
+                    {country.properties.code === origin.countryCode && (
+                      <button type="button" aria-pressed={originFocused} onClick={selectOrigin}>
+                        <i style={{ background: getConnectionStatus(origin.status).color }} />
+                        <span>
+                          <strong>{origin.city}</strong>
+                          <span>{origin.name} · 출발지</span>
+                        </span>
+                        <ArrowUpRight size={14} />
+                      </button>
+                    )}
+                    {sites.map(item => (
+                      <button
+                        type="button"
+                        key={item.id}
+                        aria-pressed={selectedId === item.id}
+                        onClick={() => select(item)}
+                      >
+                        <i style={{ background: getConnectionStatus(item.status).color }} />
+                        <span>
+                          <strong>{item.city}</strong>
+                          <span>
+                            {item.region} · {item.service}
+                          </span>
+                        </span>
+                        <ArrowUpRight size={14} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </section>
             ))}
-            {!filtered.length && <p className="network-empty">검색 결과가 없습니다.</p>}
+            {!countryGroups.length && <p className="network-empty">검색 결과가 없습니다.</p>}
           </div>
         </aside>
-        <aside
-          className="network-detail network-info-panel"
-          aria-label="연결 상세"
-          aria-live="polite"
-        >
-          <header>
-            <h2>연결 상세</h2>
-            {selected && (
-              <span className={selected.status === 'warning' ? 'network-amber' : 'network-green'}>
-                {selected.status === 'warning' ? '지연 주의' : '정상'}
-              </span>
-            )}
-          </header>
-          {selected ? (
-            <>
-              <div className="network-endpoints">
-                <span>
-                  KNU AIDC<small>대한민국 · 대구</small>
-                </span>
-                <ArrowUpRight size={18} />
-                <span>
-                  {selected.city}
-                  <small>
-                    {selected.country} · {selected.region}
-                  </small>
-                </span>
-              </div>
-              <p>{selected.purpose}</p>
-              <dl>
-                {[
-                  ['서비스', selected.service],
-                  ['통신 방식', selected.protocol],
-                  ['방향', selected.direction],
-                  ['응답 지연', `${selected.latency} ms`],
-                  ['트래픽', `${selected.traffic} Mbps`],
-                  ['분당 요청', `${format(selected.requests)}건`],
-                ].map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-              <button type="button" className="network-back" onClick={reset}>
-                <ArrowLeft size={14} />
-                전체 연결 보기
-              </button>
-            </>
-          ) : (
-            <div className="network-detail-placeholder">
-              <Globe2 size={30} />
-              <strong>어디와 통신하고 있을까요?</strong>
-              <p>
-                지구본의 목적지나 목록을 선택하면
-                <br />
-                평면지도와 연결 정보를 볼 수 있습니다.
-              </p>
-            </div>
-          )}
-        </aside>
+        <CountryConnectionDetails
+          country={selectedCountry}
+          sites={countrySites}
+          selected={selected}
+          originFocused={originFocused}
+          onSelect={select}
+          onSelectOrigin={selectOrigin}
+          onCountry={selectCountry}
+          onOverview={showAll}
+        />
       </div>
     </main>
   );

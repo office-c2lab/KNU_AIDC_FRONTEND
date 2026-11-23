@@ -1,12 +1,34 @@
 // Illustrative traffic only. Replace this collection with a telemetry adapter when available.
-export const origin = { name: 'KNU AIDC', city: '대구, 대한민국', coordinates: [128.61, 35.89] };
+// Approximate Chuncheon campus origin for the example, not a verified AIDC endpoint.
+export const connectionStatuses = {
+  normal: { label: '통신 정상', color: '#73e1c0' },
+  warning: { label: '지연 주의', color: '#eac476' },
+};
+
+export const getConnectionStatus = status =>
+  connectionStatuses[status] ?? { label: '상태 미확인', color: '#8fa7bd' };
+
+export const origin = {
+  status: 'normal',
+  name: 'KNU AIDC',
+  city: '춘천',
+  country: '대한민국',
+  countryCode: 'KR',
+  region: '강원특별자치도',
+  location: '강원대학교 춘천캠퍼스 부근 · 예시 출발지',
+  coordinates: [127.74, 37.87],
+};
 
 export const connections = [
   {
     id: 'tokyo',
     city: '도쿄',
     country: '일본',
-    region: '아시아',
+    countryCode: 'JP',
+    continent: '아시아',
+    region: '도쿄도',
+    location: '도쿄 예시 AI 추론 연결 지점',
+    flow: 'bidirectional',
     coordinates: [139.69, 35.68],
     service: 'AI 추론 API',
     protocol: 'HTTPS / TLS 1.3',
@@ -16,13 +38,16 @@ export const connections = [
     requests: 1840,
     status: 'normal',
     purpose: '사용자 요청의 추론 처리 및 응답 수신',
-    color: '#73e1c0',
   },
   {
     id: 'singapore',
     city: '싱가포르',
     country: '싱가포르',
-    region: '아시아',
+    countryCode: 'SG',
+    continent: '아시아',
+    region: '싱가포르 권역',
+    location: '싱가포르 예시 검색 연결 지점',
+    flow: 'bidirectional',
     coordinates: [103.82, 1.35],
     service: '벡터 검색',
     protocol: 'HTTPS / TLS 1.3',
@@ -32,13 +57,16 @@ export const connections = [
     requests: 920,
     status: 'normal',
     purpose: '검색 증강 생성에 필요한 문서 임베딩 조회',
-    color: '#87bce9',
   },
   {
     id: 'virginia',
-    city: '버지니아',
+    city: '애슈번',
     country: '미국',
-    region: '북미',
+    countryCode: 'US',
+    continent: '북미',
+    region: '버지니아주',
+    location: '버지니아 예시 모델 저장소 연결 지점',
+    flow: 'inbound',
     coordinates: [-77.49, 39.04],
     service: '모델 저장소',
     protocol: 'HTTPS / TLS 1.3',
@@ -48,13 +76,16 @@ export const connections = [
     requests: 216,
     status: 'normal',
     purpose: '배포할 AI 모델 가중치와 버전 정보 수신',
-    color: '#b7a5f4',
   },
   {
     id: 'frankfurt',
     city: '프랑크푸르트',
     country: '독일',
-    region: '유럽',
+    countryCode: 'DE',
+    continent: '유럽',
+    region: '헤센주',
+    location: '프랑크푸르트 예시 학습 연결 지점',
+    flow: 'bidirectional',
     coordinates: [8.68, 50.11],
     service: '분산 학습',
     protocol: 'gRPC / TLS',
@@ -64,13 +95,16 @@ export const connections = [
     requests: 462,
     status: 'warning',
     purpose: '분산 학습 작업의 파라미터 및 체크포인트 동기화',
-    color: '#eac476',
   },
   {
     id: 'sydney',
     city: '시드니',
     country: '호주',
-    region: '오세아니아',
+    countryCode: 'AU',
+    continent: '오세아니아',
+    region: '뉴사우스웨일스주',
+    location: '시드니 예시 모니터링 연결 지점',
+    flow: 'outbound',
     coordinates: [151.21, -33.87],
     service: '모니터링 수집',
     protocol: 'HTTPS / TLS 1.3',
@@ -80,6 +114,5 @@ export const connections = [
     requests: 360,
     status: 'normal',
     purpose: 'AI 서비스 운영 메트릭과 성능 로그 전송',
-    color: '#78cedd',
   },
 ];

@@ -163,6 +163,123 @@
 .network-route-tail {
   animation-name: network-route-tail;
 }
+.network-route-reverse {
+  animation-name: network-route-return;
+  animation-delay: calc(var(--flow-delay) - 1.6s);
+}
+@keyframes network-route-return {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+.network-origin-point {
+  cursor: pointer;
+}
+.network-country-group + .network-country-group {
+  border-top: 1px solid #304a6845;
+}
+.network-country-list .network-country-trigger > svg:first-child {
+  color: #9ec6e5;
+  flex: none;
+}
+.network-country-list .network-country-trigger > svg:last-child {
+  margin-left: auto;
+  flex: none;
+}
+.network-country-locations {
+  margin: 0 0 8px 12px;
+  padding-left: 8px;
+  border-left: 1px solid #45678d66;
+}
+.network-country-summary {
+  padding: 18px;
+  border-bottom: 1px solid #304a6870;
+}
+.network-country-summary > span {
+  color: #89a5c1;
+  font-size: 10px;
+}
+.network-country-summary h3 {
+  margin: 6px 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+.network-country-summary p {
+  margin: 0;
+  color: #a5bdd5;
+  font-size: 11px;
+}
+.network-country-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 18px 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #a9cee9;
+  font-size: 11px;
+}
+.network-location-path {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  margin: 16px 18px 8px;
+  color: #9ed0f0;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.network-location-path svg {
+  flex: none;
+  margin-top: 3px;
+}
+.network-country-site {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 12px 14px;
+  width: calc(100% - 28px);
+  padding: 12px 10px;
+  border: 1px solid #3e5f7e;
+  border-radius: 5px;
+  background: #10273bbf;
+  color: #c2def2;
+  text-align: left;
+}
+.network-country-site:hover,
+.network-country-site.active {
+  border-color: #8bbddf;
+  background: #21415d;
+}
+.network-country-site > span {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.network-country-site > svg {
+  flex: none;
+  margin-top: 2px;
+}
+.network-country-site strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+.network-country-site small {
+  color: #a2bdd4;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.network-detail > .network-location-note {
+  padding-top: 12px;
+  border-top: 1px solid #304a6870;
+  margin-top: 16px;
+  color: #8fa7bd;
+  font-size: 10px;
+}
 @keyframes network-route-flow {
   from {
     stroke-dashoffset: 0;
