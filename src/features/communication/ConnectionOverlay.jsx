@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Server } from 'lucide-react';
 import { geoDistance, geoInterpolate } from 'd3-geo';
 import { connections, origin, getConnectionStatus } from './networkData.js';
 
@@ -58,23 +57,7 @@ function NetworkPoint({
       style={{ '--connection-color': color }}
     >
       <circle r="20" fill="transparent" className="network-point-target" />
-      {hub ? (
-        <g className="network-origin-server" transform={`scale(${labelScale})`}>
-          <rect
-            x="-15"
-            y="-15"
-            width="30"
-            height="30"
-            rx="6"
-            fill="#071423"
-            stroke={color}
-            strokeWidth="1"
-          />
-          <Server x={-10} y={-10} size={20} color={color} strokeWidth={1.5} />
-        </g>
-      ) : (
-        <circle r="5" fill={color} transform={`scale(${labelScale})`} />
-      )}
+      <circle r="5" fill={color} transform={`scale(${labelScale})`} />
       <g
         className="network-point-label"
         transform={`translate(${labelX},${labelY}) scale(${labelScale})`}
@@ -262,7 +245,7 @@ export default function ConnectionOverlay({
               point={originPoint}
               label={origin.name}
               detail={`출발지 · ${origin.city}`}
-              color="#9fdcff"
+              color={getConnectionStatus(origin.status).color}
               hub
               compact={mode === 'map'}
               screenScale={screenScale}
