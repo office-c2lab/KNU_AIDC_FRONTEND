@@ -11,12 +11,7 @@ import {
   countryFeatures,
   countryView,
 } from '../features/communication/countryGeography.js';
-import {
-  connections,
-  origin,
-  connectionStatuses,
-  getConnectionStatus,
-} from '../features/communication/networkData.js';
+import { connections, origin, getConnectionStatus } from '../features/communication/networkData.js';
 import '../features/communication/network.css';
 
 const geography = { type: 'MultiPolygon', coordinates: land };
@@ -466,11 +461,6 @@ export default function AiNetworkPage() {
             </svg>
           </div>
           <div className="network-map-footer">
-            <span>
-              {mode === 'globe'
-                ? '드래그로 회전 · 휠로 확대/축소'
-                : '드래그로 이동 · 휠로 확대/축소'}
-            </span>
             <div className="network-map-tools">
               <button
                 type="button"
@@ -492,15 +482,6 @@ export default function AiNetworkPage() {
                 <RotateCcw size={16} />
               </button>
             </div>
-          </div>
-          <div className="network-legend">
-            {Object.entries(connectionStatuses).map(([status, { label, color }]) => (
-              <span key={status}>
-                <i style={{ background: color }} />
-                {label}
-              </span>
-            ))}
-            <span className="network-geography-credit">NASA / Natural Earth · 개략적 위치</span>
           </div>
         </section>
         <aside className="network-destinations network-info-panel" aria-label="통신 목적지">

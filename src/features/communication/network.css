@@ -1,5 +1,6 @@
 .network-page {
   --network-panel-width: 280px;
+  --network-panel-inset: 32px;
   position: relative;
   height: var(--app-viewport-height, 100dvh);
   overflow: hidden;
@@ -71,8 +72,8 @@
   position: absolute;
   z-index: 2;
   top: 96px;
-  left: calc(var(--network-panel-width) + 44px);
-  right: calc(var(--network-panel-width) + 44px);
+  left: calc(var(--network-panel-width) + var(--network-panel-inset) + 16px);
+  right: calc(var(--network-panel-width) + var(--network-panel-inset) + 16px);
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -350,11 +351,11 @@
 .network-map-footer {
   position: absolute;
   z-index: 2;
-  bottom: 48px;
-  left: calc(var(--network-panel-width) + 44px);
-  right: calc(var(--network-panel-width) + 44px);
+  bottom: var(--network-panel-inset);
+  left: calc(var(--network-panel-width) + var(--network-panel-inset) + 16px);
+  right: calc(var(--network-panel-width) + var(--network-panel-inset) + 16px);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 12px;
   padding: 0;
@@ -424,16 +425,16 @@
 }
 .network-destinations {
   grid-area: destinations;
-  left: 28px;
+  left: var(--network-panel-inset);
 }
 .network-detail {
   grid-area: detail;
-  right: 28px;
+  right: var(--network-panel-inset);
 }
 .network-info-panel {
   position: absolute;
   top: 92px;
-  bottom: 48px;
+  bottom: var(--network-panel-inset);
   z-index: 3;
   width: var(--network-panel-width);
   min-width: 0;
