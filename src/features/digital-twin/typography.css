@@ -1,10 +1,11 @@
 /* Shared typography for Korean, Latin labels, identifiers and numeric readouts. */
 /* Anchor navigation to the central title; retain the clock and alarm at the outer edge. */
 .app-header .main-nav {
+  gap: 18px;
   justify-content: flex-end;
   padding-left: 12px;
-  /* 19px offset + 52px ticks + skew + separation from the menu. */
-  padding-right: 88px;
+  /* Leave room for three user tabs beside the central title. */
+  padding-right: 28px;
 }
 .app-header .header-tools {
   padding-left: 88px;
@@ -32,6 +33,7 @@
 /* Keep the administrator navigation available alongside user navigation on small screens. */
 @media (max-width: 700px) {
   .app-header .main-nav {
+    gap: 8px;
     padding-right: 12px;
   }
   .app-header .header-tools {

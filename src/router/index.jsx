@@ -9,6 +9,12 @@ const router = createBrowserRouter([
     element: <AppLayout />,
     children: [
       {
+        path: 'ai-network',
+        lazy: async () => ({
+          Component: (await import('../pages/AiNetworkPage.jsx')).default,
+        }),
+      },
+      {
         index: true,
         element: <DigitalTwinPage />,
       },

@@ -54,6 +54,12 @@ export default function AppHeader({ ready = true }) {
           >
             디지털 트윈
           </NavLink>
+          <NavLink
+            to="/ai-network"
+            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
+          >
+            AI 통신 지도
+          </NavLink>
         </nav>
         <div className="system-title relative grid h-[66px] place-items-center text-center">
           <span className="title-ticks left" aria-hidden="true"></span>
