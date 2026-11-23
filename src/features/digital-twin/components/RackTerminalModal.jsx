@@ -207,7 +207,7 @@ function TerminalWindow({ rack, close }) {
             <h2 id="rack-terminal-title">{rack.id} · 원격 터미널</h2>
           </div>
           <button ref={closeRef} type="button" onClick={close} aria-label="터미널 닫기">
-            <X size={20} />
+            <X size={18} aria-hidden="true" />
           </button>
         </header>
         <div className="rack-terminal-toolbar">

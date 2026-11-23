@@ -59,6 +59,16 @@
 .rack-terminal-window button {
   cursor: pointer;
 }
+.rack-terminal-window .rack-terminal-header button {
+  flex: 0 0 34px;
+  padding: 0;
+  line-height: 0;
+}
+.rack-terminal-window .rack-terminal-header button svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
 .rack-terminal-window button:disabled {
   opacity: 0.5;
   cursor: not-allowed;

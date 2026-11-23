@@ -657,7 +657,8 @@ body{font-size:12px}
 .asset-detail-trigger[hidden],.selected-card .state-tag[hidden]{display:none!important}
 .asset-detail-trigger:hover:not(:disabled){border-color:#9ad7ff;background:linear-gradient(120deg,#315b82,#173759)}
 .asset-detail-trigger:disabled{opacity:.48;cursor:default}
-.asset-detail-trigger span:last-child{font-size:15px;color:#9ed9ff}
+.asset-detail-trigger span:last-child{display:grid;width:22px;height:22px;flex:none;place-items:center;color:#9ed9ff;line-height:0}
+.asset-detail-trigger span:last-child svg{display:block;width:16px;height:16px}
 .asset-modal[hidden]{display:none!important}
 .asset-modal{--modal-top-space:calc(9px + var(--header-h,76px) + 16px)}
 .asset-modal{position:fixed;inset:0;z-index:110;display:flex;align-items:center;justify-content:center;padding:clamp(24px,3vw,40px);isolation:isolate;color:#e8f3ff}
@@ -731,7 +732,7 @@ body{font-size:12px}
 .runtime-icon{display:inline-block;vertical-align:middle;flex:none}
 .state-tag .runtime-icon{width:9px;height:9px;fill:currentColor}
 .inspect-back .runtime-icon{margin:0 4px}
-.lucide{flex-shrink:0}
+.lucide{display:block;flex-shrink:0}
 .agent-quicklist summary span{color:#88d9ed;font:600 10px ui-monospace,Consolas,monospace}
 .agent-shortcuts{padding:0 6px 6px;display:grid;gap:3px}
 .agent-shortcut{width:100%;display:flex;justify-content:space-between;align-items:center;gap:5px;text-align:left;padding:9px 7px;border:1px solid transparent;border-radius:2px;color:#d5e7f9;background:#172a426a;cursor:pointer}
