@@ -93,17 +93,6 @@ function NetworkPoint({
           )}
         </>
       )}
-      <path
-        d={
-          hub
-            ? `M${left ? -12 : 12} 8L${left ? -gap : gap} ${compact ? 22 : 24}`
-            : `M${left ? -9 : 9} -5L${left ? -gap + 4 : gap - 4} ${-19 * labelScale}H${left ? -gap : gap}`
-        }
-        fill="none"
-        stroke={color}
-        strokeOpacity=".6"
-        strokeWidth=".8"
-      />
       <g
         className="network-point-label"
         transform={`translate(${labelX},${labelY}) scale(${labelScale})`}
@@ -119,11 +108,11 @@ function NetworkPoint({
           strokeOpacity={hub || selected ? '.65' : '.28'}
           strokeWidth=".7"
         />
-        <rect x="0" y="10" width="2" height="19" rx="1" fill={color} />
-        <text className="network-point-name" x="11" y="16" fill="#eef7ff">
+        <circle cx="7" cy="12" r="2" fill={color} />
+        <text className="network-point-name" x="15" y="16" fill="#eef7ff">
           {label}
         </text>
-        <text className="network-point-detail" x="11" y="30" fill={color}>
+        <text className="network-point-detail" x="15" y="30" fill={color}>
           {detail}
         </text>
       </g>
