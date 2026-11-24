@@ -231,7 +231,7 @@ export default function ConnectionOverlay({
               <NetworkPoint
                 point={point}
                 label={item.city}
-                detail={`${item.latency} ms · ${item.status === 'warning' ? '지연 주의' : item.flow === 'inbound' ? '수신' : item.flow === 'outbound' ? '송신' : '송수신'}`}
+                detail={`${item.latency} ms · ${item.status !== 'normal' ? getConnectionStatus(item.status).label : item.flow === 'inbound' ? '수신' : item.flow === 'outbound' ? '송신' : '송수신'}`}
                 color={getConnectionStatus(item.status).color}
                 selected={item.id === selectedId}
                 compact={mode === 'map'}

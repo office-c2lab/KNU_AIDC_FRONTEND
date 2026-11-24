@@ -191,9 +191,9 @@
   flex: none;
 }
 .network-country-locations {
-  margin: 0 0 8px 12px;
-  padding-left: 8px;
-  border-left: 1px solid #45678d66;
+  margin: 3px 0 12px 13px;
+  padding-left: 12px;
+  border-left: 1px solid #52749699;
 }
 .network-country-summary {
   padding: 18px;
@@ -540,6 +540,45 @@
 .network-destination-list button[aria-pressed='true'] {
   background: #1e3d59;
   border-color: #4d799c;
+}
+.network-country-list .network-country-trigger {
+  margin-top: 4px;
+  background: #14263b80;
+}
+.network-country-list .network-country-trigger[aria-pressed='true'] {
+  background: #1a3249;
+  border-color: transparent;
+}
+.network-country-list .network-country-trigger strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+.network-country-locations > button {
+  position: relative;
+  margin-top: 3px;
+  padding: 10px 8px;
+  border-radius: 0 4px 4px 0;
+}
+.network-country-locations > button::before {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: -13px;
+  width: 11px;
+  border-top: 1px solid #52749699;
+}
+.network-country-locations > button[aria-pressed='true'] {
+  background: #21415a80;
+  border-color: transparent;
+  border-left-color: #9acde9;
+}
+.network-country-locations > button strong {
+  font-size: 11px;
+  font-weight: 500;
+}
+.network-country-list button:focus-visible {
+  outline: 2px solid #9acde9;
+  outline-offset: -3px;
 }
 .network-destination-list button > i {
   width: 7px;

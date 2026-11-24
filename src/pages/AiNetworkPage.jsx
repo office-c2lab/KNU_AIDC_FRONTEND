@@ -1,6 +1,16 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { geoContains, geoGraticule10, geoMercator, geoOrthographic, geoPath } from 'd3-geo';
-import { ArrowUpRight, Globe2, Map, Minus, Plus, RotateCcw, Search } from 'lucide-react';
+import {
+  ArrowUpRight,
+  ChevronDown,
+  ChevronRight,
+  Globe2,
+  Map,
+  Minus,
+  Plus,
+  RotateCcw,
+  Search,
+} from 'lucide-react';
 import land from '../features/communication/land.json';
 import countries from '../features/communication/countries.json';
 import NetworkSurface from '../features/communication/NetworkSurface.jsx';
@@ -119,6 +129,7 @@ export default function AiNetworkPage() {
     .filter(
       code =>
         code !== origin.countryCode ||
+        filtered.some(item => item.countryCode === code) ||
         !query.trim() ||
         `${origin.country} ${origin.city} ${origin.region}`.includes(query.trim())
     )
@@ -126,11 +137,13 @@ export default function AiNetworkPage() {
       country: countryByCode.get(code),
       sites: filtered.filter(item => item.countryCode === code),
       status: getConnectionStatus(
-        code === origin.countryCode
-          ? origin.status
+        connections.some(item => item.countryCode === code && item.status === 'error')
+          ? 'error'
           : connections.some(item => item.countryCode === code && item.status === 'warning')
             ? 'warning'
-            : 'normal'
+            : code === origin.countryCode
+              ? origin.status
+              : 'normal'
       ),
     }));
   const projection = useMemo(() => {
@@ -524,14 +537,16 @@ export default function AiNetworkPage() {
                   <span>
                     <strong>{country.properties.name}</strong>
                     <span>
-                      {country.properties.code === origin.countryCode
-                        ? `${origin.city} 출발지`
-                        : `${sites.length}개 통신 지점`}
+                      {sites.length}개 통신 지점
                       {' · '}
                       <span style={{ color: status.color }}>{status.label}</span>
                     </span>
                   </span>
-                  <ArrowUpRight size={14} />
+                  {selectedCountryCode === country.properties.code || query.trim() ? (
+                    <ChevronDown size={14} aria-hidden="true" />
+                  ) : (
+                    <ChevronRight size={14} aria-hidden="true" />
+                  )}
                 </button>
                 {(selectedCountryCode === country.properties.code || query.trim()) && (
                   <div className="network-country-locations">

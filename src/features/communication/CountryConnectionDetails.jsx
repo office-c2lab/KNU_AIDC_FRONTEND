@@ -47,7 +47,10 @@ export default function CountryConnectionDetails({
           <div className="network-country-summary">
             <span>선택 국가</span>
             <h3>{country.properties.name}</h3>
-            <p>{local ? `${origin.city} 출발지` : `${sites.length}개 통신 지점`}</p>
+            <p>
+              {local && `${origin.city} 출발지 · `}
+              {sites.length}개 통신 지점
+            </p>
           </div>
           {site ? (
             <>
@@ -69,6 +72,7 @@ export default function CountryConnectionDetails({
                 {[
                   ['위치', site.location],
                   ['좌표', coordinates(site.coordinates)],
+                  ['상태', getConnectionStatus(site.status).label],
                   ...(selected
                     ? [
                         ['송수신', flowNames[selected.flow]],
