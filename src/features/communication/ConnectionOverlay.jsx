@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { geoDistance, geoInterpolate } from 'd3-geo';
 import { connections, origin, getConnectionStatus } from './networkData.js';
 
@@ -44,7 +44,25 @@ function NetworkPoint({
   compact = false,
   screenScale = 1,
 }) {
-  const width = Math.max(100, label.length * 14 + 32);
+  const labelRef = useRef(null);
+  const [width, setWidth] = useState(() =>
+    Math.max(100, label.length * 14 + 32, detail.length * 11 + 32)
+  );
+  useLayoutEffect(() => {
+    let active = true;
+    const measure = () => {
+      if (!active || !labelRef.current) return;
+      const lengths = [...labelRef.current.querySelectorAll('text')].map(text =>
+        text.getComputedTextLength()
+      );
+      setWidth(Math.max(100, Math.ceil(Math.max(...lengths) + 28)));
+    };
+    measure();
+    document.fonts.ready.then(measure);
+    return () => {
+      active = false;
+    };
+  }, [label, detail]);
   const labelScale = 1 / Math.max(0.1, screenScale);
   const gap = compact ? 18 : 24;
   const left = hub || (point[0] < 480 && point[0] > 130) || point[0] > 810;
@@ -59,6 +77,7 @@ function NetworkPoint({
       <circle r="20" fill="transparent" className="network-point-target" />
       <circle r="5" fill={color} transform={`scale(${labelScale})`} />
       <g
+        ref={labelRef}
         className="network-point-label"
         transform={`translate(${labelX},${labelY}) scale(${labelScale})`}
       >
@@ -133,126 +152,134 @@ export default function ConnectionOverlay({
           </linearGradient>
         ))}
       </defs>
-      <g className="network-connections">
-        {routes.map(({ item, index, path }) => {
-          const selected = item.id === selectedId;
-          return (
-            <g
-              key={item.id}
-              className={`network-route${selected ? ' selected' : ''}`}
-              data-destination={item.id}
-              opacity={!selectedId || selected ? 1 : 0.24}
-              onClick={() => onSelect(item)}
-              style={{
-                '--connection-color': getConnectionStatus(item.status).color,
-                '--flow-duration': `${3.2 + index * 0.5}s`,
-                '--flow-delay': `${-index * 0.7}s`,
-              }}
-            >
-              <path
-                className="network-route-target"
-                d={path}
-                fill="none"
-                stroke="transparent"
-                strokeWidth="20"
-              />
-              <path
-                d={path}
-                fill="none"
-                stroke="#020a13"
-                strokeOpacity=".75"
-                strokeWidth={selected ? 4.7 : 3.8}
-              />
-              <path
-                d={path}
-                fill="none"
-                stroke={getConnectionStatus(item.status).color}
-                strokeWidth={selected ? 5 : 3}
-                strokeOpacity={selected ? '.15' : '.08'}
-              />
-              <path
-                className="network-route-line"
-                d={path}
-                fill="none"
-                stroke={`url(#${idPrefix}-route-${item.id})`}
-                strokeWidth={selected ? 2 : 1.3}
-                strokeDasharray={item.status === 'warning' ? '6 4' : undefined}
-              />
-              {path && (
-                <>
-                  <path
-                    className="network-route-flow network-route-tail"
-                    d={path}
-                    fill="none"
-                    pathLength="100"
-                    stroke={getConnectionStatus(item.status).color}
-                    strokeWidth="3.5"
-                    strokeOpacity=".35"
-                    strokeDasharray="4 96"
-                  />
-                  <path
-                    className="network-route-flow"
-                    d={path}
-                    fill="none"
-                    pathLength="100"
-                    stroke={getConnectionStatus(item.status).color}
-                    strokeWidth={selected ? 1.8 : 1.4}
-                    strokeDasharray="1 99"
-                  />
-                  {item.flow === 'bidirectional' && (
+      {[false, true].map(critical => (
+        <g key={String(critical)} data-connection-layer={critical ? 'error' : 'normal'}>
+          <g className="network-connections">
+            {routes
+              .filter(({ item }) => (item.status === 'error') === critical)
+              .map(({ item, index, path }) => {
+                const selected = item.id === selectedId;
+                return (
+                  <g
+                    key={item.id}
+                    className={`network-route${selected ? ' selected' : ''}`}
+                    data-destination={item.id}
+                    opacity={critical || !selectedId || selected ? 1 : 0.24}
+                    onClick={() => onSelect(item)}
+                    style={{
+                      '--connection-color': getConnectionStatus(item.status).color,
+                      '--flow-duration': `${3.2 + index * 0.5}s`,
+                      '--flow-delay': `${-index * 0.7}s`,
+                    }}
+                  >
                     <path
-                      className="network-route-flow network-route-reverse"
+                      className="network-route-target"
                       d={path}
                       fill="none"
-                      pathLength="100"
-                      stroke={getConnectionStatus(item.status).color}
-                      strokeOpacity=".8"
-                      strokeWidth="1.2"
-                      strokeDasharray="1 99"
+                      stroke="transparent"
+                      strokeWidth="20"
                     />
-                  )}
-                </>
-              )}
-            </g>
-          );
-        })}
-      </g>
-      <g className="network-points">
-        {routes
-          .filter(({ item }) => visible(item.coordinates))
-          .map(({ item, point }) => (
-            <g
-              key={item.id}
-              className="network-destination-point"
-              data-destination={item.id}
-              opacity={!selectedId || item.id === selectedId ? 1 : 0.3}
-              onClick={() => onSelect(item)}
-            >
-              <NetworkPoint
-                point={point}
-                label={item.city}
-                detail={`${item.latency} ms · ${item.status !== 'normal' ? getConnectionStatus(item.status).label : item.flow === 'inbound' ? '수신' : item.flow === 'outbound' ? '송신' : '송수신'}`}
-                color={getConnectionStatus(item.status).color}
-                selected={item.id === selectedId}
-                compact={mode === 'map'}
-                screenScale={screenScale}
-              />
-            </g>
-          ))}
-        {visible(origin.coordinates) && (
-          <g className="network-origin-point" onClick={onSelectOrigin}>
-            <NetworkPoint
-              point={originPoint}
-              label={origin.name}
-              detail={`출발지 · ${origin.city}`}
-              color={getConnectionStatus(origin.status).color}
-              hub
-              compact={mode === 'map'}
-              screenScale={screenScale}
-            />
+                    <path
+                      d={path}
+                      fill="none"
+                      stroke="#020a13"
+                      strokeOpacity=".75"
+                      strokeWidth={selected ? 4.7 : 3.8}
+                    />
+                    <path
+                      d={path}
+                      fill="none"
+                      stroke={getConnectionStatus(item.status).color}
+                      strokeWidth={selected ? 5 : 3}
+                      strokeOpacity={selected ? '.15' : '.08'}
+                    />
+                    <path
+                      className="network-route-line"
+                      d={path}
+                      fill="none"
+                      stroke={`url(#${idPrefix}-route-${item.id})`}
+                      strokeWidth={selected ? 2 : 1.3}
+                      strokeDasharray={item.status === 'warning' ? '6 4' : undefined}
+                    />
+                    {path && (
+                      <>
+                        <path
+                          className="network-route-flow network-route-tail"
+                          d={path}
+                          fill="none"
+                          pathLength="100"
+                          stroke={getConnectionStatus(item.status).color}
+                          strokeWidth="3.5"
+                          strokeOpacity=".35"
+                          strokeDasharray="4 96"
+                        />
+                        <path
+                          className="network-route-flow"
+                          d={path}
+                          fill="none"
+                          pathLength="100"
+                          stroke={getConnectionStatus(item.status).color}
+                          strokeWidth={selected ? 1.8 : 1.4}
+                          strokeDasharray="1 99"
+                        />
+                        {item.flow === 'bidirectional' && (
+                          <path
+                            className="network-route-flow network-route-reverse"
+                            d={path}
+                            fill="none"
+                            pathLength="100"
+                            stroke={getConnectionStatus(item.status).color}
+                            strokeOpacity=".8"
+                            strokeWidth="1.2"
+                            strokeDasharray="1 99"
+                          />
+                        )}
+                      </>
+                    )}
+                  </g>
+                );
+              })}
           </g>
-        )}
-      </g>
+          <g className="network-points">
+            {routes
+              .filter(
+                ({ item }) => (item.status === 'error') === critical && visible(item.coordinates)
+              )
+              .map(({ item, point }) => (
+                <g
+                  key={item.id}
+                  className="network-destination-point"
+                  data-destination={item.id}
+                  opacity={critical || !selectedId || item.id === selectedId ? 1 : 0.3}
+                  onClick={() => onSelect(item)}
+                >
+                  <NetworkPoint
+                    point={point}
+                    label={item.city}
+                    detail={`${item.latency} ms · ${item.status !== 'normal' ? getConnectionStatus(item.status).label : item.flow === 'inbound' ? '수신' : item.flow === 'outbound' ? '송신' : '송수신'}`}
+                    color={getConnectionStatus(item.status).color}
+                    selected={item.id === selectedId}
+                    compact={mode === 'map'}
+                    screenScale={screenScale}
+                  />
+                </g>
+              ))}
+            {!critical && visible(origin.coordinates) && (
+              <g className="network-origin-point" onClick={onSelectOrigin}>
+                <NetworkPoint
+                  point={originPoint}
+                  label={origin.name}
+                  detail={`출발지 · ${origin.city}`}
+                  color={getConnectionStatus(origin.status).color}
+                  hub
+                  compact={mode === 'map'}
+                  screenScale={screenScale}
+                />
+              </g>
+            )}
+          </g>
+        </g>
+      ))}
     </>
   );
 }
