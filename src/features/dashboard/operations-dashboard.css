@@ -125,7 +125,68 @@
 .ops-line-chart {
   width: 100%;
   min-width: 0;
-  height: clamp(150px, 18vh, 185px);
+  height: clamp(185px, calc(20vh + 20px), 225px);
+}
+.ops-line-chart .recharts-surface {
+  overflow: visible;
+}
+.ops-line-chart .recharts-cartesian-axis-tick-value {
+  font-variant-numeric: tabular-nums;
+}
+.ops-chart-tooltip {
+  min-width: 185px;
+  padding: 12px 14px;
+  border: 1px solid #658bad80;
+  border-radius: 8px;
+  background: #0b192cf5;
+  box-shadow: 0 8px 24px #01081366;
+  color: #edf5ff;
+  font-size: 13px;
+}
+.ops-chart-tooltip-heading {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #3e5a7666;
+  color: #bfd1e5;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.ops-chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.ops-chart-tooltip-row > span {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 7px;
+}
+.ops-chart-tooltip-row i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.ops-chart-tooltip-row strong {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.ops-chart-tooltip-row small {
+  margin-left: 4px;
+  color: #bfd1e5;
+  font-size: 11px;
+  font-weight: 400;
+}
+.ops-chart-tooltip-row em {
+  color: #bfd1e5;
+  font-size: 11px;
+  font-style: normal;
+}
+.ops-chart-legend [data-series='GPU'] i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
 }
 .ops-chart-legend {
   display: flex;
@@ -163,7 +224,7 @@
   position: relative;
   width: 100%;
   max-width: 195px;
-  height: clamp(150px, 19vh, 185px);
+  height: clamp(170px, calc(19vh + 20px), 205px);
   justify-self: center;
 }
 .ops-power-donut-total {
@@ -191,7 +252,7 @@
 }
 .ops-power-legend {
   display: grid;
-  gap: 16px;
+  gap: 10px;
   min-width: 0;
 }
 .ops-power-legend > div {
@@ -210,6 +271,14 @@
 .ops-power-legend strong {
   white-space: nowrap;
   font-weight: 500;
+  text-align: right;
+}
+.ops-power-percentage {
+  display: block;
+  margin-top: 2px;
+  color: #a9bfd7;
+  font-size: 11px;
+  font-style: normal;
 }
 .ops-power-legend small {
   margin-left: 4px;
@@ -241,24 +310,53 @@
 .ops-log-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 14px;
-  margin-bottom: 6px;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #3b55724d;
+  border-radius: 6px;
+  background: #09172780;
 }
 .ops-log-filters button {
-  padding: 3px 0;
-  border: 0;
-  border-bottom: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 4px;
   background: transparent;
   color: #b6c9df;
   font-size: 14px;
 }
 .ops-log-filters button[aria-pressed='true'] {
   color: #dcefff;
-  border-bottom-color: #87bce9;
+  background: #29465f;
+  border-color: #6487a580;
+}
+.ops-log-filters button > span {
+  min-width: 18px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: #7298bd15;
+  color: #bfd1e5;
+  font-size: 12px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.ops-log-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 5px 0 14px;
+}
+.ops-log-order {
+  color: #b6c9df;
+  font-size: 12px;
 }
 .ops-table-scroll {
   min-width: 0;
-  max-height: 300px;
+  max-height: 360px;
   overflow: auto;
   scrollbar-width: thin;
 }
@@ -272,8 +370,8 @@
 .ops-events th {
   position: sticky;
   top: 0;
-  padding: 9px 12px;
-  background: #101e32;
+  padding: 11px 14px;
+  background: #16273b;
   border-bottom: 1px solid #304a68;
   color: #b6c9df;
   font-size: 14px;
@@ -281,9 +379,45 @@
   white-space: nowrap;
 }
 .ops-events td {
-  padding: 10px 12px;
+  padding: 13px 14px;
   border-bottom: 1px solid #304a6844;
   color: #dce9f8;
+  vertical-align: middle;
+}
+.ops-events tbody tr[data-kind='danger'] {
+  background: #ff818807;
+}
+.ops-log-category {
+  color: #bcd8ee;
+  white-space: nowrap;
+}
+.ops-log-asset {
+  display: grid;
+  gap: 4px;
+  min-width: 120px;
+  font-variant-numeric: tabular-nums;
+}
+.ops-log-asset strong {
+  color: #edf5ff;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.ops-log-asset small {
+  color: #b6c9df;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.ops-log-description {
+  display: block;
+  min-width: 200px;
+  color: #e5eff9;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.65;
 }
 .ops-events tr:last-child td {
   border-bottom: 0;
@@ -294,21 +428,31 @@
   font-size: 14px;
 }
 .ops-events th:first-child {
-  width: 15%;
+  width: 22%;
 }
 .ops-events th:nth-child(2) {
-  width: 12%;
+  width: 10%;
 }
 .ops-events th:nth-child(3) {
-  width: 20%;
+  width: 18%;
 }
 .ops-events th:last-child {
   width: 10%;
 }
 .ops-event-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 14px;
   color: #d1deed;
   white-space: nowrap;
+}
+.ops-event-state > i {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 .ops-event-state.danger {
   color: #ff8188;
@@ -316,10 +460,48 @@
 .ops-event-state.success {
   color: #73e1c0;
 }
+.ops-event-state.normal {
+  color: #73e1c0;
+}
+.ops-event-state.warning {
+  color: #eac476;
+}
 .ops-events .ops-empty-cell {
-  padding: 22px 10px;
+  padding: 28px 14px;
   color: #b6c9df;
   text-align: center;
+}
+.ops-log-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.ops-log-empty > svg {
+  margin-bottom: 3px;
+  color: #87bce9;
+}
+.ops-log-empty strong {
+  color: #dce9f8;
+  font-size: 14px;
+  font-weight: 500;
+}
+.ops-log-empty > span,
+.ops-log-empty > a {
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: normal;
+}
+.ops-log-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 14px;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid #304a6844;
+  color: #a6bcd4;
+  font-size: 12px;
 }
 .ops-empty-cell a {
   margin-left: 8px;
@@ -371,10 +553,10 @@
     gap: 10px;
   }
   .ops-line-chart {
-    height: 180px;
+    height: 200px;
   }
   .ops-power-donut {
-    height: 160px;
+    height: 180px;
   }
   .ops-events table {
     min-width: 500px;
