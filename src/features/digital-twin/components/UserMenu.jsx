@@ -1,5 +1,6 @@
 import { ChevronDown, LockKeyhole, LogOut, Settings2, UserRound, X } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { useUserPreferencesStore } from '../../../stores/userPreferencesStore.js';
 
@@ -229,6 +230,13 @@ export default function UserMenu() {
               <p className="max-w-[300px] text-[13px] leading-relaxed text-[#9cb2cc]">
                 계정 연동 후 내 정보 확인, 비밀번호 변경과 로그아웃을 이용할 수 있습니다.
               </p>
+              <Link
+                to="/login"
+                onClick={closeDialog}
+                className="mt-2 rounded-md border border-[#5786ad] bg-[#1d4264] px-4 py-2 text-[13px] font-medium text-[#e3f2ff] hover:bg-[#2b5a80]"
+              >
+                로그인 화면으로 이동
+              </Link>
             </div>
           )}
         </div>

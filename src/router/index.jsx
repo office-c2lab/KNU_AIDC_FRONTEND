@@ -5,6 +5,12 @@ import DashboardPage from '../pages/DashboardPage.jsx';
 
 const router = createBrowserRouter([
   {
+    path: '/login',
+    lazy: async () => ({
+      Component: (await import('../pages/LoginPage.jsx')).default,
+    }),
+  },
+  {
     path: '/',
     element: <AppLayout />,
     children: [
