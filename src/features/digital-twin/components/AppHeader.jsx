@@ -5,6 +5,8 @@ import { NavLink } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { panelEntrance } from '../../../utils/panelMotion.js';
 import HeaderFrame from './HeaderFrame.jsx';
+import UserMenu from './UserMenu.jsx';
+import { useUserPreferencesStore } from '../../../stores/userPreferencesStore.js';
 
 const clockFormatter = new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul',
@@ -15,11 +17,13 @@ const clockFormatter = new Intl.DateTimeFormat('ko-KR', {
 });
 
 function HeaderClock() {
+  const showClock = useUserPreferencesStore(state => state.showClock);
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
+  if (!showClock) return null;
   return (
     <time
       className="shrink-0 text-[11px] font-medium text-[#9fb8d4] tabular-nums max-[1200px]:hidden"
@@ -37,7 +41,7 @@ function HeaderLink({ to, end, children }) {
     <NavLink
       to={to}
       end={end}
-      className="group relative inline-flex h-10 shrink-0 items-center justify-center px-4 text-[15px] font-semibold whitespace-nowrap outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#9dccff] max-[1400px]:px-3 max-[1100px]:px-1.5 max-[1100px]:text-[12px] max-[700px]:text-[11px]"
+      className="group relative inline-flex h-10 shrink-0 items-center justify-center px-2.5 text-[14px] font-semibold whitespace-nowrap outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#9dccff] max-[1300px]:px-1.5 max-[1300px]:text-[12px] max-[700px]:text-[11px]"
     >
       {({ isActive }) => (
         <>
@@ -67,7 +71,7 @@ export default function AppHeader({ ready = true }) {
   return (
     <motion.header
       {...panelEntrance({ y: -96, ready })}
-      className="fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[minmax(0,1fr)_48%_minmax(0,1fr)] items-center isolate bg-linear-to-b from-[#06101ee8] via-[#071528f5] to-[#030d1bf5] shadow-[0_8px_24px_#01050f40] will-change-[transform,opacity] before:pointer-events-none before:absolute before:inset-x-0 before:top-px before:h-px before:bg-linear-to-r before:from-[#1476bca6] before:via-[#97d8ff] before:to-[#1476bca6] before:shadow-[0_0_7px_#148aff66] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-[5px] after:h-px after:bg-[linear-gradient(90deg,#275c85_0%,#dca43c_8%,#fff1bb_13%,#bc862e_19%,#249ce9_28%,#249ce9_72%,#bc862e_81%,#fff1bb_88%,#dca43c_94%,#275c85_100%)] after:shadow-[0_0_5px_#d6ac5559] max-[1100px]:grid-cols-[minmax(0,1fr)_43%_minmax(0,1fr)] max-[700px]:grid-cols-[minmax(0,1fr)_auto]"
+      className="fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[minmax(0,1fr)_48%_minmax(0,1fr)] items-center isolate bg-linear-to-b from-[#06101ee8] via-[#071528f5] to-[#030d1bf5] shadow-[0_8px_24px_#01050f40] will-change-[transform,opacity] before:pointer-events-none before:absolute before:inset-x-0 before:top-px before:h-px before:bg-linear-to-r before:from-[#1476bca6] before:via-[#97d8ff] before:to-[#1476bca6] before:shadow-[0_0_7px_#148aff66] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-[5px] after:h-px after:bg-[linear-gradient(90deg,#275c85_0%,#dca43c_8%,#fff1bb_13%,#bc862e_19%,#249ce9_28%,#249ce9_72%,#bc862e_81%,#fff1bb_88%,#dca43c_94%,#275c85_100%)] after:shadow-[0_0_5px_#d6ac5559] max-[1100px]:grid-cols-[minmax(0,1fr)_43%_minmax(0,1fr)] max-[1000px]:grid-cols-[minmax(0,1fr)_auto]"
     >
       <span
         aria-hidden="true"
@@ -78,7 +82,7 @@ export default function AppHeader({ ready = true }) {
         className="pointer-events-none absolute right-[2%] bottom-px h-[10px] w-[18%] bg-[radial-gradient(ellipse,#fff7d5_0%,#ffd36d80_12%,#b77e2633_40%,transparent_72%)] blur-[1.5px]"
       />
       <nav
-        className="relative z-10 flex min-w-0 items-center justify-end gap-2 pr-10 pl-5 max-[1400px]:gap-1 max-[1400px]:pr-7 max-[1100px]:gap-0.5 max-[1100px]:pr-4 max-[1100px]:pl-2 max-[700px]:justify-start max-[700px]:pr-2"
+        className="relative z-10 flex min-w-0 items-center justify-start gap-1.5 pr-7 pl-3 max-[1400px]:gap-1 max-[1300px]:gap-0.5 max-[1300px]:pr-4 max-[1300px]:pl-2 max-[700px]:pr-2"
         aria-label="사용자 메뉴"
       >
         <HeaderLink to="/dashboard">대시보드</HeaderLink>
@@ -86,9 +90,10 @@ export default function AppHeader({ ready = true }) {
         <HeaderLink to="/" end>
           디지털 트윈
         </HeaderLink>
+        <HeaderLink to="/scenario-control">시스템 제어</HeaderLink>
       </nav>
 
-      <div className="relative flex h-[76px] min-w-0 flex-col items-center justify-center pb-2 max-[700px]:hidden">
+      <div className="relative flex h-[76px] min-w-0 flex-col items-center justify-center pb-2 max-[1000px]:hidden">
         <HeaderFrame />
         <div className="relative flex min-w-0 flex-col items-center gap-1.5 px-9 text-center max-[1100px]:gap-1 max-[1100px]:px-5">
           <strong className="text-[clamp(16px,1.3vw,23px)] leading-tight font-semibold whitespace-nowrap text-[#f0f5fd] [text-shadow:0_2px_6px_#010713] max-[1100px]:text-[13px]">
@@ -114,9 +119,6 @@ export default function AppHeader({ ready = true }) {
       </div>
 
       <div className="relative z-10 flex min-w-0 items-center justify-end gap-4 pr-5 pl-10 max-[1400px]:gap-3 max-[1400px]:pl-7 max-[1100px]:gap-2 max-[1100px]:pr-3 max-[1100px]:pl-3 max-[700px]:gap-1 max-[700px]:pl-1">
-        <nav className="mr-auto shrink-0" aria-label="관리자 메뉴">
-          <HeaderLink to="/scenario-control">시스템 제어</HeaderLink>
-        </nav>
         <HeaderClock />
         <button
           type="button"
@@ -136,6 +138,7 @@ export default function AppHeader({ ready = true }) {
             {incidentCount}
           </span>
         </button>
+        <UserMenu />
       </div>
     </motion.header>
   );

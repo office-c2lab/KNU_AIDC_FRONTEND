@@ -6,8 +6,10 @@ import { MotionConfig } from 'framer-motion';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import AppHeader from '../features/digital-twin/components/AppHeader.jsx';
 import NotificationsPanel from '../features/digital-twin/components/NotificationsPanel.jsx';
+import { useUserPreferencesStore } from '../stores/userPreferencesStore.js';
 export default function AppLayout() {
   const scaleClass = useInterfaceScale();
+  const reducePanelMotion = useUserPreferencesStore(state => state.reducePanelMotion);
   const location = useLocation();
   const twinMode = location.pathname === '/';
   const systemMode = location.pathname === '/scenario-control';
@@ -18,7 +20,7 @@ export default function AppLayout() {
     return () => clearInterval(interval);
   }, [advanceSimulation]);
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionConfig reducedMotion={reducePanelMotion ? 'always' : 'user'}>
       <div
         className={uiClass(
           `digital-twin-root relative overflow-hidden bg-[#071024] [scrollbar-width:thin] [scrollbar-color:#55779a_transparent] [&_*]:[scrollbar-width:thin] [&_*]:[scrollbar-color:#55779a_transparent] [&_:where(button,a[href],summary,select,label[for],input[type=button],input[type=submit],input[type=reset],input[type=checkbox],input[type=radio],[role=button],[role=tab],[role=menuitem],[role=menuitemradio],[role=menuitemcheckbox],[data-asset-modal-close],[data-scenario-focus]):not(:disabled):not([aria-disabled=true])]:cursor-pointer [&_[aria-disabled=true]]:cursor-default [&.dashboard-root]:text-dashboard-text ${scaleClass}${dashboardMode ? ' dashboard-root' : ''}`
