@@ -1,15 +1,19 @@
+import { uiClass } from '../../styles/interfaceStyles.js';
 import { useEffect, useRef } from 'react';
-
 export default function NetworkSurface({ mode, projection, onReady }) {
   const canvasRef = useRef(null);
   const surfaceRef = useRef(null);
-  const latestRef = useRef({ mode, projection });
-
+  const latestRef = useRef({
+    mode,
+    projection,
+  });
   useEffect(() => {
-    latestRef.current = { mode, projection };
+    latestRef.current = {
+      mode,
+      projection,
+    };
     surfaceRef.current?.update(latestRef.current);
   }, [mode, projection]);
-
   useEffect(() => {
     let cancelled = false;
     let surface;
@@ -58,6 +62,5 @@ export default function NetworkSurface({ mode, projection, onReady }) {
       surfaceRef.current = null;
     };
   }, [onReady]);
-
-  return <canvas ref={canvasRef} className="network-earth-surface" aria-hidden="true" />;
+  return <canvas ref={canvasRef} className={uiClass('network-earth-surface')} aria-hidden="true" />;
 }

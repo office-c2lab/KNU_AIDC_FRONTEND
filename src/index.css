@@ -1,5 +1,26 @@
 @import 'tailwindcss';
 
+@theme static {
+  --ui-empty-content: '';
+  --font-interface: 'Noto Sans KR Variable', 'Noto Sans KR', sans-serif;
+  --color-dashboard-surface: #101e32;
+  --color-dashboard-border: #324f72;
+  --color-dashboard-divider: #304a68;
+  --color-dashboard-row-divider: #2c466655;
+  --color-dashboard-heading: #e6f6ff;
+  --color-dashboard-text: #dce9f8;
+  --color-dashboard-muted: #9fb7d1;
+  --color-dashboard-normal: #73e1c0;
+  --color-dashboard-warning: #eac476;
+  --color-dashboard-fault: #ff8188;
+  --radius-dashboard-panel: 12px;
+  --radius-dashboard-instrument: 8px;
+  --spacing-dashboard-panel: 22px;
+  --spacing-dashboard-gap: 14px;
+  --spacing-dashboard-instrument: 14px;
+  --shadow-dashboard-panel: 0 12px 32px #0207144d;
+}
+
 html,
 body,
 #root {
@@ -13,40 +34,79 @@ body {
   background: #071024;
 }
 
-.digital-twin-root {
-  --ui-scale: 0.9;
-  --app-viewport-height: calc(100dvh / var(--ui-scale));
-  --app-viewport-width: calc(100vw / var(--ui-scale));
-  zoom: var(--ui-scale);
-  width: var(--app-viewport-width);
-  height: var(--app-viewport-height);
-  min-height: var(--app-viewport-height);
-  /* Keep fixed panels within the same scaled viewport as page content. */
-  transform: translateZ(0);
-}
-
 /* Fit the same panel layout to laptop screens, including short browser windows.
    The compensated viewport above keeps fixed panels and the scene aligned. */
-@media (min-width: 1101px) and (max-width: 1600px), (min-width: 1101px) and (max-height: 900px) {
-  .digital-twin-root {
-    --ui-scale: 0.84;
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
-@media (min-width: 1101px) and (max-width: 1440px), (min-width: 1101px) and (max-height: 800px) {
-  .digital-twin-root {
-    --ui-scale: 0.8;
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+    box-shadow: 0 0 3px var(--mint);
   }
 }
 
-@media (min-width: 701px) and (max-width: 1100px) {
-  .digital-twin-root {
-    --ui-scale: 0.84;
+@keyframes load {
+  50% {
+    transform: scale(0.45);
+    background: #559cfa;
+    box-shadow: 0 0 24px #559cfa;
   }
 }
 
-@media (min-width: 931px) and (max-height: 740px) {
-  .digital-twin-root {
-    --ui-scale: 0.76;
+@keyframes twin-fault-halo {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px #ff526b1f,
+      0 4px 14px #02071480;
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px #ff526b12,
+      0 0 17px #ff526b45;
+  }
+}
+
+@keyframes network-route-return {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes network-route-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+@keyframes network-route-tail {
+  from {
+    stroke-dashoffset: 3;
+  }
+  to {
+    stroke-dashoffset: -97;
+  }
+}
+
+@keyframes network-node-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  85%,
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
   }
 }

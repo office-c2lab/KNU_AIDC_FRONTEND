@@ -1,11 +1,9 @@
+import { uiClass } from '../../styles/interfaceStyles.js';
 import { useEffect, useMemo, useState } from 'react';
 import { SCENARIOS } from '../digital-twin/scene/config/scenarioConfig.js';
 import { createIncidentSelectors } from '../digital-twin/scene/systems/createIncidentSelectors.js';
-import './equipment-catalog.css';
 import { equipmentStatusLabels } from './equipmentStatus.js';
-
 const scenarioById = new Map(SCENARIOS.map(item => [item.id, item]));
-
 export default function EquipmentCatalog({
   facilityGroups,
   assets,
@@ -21,7 +19,9 @@ export default function EquipmentCatalog({
   const selectors = useMemo(
     () =>
       createIncidentSelectors({
-        clock: { elapsedTime: 0 },
+        clock: {
+          elapsedTime: 0,
+        },
         activeIncidents: new Map(incidents.map(item => [item.id, item])),
         scenarioById,
       }),
@@ -41,7 +41,6 @@ export default function EquipmentCatalog({
           ))
     ),
   }));
-
   useEffect(() => {
     let cancelled = false;
     let generator;
@@ -62,7 +61,10 @@ export default function EquipmentCatalog({
               batch[asset.id] = null;
             }
           }
-          setThumbnails(previous => ({ ...previous, ...batch }));
+          setThumbnails(previous => ({
+            ...previous,
+            ...batch,
+          }));
           if (index < assets.length) frame = requestAnimationFrame(captureBatch);
           else {
             generator.dispose();
@@ -85,14 +87,13 @@ export default function EquipmentCatalog({
       generator?.dispose();
     };
   }, [assets]);
-
   const resultCount = groups.reduce((sum, group) => sum + group.assets.length, 0);
   return (
-    <div className="equipment-catalog" aria-label="전체 층 및 시설별 설비">
-      <div className="equipment-catalog-heading">
+    <div className={uiClass('equipment-catalog')} aria-label="전체 층 및 시설별 설비">
+      <div className={uiClass('equipment-catalog-heading')}>
         <h2>{title}</h2>
         {statusFilter !== 'all' && (
-          <span className={`equipment-catalog-filter ${statusFilter}`}>
+          <span className={uiClass(`equipment-catalog-filter ${statusFilter}`)}>
             {equipmentStatusLabels[statusFilter]} 설비
           </span>
         )}
@@ -106,7 +107,7 @@ export default function EquipmentCatalog({
         .filter(group => (!query && statusFilter === 'all') || group.assets.length)
         .map(group => (
           <section
-            className="equipment-catalog-group"
+            className={uiClass('equipment-catalog-group')}
             key={group.id}
             aria-labelledby={`catalog-${group.id}`}
           >
@@ -117,7 +118,7 @@ export default function EquipmentCatalog({
                 <small>{group.assets.length}개 설비</small>
               </div>
             </header>
-            <div className="equipment-catalog-assets">
+            <div className={uiClass('equipment-catalog-assets')}>
               {group.assets.map(asset => {
                 const status = selectors.getAssetStatus(asset);
                 const tone = status === '정상' ? 'normal' : status === '주의' ? 'warning' : 'fault';
@@ -126,15 +127,15 @@ export default function EquipmentCatalog({
                     type="button"
                     key={asset.id}
                     data-asset-id={asset.id}
-                    className={`equipment-catalog-asset ${tone}`}
+                    className={uiClass(`equipment-catalog-asset ${tone}`)}
                     onClick={() => onSelectAsset(group.id, asset)}
                     aria-label={`${asset.id}, ${asset.name}, ${status}, 상세 보기`}
                   >
-                    <div className="equipment-catalog-asset-name">
+                    <div className={uiClass('equipment-catalog-asset-name')}>
                       <strong>{asset.id}</strong>
                       <small>{asset.name.replace(asset.id, '').trim() || asset.type}</small>
                     </div>
-                    <div className="equipment-catalog-model">
+                    <div className={uiClass('equipment-catalog-model')}>
                       {thumbnails[asset.id] ? (
                         <img
                           src={thumbnails[asset.id]}
@@ -151,7 +152,7 @@ export default function EquipmentCatalog({
                         </span>
                       )}
                     </div>
-                    <span className="equipment-catalog-status">
+                    <span className={uiClass('equipment-catalog-status')}>
                       <i />
                       {status}
                     </span>
@@ -159,13 +160,13 @@ export default function EquipmentCatalog({
                 );
               })}
               {!group.assets.length && (
-                <p className="equipment-catalog-empty">등록된 설비가 없습니다.</p>
+                <p className={uiClass('equipment-catalog-empty')}>등록된 설비가 없습니다.</p>
               )}
             </div>
           </section>
         ))}
       {!resultCount && (query || statusFilter !== 'all') && (
-        <p className="equipment-catalog-empty" role="status">
+        <p className={uiClass('equipment-catalog-empty')} role="status">
           {query
             ? '검색 조건과 일치하는 설비가 없습니다.'
             : `선택한 구역에 ${equipmentStatusLabels[statusFilter]} 상태의 설비가 없습니다.`}

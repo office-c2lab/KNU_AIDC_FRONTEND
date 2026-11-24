@@ -1,13 +1,12 @@
+import { uiClass } from '../../../styles/interfaceStyles.js';
 import { Bell } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { panelEntrance } from '../../../utils/panelMotion.js';
-
 const navItem =
   'nav-item relative h-16 border-0 bg-transparent px-0.5 font-semibold tracking-[0.15px] text-[#a8b9d2] transition-colors hover:text-[#f0f7ff]';
-
 const clockFormatter = new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul',
   hour: '2-digit',
@@ -15,7 +14,6 @@ const clockFormatter = new Intl.DateTimeFormat('ko-KR', {
   second: '2-digit',
   hour12: false,
 });
-
 function HeaderClock() {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -23,12 +21,16 @@ function HeaderClock() {
     return () => clearInterval(interval);
   }, []);
   return (
-    <time className="clock" id="clock" dateTime={now.toISOString()} title="한국 표준시 (KST)">
+    <time
+      className={uiClass('clock')}
+      id="clock"
+      dateTime={now.toISOString()}
+      title="한국 표준시 (KST)"
+    >
       {clockFormatter.format(now)}
     </time>
   );
 }
-
 export default function AppHeader({ ready = true }) {
   const notificationsOpen = useDigitalTwinStore(state => state.notificationsOpen);
   const setNotificationsOpen = useDigitalTwinStore(state => state.setNotificationsOpen);
@@ -36,35 +38,50 @@ export default function AppHeader({ ready = true }) {
   return (
     <>
       <motion.header
-        {...panelEntrance({ y: -96, ready })}
-        style={{ willChange: 'transform, opacity' }}
-        className="app-header fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959] max-[1250px]:grid-cols-[1fr_420px_1fr] max-[930px]:grid-cols-[1fr_330px_1fr] max-[700px]:grid-cols-[1fr_220px_1fr]"
+        {...panelEntrance({
+          y: -96,
+          ready,
+        })}
+        className={uiClass(
+          'app-header will-change-[transform,opacity] fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[1fr_520px_1fr] items-start border-b border-[#668cc556] bg-[#0c1833] shadow-[inset_0_1px_#88ade13d,0_8px_25px_#03081959]'
+        )}
       >
-        <nav className="main-nav flex h-16 items-center gap-[30px] pl-7" aria-label="사용자 메뉴">
+        <nav
+          className={uiClass('main-nav flex h-16 items-center gap-[30px] pl-7')}
+          aria-label="사용자 메뉴"
+        >
           <NavLink
             to="/dashboard"
-            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
+            className={({ isActive }) =>
+              uiClass(`${navItem}${isActive ? ' active' : ''} flex items-center`)
+            }
           >
             대시보드
           </NavLink>
           <NavLink
             to="/ai-network"
-            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
+            className={({ isActive }) =>
+              uiClass(`${navItem}${isActive ? ' active' : ''} flex items-center`)
+            }
           >
             AI 통신 지도
           </NavLink>
           <NavLink
             to="/"
             end
-            className={({ isActive }) => `${navItem}${isActive ? ' active' : ''} flex items-center`}
+            className={({ isActive }) =>
+              uiClass(`${navItem}${isActive ? ' active' : ''} flex items-center`)
+            }
           >
             디지털 트윈
           </NavLink>
         </nav>
-        <div className="system-title relative grid h-[66px] place-items-center text-center">
-          <span className="title-ticks left" aria-hidden="true"></span>
+        <div
+          className={uiClass('system-title relative grid h-[66px] place-items-center text-center')}
+        >
+          <span className={uiClass('title-ticks left')} aria-hidden="true"></span>
           <svg
-            className="title-frame"
+            className={uiClass('title-frame')}
             aria-hidden="true"
             viewBox="0 0 600 76"
             preserveAspectRatio="none"
@@ -143,23 +160,27 @@ export default function AppHeader({ ready = true }) {
             />
             <path fill="none" stroke="#ffe1a0" strokeOpacity=".95" d="M265 65H335" />
           </svg>
-          <div className="title-copy relative pb-0.5">
-            <strong className="text-sm font-semibold tracking-[0.65px]">
+          <div className={uiClass('title-copy relative pb-0.5')}>
+            <strong className={uiClass('text-sm font-semibold tracking-[0.65px]')}>
               KNU AIDC Infrastructure Management System
             </strong>
-            <small className="mt-1.5 block text-[9px] tracking-[2.4px] text-[#aac9ef]">
+            <small className={uiClass('mt-1.5 block text-[9px] tracking-[2.4px] text-[#aac9ef]')}>
               3D DIGITAL TWIN CONTROL CENTER
             </small>
           </div>
-          <span className="title-ticks right" aria-hidden="true"></span>
+          <span className={uiClass('title-ticks right')} aria-hidden="true"></span>
         </div>
 
-        <div className="header-tools flex h-16 items-center justify-end gap-[18px] pr-7 text-[#9dafc4]">
-          <nav className="admin-nav flex h-16 items-center" aria-label="관리자 메뉴">
+        <div
+          className={uiClass(
+            'header-tools flex h-16 items-center justify-end gap-[18px] pr-7 text-[#9dafc4]'
+          )}
+        >
+          <nav className={uiClass('admin-nav flex h-16 items-center')} aria-label="관리자 메뉴">
             <NavLink
               to="/scenario-control"
               className={({ isActive }) =>
-                `${navItem}${isActive ? ' active' : ''} flex items-center`
+                uiClass(`${navItem}${isActive ? ' active' : ''} flex items-center`)
               }
             >
               시스템 제어
@@ -168,7 +189,9 @@ export default function AppHeader({ ready = true }) {
           <HeaderClock />
           <button
             type="button"
-            className="tool-icon relative grid h-[29px] w-[29px] place-items-center rounded-sm border border-[#3a5279] bg-[#16243d] text-[#bdd3ed]"
+            className={uiClass(
+              'tool-icon relative grid h-[29px] w-[29px] place-items-center rounded-[3px] border border-[#3a5279] bg-[#16243d] text-[#bdd3ed]'
+            )}
             id="header-alarm"
             aria-expanded={notificationsOpen}
             aria-controls="notifications-panel"
@@ -177,7 +200,7 @@ export default function AppHeader({ ready = true }) {
             aria-label="알림 및 이벤트 보기"
           >
             <Bell size={16} aria-hidden="true" />
-            <span className="badge" id="header-alarm-count">
+            <span className={uiClass('badge')} id="header-alarm-count">
               {incidentCount}
             </span>
           </button>

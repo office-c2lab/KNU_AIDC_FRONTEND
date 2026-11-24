@@ -1,5 +1,5 @@
+import { uiClass } from '../../styles/interfaceStyles.js';
 import { useEffect, useRef, useState } from 'react';
-
 export default function EquipmentLocationPreview({ source, asset }) {
   const canvasRef = useRef(null);
   const viewerRef = useRef(null);
@@ -45,9 +45,9 @@ export default function EquipmentLocationPreview({ source, asset }) {
     };
   }, [source]);
   return (
-    <div className="equipment-location-preview">
+    <div className={uiClass('equipment-location-preview')}>
       <div
-        className="equipment-location-canvas"
+        className={uiClass('equipment-location-canvas')}
         ref={canvasRef}
         aria-label={`${asset.name}의 실제 배치와 위치 핀을 보여주는 3D 층 미니어처. 드래그로 회전할 수 있습니다.`}
       />

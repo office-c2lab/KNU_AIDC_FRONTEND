@@ -1,11 +1,10 @@
+import { uiClass } from '../../styles/interfaceStyles.js';
 import { useEffect, useRef, useState } from 'react';
-
 export default function EquipmentModelPreview({ asset, onLayout }) {
   const canvasRef = useRef(null);
   const viewerRef = useRef(null);
   const assetIdRef = useRef(asset.id);
   const [state, setState] = useState('loading');
-
   useEffect(() => {
     assetIdRef.current = asset.id;
     const frame = requestAnimationFrame(() => {
@@ -19,7 +18,6 @@ export default function EquipmentModelPreview({ asset, onLayout }) {
     });
     return () => cancelAnimationFrame(frame);
   }, [asset.id]);
-
   useEffect(() => {
     let cancelled = false;
     import('./createEquipmentPreview.js')
@@ -45,11 +43,10 @@ export default function EquipmentModelPreview({ asset, onLayout }) {
       viewerRef.current = null;
     };
   }, [onLayout]);
-
   return (
-    <div className="equipment-model-preview">
+    <div className={uiClass('equipment-model-preview')}>
       <div
-        className="equipment-model-canvas"
+        className={uiClass('equipment-model-canvas')}
         ref={canvasRef}
         aria-label={`${asset.name} 3D 모델. 드래그로 회전, 휠로 확대할 수 있습니다.`}
       />

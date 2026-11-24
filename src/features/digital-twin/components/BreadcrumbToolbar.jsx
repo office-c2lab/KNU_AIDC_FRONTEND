@@ -1,20 +1,18 @@
+import { uiClass } from '../../../styles/interfaceStyles.js';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChevronDown, ChevronRight, House, RotateCcw, RotateCw } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { panelEntrance } from '../../../utils/panelMotion.js';
-
 const chip = 'chip control-menu-trigger';
 const menuItem = 'control-menu-item';
-
 function Menu({ id, label, summary, openMenu, setOpenMenu, children }) {
   const isOpen = openMenu === id;
-
   return (
-    <div className="control-menu">
+    <div className={uiClass('control-menu')}>
       <button
         type="button"
-        className={`${chip}${isOpen ? ' active' : ''}`}
+        className={uiClass(`${chip}${isOpen ? ' active' : ''}`)}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-controls={`${id}-menu`}
@@ -25,7 +23,7 @@ function Menu({ id, label, summary, openMenu, setOpenMenu, children }) {
         <ChevronDown size={13} aria-hidden="true" />
       </button>
       <div
-        className="control-menu-popover"
+        className={uiClass('control-menu-popover')}
         id={`${id}-menu`}
         role="menu"
         aria-label={label}
@@ -37,11 +35,9 @@ function Menu({ id, label, summary, openMenu, setOpenMenu, children }) {
     </div>
   );
 }
-
 function SelectedMark({ selected }) {
   return selected ? <Check size={13} aria-hidden="true" /> : <span aria-hidden="true" />;
 }
-
 export default function BreadcrumbToolbar({ ready = true }) {
   const [openMenu, setOpenMenu] = useState(null);
   const toolbarRef = useRef(null);
@@ -50,7 +46,6 @@ export default function BreadcrumbToolbar({ ready = true }) {
   const autoRotate = useDigitalTwinStore(state => state.autoRotate);
   const highQuality = useDigitalTwinStore(state => state.highQuality);
   const splitLabels = ['기본', '분리 1단계', '분리 2단계'];
-
   useEffect(() => {
     if (!openMenu) return undefined;
     const closeOnOutsideClick = event => {
@@ -69,19 +64,25 @@ export default function BreadcrumbToolbar({ ready = true }) {
       document.removeEventListener('keydown', closeOnEscape);
     };
   }, [openMenu]);
-
   return (
-    <motion.div {...panelEntrance({ y: -16, delay: 1.44, ready })} className="breadcrumbs">
-      <div className="crumb-path">
+    <motion.div
+      {...panelEntrance({
+        y: -16,
+        delay: 1.44,
+        ready,
+      })}
+      className={uiClass('breadcrumbs')}
+    >
+      <div className={uiClass('crumb-path')}>
         <House size={14} aria-hidden="true" />
-        <ChevronRight className="sep" size={12} aria-hidden="true" />
+        <ChevronRight className={uiClass('sep')} size={12} aria-hidden="true" />
         <span>KNU AIDC</span>
-        <ChevronRight className="sep" size={12} aria-hidden="true" />
+        <ChevronRight className={uiClass('sep')} size={12} aria-hidden="true" />
         <b id="crumb-current">시설 전체</b>
       </div>
       <div
         ref={toolbarRef}
-        className="view-actions"
+        className={uiClass('view-actions')}
         role="toolbar"
         aria-label="시설 층 배치, 시점 및 보기 설정"
       >
@@ -97,7 +98,7 @@ export default function BreadcrumbToolbar({ ready = true }) {
             return (
               <button
                 type="button"
-                className={`${menuItem}${selected ? ' active' : ''}`}
+                className={uiClass(`${menuItem}${selected ? ' active' : ''}`)}
                 data-split-level={level}
                 aria-pressed={selected}
                 role="menuitemradio"
@@ -118,13 +119,13 @@ export default function BreadcrumbToolbar({ ready = true }) {
           openMenu={openMenu}
           setOpenMenu={setOpenMenu}
         >
-          <button type="button" className={menuItem} id="topChip" role="menuitem">
+          <button type="button" className={uiClass(menuItem)} id="topChip" role="menuitem">
             <span aria-hidden="true" />
             <span>위에서 보기</span>
           </button>
           <button
             type="button"
-            className={`${menuItem}${autoRotate ? ' active' : ''}`}
+            className={uiClass(`${menuItem}${autoRotate ? ' active' : ''}`)}
             id="btn-auto"
             aria-pressed={autoRotate}
             role="menuitemcheckbox"
@@ -133,7 +134,7 @@ export default function BreadcrumbToolbar({ ready = true }) {
             <RotateCw size={13} aria-hidden="true" />
             <span>자동 회전</span>
           </button>
-          <button type="button" className={menuItem} id="btn-view-reset" role="menuitem">
+          <button type="button" className={uiClass(menuItem)} id="btn-view-reset" role="menuitem">
             <RotateCcw size={13} aria-hidden="true" />
             <span>시점 초기화</span>
           </button>
@@ -148,7 +149,7 @@ export default function BreadcrumbToolbar({ ready = true }) {
         >
           <button
             type="button"
-            className={`${menuItem}${!highQuality ? ' active' : ''}`}
+            className={uiClass(`${menuItem}${!highQuality ? ' active' : ''}`)}
             id="quality-low"
             data-quality="low"
             aria-pressed={!highQuality}
@@ -160,7 +161,7 @@ export default function BreadcrumbToolbar({ ready = true }) {
           </button>
           <button
             type="button"
-            className={`${menuItem}${highQuality ? ' active' : ''}`}
+            className={uiClass(`${menuItem}${highQuality ? ' active' : ''}`)}
             id="quality-high"
             data-quality="high"
             aria-pressed={highQuality}

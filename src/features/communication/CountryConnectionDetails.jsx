@@ -1,12 +1,15 @@
+import { uiClass } from '../../styles/interfaceStyles.js';
 import { useRef } from 'react';
 import DetailBackNavigation from '../../components/DetailBackNavigation.jsx';
 import ConnectionSummaryList from './ConnectionSummaryList.jsx';
 import { connections, origin, getConnectionStatus } from './networkData.js';
 import { connectionHistory, formatHistoryTime } from './networkHistory.js';
-
 const sitesById = new Map(connections.map(site => [site.id, site]));
-const flowNames = { inbound: '수신', outbound: '송신', bidirectional: '송수신' };
-
+const flowNames = {
+  inbound: '수신',
+  outbound: '송신',
+  bidirectional: '송수신',
+};
 export default function CountryConnectionDetails({
   country,
   sites,
@@ -37,7 +40,6 @@ export default function CountryConnectionDetails({
       ? `${selected.city} → ${origin.city}`
       : `${origin.city} ${selected.flow === 'bidirectional' ? '↔' : '→'} ${selected.city}`
     : null;
-
   if (!site) {
     return (
       <ConnectionSummaryList
@@ -45,7 +47,10 @@ export default function CountryConnectionDetails({
         sites={scope}
         onOverview={onOverview}
         onSelect={target => {
-          listOrigin.current = { siteId: target.id, countryCode: country?.properties.code ?? null };
+          listOrigin.current = {
+            siteId: target.id,
+            countryCode: country?.properties.code ?? null,
+          };
           onSelect(target);
         }}
       />
@@ -58,27 +63,38 @@ export default function CountryConnectionDetails({
     if (fromCard && !previous.countryCode) onOverview();
     else onCountry(fromCard ? previous.countryCode : country.properties.code);
   };
-
   return (
-    <aside className="network-detail network-info-panel" aria-label="AI 통신 현황 및 이력">
+    <aside
+      className={uiClass('network-detail network-info-panel')}
+      aria-label="AI 통신 현황 및 이력"
+    >
       <header>
-        <div className="network-detail-place-heading">
+        <div className={uiClass('network-detail-place-heading')}>
           <h2>{site.city}</h2>
           <span>
             {site.country} · {site.region}
           </span>
         </div>
-        <span className="network-activity-status" style={{ color: status.color }}>
-          <i style={{ background: status.color }} />
+        <span
+          className={uiClass('network-activity-status')}
+          style={{
+            color: status.color,
+          }}
+        >
+          <i
+            style={{
+              background: status.color,
+            }}
+          />
           {status.label}
         </span>
       </header>
       <DetailBackNavigation onBack={backToList} label="통신 상세 탐색">
         통신 목록으로 돌아가기
       </DetailBackNavigation>
-      <div className="network-activity-summary">
+      <div className={uiClass('network-activity-summary')}>
         {selected ? (
-          <dl className="network-activity-facts">
+          <dl className={uiClass('network-activity-facts')}>
             {[
               ['서비스', selected.service],
               ['통신 경로', route],
@@ -92,7 +108,7 @@ export default function CountryConnectionDetails({
             ))}
           </dl>
         ) : (
-          <div className="network-activity-metrics">
+          <div className={uiClass('network-activity-metrics')}>
             <div>
               <span>통신 지점</span>
               <strong>
@@ -103,7 +119,9 @@ export default function CountryConnectionDetails({
             <div>
               <span>통신 이상</span>
               <strong
-                style={{ color: errorCount ? getConnectionStatus('error').color : undefined }}
+                style={{
+                  color: errorCount ? getConnectionStatus('error').color : undefined,
+                }}
               >
                 {errorCount}
                 <small>곳</small>
@@ -112,31 +130,44 @@ export default function CountryConnectionDetails({
           </div>
         )}
         {originFocused && (
-          <p className="network-activity-origin">{origin.name} · 출발지의 전체 송수신 이력</p>
+          <p className={uiClass('network-activity-origin')}>
+            {origin.name} · 출발지의 전체 송수신 이력
+          </p>
         )}
       </div>
-      <section className="network-history" aria-label="최근 통신 이력">
+      <section className={uiClass('network-history')} aria-label="최근 통신 이력">
         <header>
           <h3>최근 통신</h3>
           <span>최근 {history.length}건</span>
         </header>
         {history.length ? (
-          <ol className="network-history-list">
+          <ol className={uiClass('network-history-list')}>
             {history.map(event => {
               const target = sitesById.get(event.connectionId);
               const eventStatus = getConnectionStatus(event.status);
               return (
-                <li key={event.id} style={{ '--event-color': eventStatus.color }}>
+                <li
+                  key={event.id}
+                  style={{
+                    '--event-color': eventStatus.color,
+                  }}
+                >
                   <button
                     type="button"
                     onClick={() => onSelect(target)}
                     aria-label={`${target.city} ${event.title} 상세`}
                   >
-                    <div className="network-history-event-top">
+                    <div className={uiClass('network-history-event-top')}>
                       <time dateTime={formatHistoryTime(event.time)}>
                         {formatHistoryTime(event.time)}
                       </time>
-                      <span style={{ color: eventStatus.color }}>{event.title}</span>
+                      <span
+                        style={{
+                          color: eventStatus.color,
+                        }}
+                      >
+                        {event.title}
+                      </span>
                     </div>
                     <strong>{event.route}</strong>
                     <p>{event.detail}</p>
@@ -151,7 +182,7 @@ export default function CountryConnectionDetails({
             })}
           </ol>
         ) : (
-          <p className="network-empty">등록된 통신 이력이 없습니다.</p>
+          <p className={uiClass('network-empty')}>등록된 통신 이력이 없습니다.</p>
         )}
       </section>
     </aside>

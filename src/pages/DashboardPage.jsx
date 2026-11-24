@@ -1,3 +1,4 @@
+import { uiClass } from '../styles/interfaceStyles.js';
 import ScenarioFacilitySidebar from '../features/dashboard/ScenarioFacilitySidebar.jsx';
 import DetailBackNavigation from '../components/DetailBackNavigation.jsx';
 import EquipmentOverview from '../features/dashboard/EquipmentOverview.jsx';
@@ -7,22 +8,43 @@ import { useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
-import '../features/dashboard/dashboard.css';
 import { panelEntrance } from '../utils/panelMotion.js';
 import { createIncidentSelectors } from '../features/digital-twin/scene/systems/createIncidentSelectors.js';
 import { equipmentStatusKey } from '../features/dashboard/equipmentStatus.js';
-
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
 const steps = ['감지', '확인', '원인 분석', '복구 조치', '정상 확인'];
 const facilityGroups = [
-  { id: '4F', name: '통합 관제층', matches: asset => asset.floor === '4F' },
-  { id: '3F', name: 'AI / GPU 전산층', matches: asset => asset.floor === '3F' },
-  { id: '2F', name: '일반 서버 전산층', matches: asset => asset.floor === '2F' },
-  { id: '1F', name: '보안·통신·장비 반입', matches: asset => asset.floor === '1F' },
-  { id: 'P', name: '전력 설비동', matches: asset => !asset.floor && asset.zone === 'power' },
-  { id: 'C', name: '냉각 설비동', matches: asset => !asset.floor && asset.zone === 'cooling' },
+  {
+    id: '4F',
+    name: '통합 관제층',
+    matches: asset => asset.floor === '4F',
+  },
+  {
+    id: '3F',
+    name: 'AI / GPU 전산층',
+    matches: asset => asset.floor === '3F',
+  },
+  {
+    id: '2F',
+    name: '일반 서버 전산층',
+    matches: asset => asset.floor === '2F',
+  },
+  {
+    id: '1F',
+    name: '보안·통신·장비 반입',
+    matches: asset => asset.floor === '1F',
+  },
+  {
+    id: 'P',
+    name: '전력 설비동',
+    matches: asset => !asset.floor && asset.zone === 'power',
+  },
+  {
+    id: 'C',
+    name: '냉각 설비동',
+    matches: asset => !asset.floor && asset.zone === 'cooling',
+  },
 ];
-
 export default function DashboardPage() {
   const incidents = useDigitalTwinStore(state => state.incidents);
   const chosenScenarioId = useDigitalTwinStore(state => state.chosenScenarioId);
@@ -32,7 +54,6 @@ export default function DashboardPage() {
   const endIncident = useDigitalTwinStore(state => state.endIncident);
   const resetIncidents = useDigitalTwinStore(state => state.resetIncidents);
   const selectVisualization = useDigitalTwinStore(state => state.selectVisualization);
-
   const [selectedFacilityId, setSelectedFacilityId] = useState('all');
   const overview = selectedFacilityId === 'all';
   const [facilityListMode, setFacilityListMode] = useState(false);
@@ -64,10 +85,11 @@ export default function DashboardPage() {
     ? incidents.find(incident => incident.id === selected.id)
     : null;
   const runningIds = useMemo(() => new Set(incidents.map(incident => incident.id)), [incidents]);
-
   const assetStatuses = useMemo(() => {
     const selectors = createIncidentSelectors({
-      clock: { elapsedTime: 0 },
+      clock: {
+        elapsedTime: 0,
+      },
       activeIncidents: new Map(incidents.map(incident => [incident.id, incident])),
       scenarioById,
     });
@@ -76,7 +98,12 @@ export default function DashboardPage() {
     );
   }, [assetCatalog, incidents]);
   const liveSummary = useMemo(() => {
-    const summary = { total: assetCatalog.length, normal: 0, warning: 0, fault: 0 };
+    const summary = {
+      total: assetCatalog.length,
+      normal: 0,
+      warning: 0,
+      fault: 0,
+    };
     assetStatuses.forEach(status => summary[status]++);
     return summary;
   }, [assetCatalog.length, assetStatuses]);
@@ -87,7 +114,6 @@ export default function DashboardPage() {
       ),
     [assetCatalog, assetStatuses, statusFilter]
   );
-
   const startSelectedScenario = () => {
     if (!selected) return;
     runIncident(selected.id);
@@ -95,13 +121,14 @@ export default function DashboardPage() {
       selectVisualization(selected.mode, true);
     }
   };
-
   const selectAsset = asset => {
     setSelectedAssetId(asset.id);
     const scenario = SCENARIOS.find(item => item.asset === asset.id);
-    if (scenario) setScenarioState({ chosenScenarioId: scenario.id });
+    if (scenario)
+      setScenarioState({
+        chosenScenarioId: scenario.id,
+      });
   };
-
   const openAsset = (facilityId, asset) => {
     if (showCatalog) {
       setCatalogReturn({
@@ -124,9 +151,12 @@ export default function DashboardPage() {
     setSelectedFacilityId(facilityId);
     setExpandedFacilityId(facilityId);
     selectAsset(asset);
-    requestAnimationFrame(() => workspaceRef.current?.scrollTo({ top: 0 }));
+    requestAnimationFrame(() =>
+      workspaceRef.current?.scrollTo({
+        top: 0,
+      })
+    );
   };
-
   const backToCatalog = () => {
     setSelectedFacilityId(catalogReturn.facilityId);
     setFacilityListMode(true);
@@ -134,14 +164,17 @@ export default function DashboardPage() {
     setExpandedFacilityId(catalogReturn.expandedFacilityId);
     setStatusFilter(catalogReturn.statusFilter);
     requestAnimationFrame(() => {
-      workspaceRef.current?.scrollTo({ top: catalogReturn.scrollTop });
+      workspaceRef.current?.scrollTo({
+        top: catalogReturn.scrollTop,
+      });
       const card = [...(workspaceRef.current?.querySelectorAll('[data-asset-id]') ?? [])].find(
         element => element.dataset.assetId === selectedAssetId
       );
-      card?.focus({ preventScroll: true });
+      card?.focus({
+        preventScroll: true,
+      });
     });
   };
-
   const focusIncident = incident => {
     const scenario = scenarioById.get(incident.id);
     const asset = assetCatalog.find(item => item.id === scenario?.asset);
@@ -160,18 +193,22 @@ export default function DashboardPage() {
     setExpandedFacilityId(facility.id);
     setSelectedFacilityId(facility.id);
     setSelectedAssetId(asset.id);
-    setScenarioState({ chosenScenarioId: scenario.id, selectedIncidentId: incident.id });
+    setScenarioState({
+      chosenScenarioId: scenario.id,
+      selectedIncidentId: incident.id,
+    });
     requestAnimationFrame(() => {
-      workspaceRef.current?.scrollTo({ top: 0 });
-      facilityRef.current
-        ?.querySelector('.scenario-facility-assets .selected')
-        ?.scrollIntoView({ block: 'nearest' });
+      workspaceRef.current?.scrollTo({
+        top: 0,
+      });
+      facilityRef.current?.querySelector('.scenario-facility-assets .selected')?.scrollIntoView({
+        block: 'nearest',
+      });
     });
   };
-
   return (
-    <main className="dashboard-main">
-      <div className={`dashboard-grid${showCatalog ? ' catalog-mode' : ''}`}>
+    <main className={uiClass('dashboard-main')}>
+      <div className={uiClass(`dashboard-grid${showCatalog ? ' catalog-mode' : ''}`)}>
         <ScenarioFacilitySidebar
           facilityGroups={facilityGroups}
           assetCatalog={statusFilteredAssets}
@@ -183,7 +220,11 @@ export default function DashboardPage() {
             setFacilitySearch('');
             setExpandedFacilityId(null);
             setFacilityListMode(true);
-            requestAnimationFrame(() => workspaceRef.current?.scrollTo({ top: 0 }));
+            requestAnimationFrame(() =>
+              workspaceRef.current?.scrollTo({
+                top: 0,
+              })
+            );
           }}
           selectedAssetId={showCatalog ? null : selectedAsset?.id}
           selectedFacilityId={selectedFacilityId}
@@ -196,25 +237,36 @@ export default function DashboardPage() {
           overview={overview}
           onShowOverview={() => {
             setSelectedFacilityId('all');
-            requestAnimationFrame(() => workspaceRef.current?.scrollTo({ top: 0 }));
+            requestAnimationFrame(() =>
+              workspaceRef.current?.scrollTo({
+                top: 0,
+              })
+            );
           }}
           onSelectAsset={openAsset}
           onSelectFacility={facilityId => {
             setSelectedFacilityId(facilityId);
             setFacilityListMode(true);
-            requestAnimationFrame(() => workspaceRef.current?.scrollTo({ top: 0 }));
+            requestAnimationFrame(() =>
+              workspaceRef.current?.scrollTo({
+                top: 0,
+              })
+            );
           }}
         />
         <motion.section
-          {...panelEntrance({ y: 20, delay: 0.96 })}
-          className="scenario-workspace flex min-h-0 min-w-0 flex-col overflow-hidden"
+          {...panelEntrance({
+            y: 20,
+            delay: 0.96,
+          })}
+          className={uiClass('scenario-workspace flex min-h-0 min-w-0 flex-col overflow-hidden')}
           aria-label={
             showCatalog
               ? `${overview ? '전체 층 및 시설별' : selectedFacility?.name} 설비`
               : '선택 설비 상세'
           }
         >
-          <div className="scenario-workspace-scroll" ref={workspaceRef}>
+          <div className={uiClass('scenario-workspace-scroll')} ref={workspaceRef}>
             {showCatalog ? (
               <EquipmentCatalog
                 facilityGroups={
@@ -241,19 +293,22 @@ export default function DashboardPage() {
                   asset={selectedAsset}
                   stage={selectedIncident ? steps[selectedIncident.stage] : null}
                 />
-                <div className="scenario-operation-grid">
+                <div className={uiClass('scenario-operation-grid')}>
                   {selected ? (
                     <motion.section
-                      {...panelEntrance({ y: 22, delay: 0.12 })}
-                      className="scenario-runner"
+                      {...panelEntrance({
+                        y: 22,
+                        delay: 0.12,
+                      })}
+                      className={uiClass('scenario-runner')}
                       aria-labelledby="scenario-runner-title"
                     >
                       <h2 id="scenario-runner-title">시나리오 실행</h2>
-                      <div className="scenario-runner-name">
+                      <div className={uiClass('scenario-runner-name')}>
                         <h3>{selected.title.replace(selected.asset, '').trim()}</h3>
                         <span>시나리오 등급 · {selected.level}</span>
                       </div>
-                      <dl className="scenario-runner-summary">
+                      <dl className={uiClass('scenario-runner-summary')}>
                         <div>
                           <dt>장애 상황</dt>
                           <dd>{selected.condition}</dd>
@@ -263,7 +318,7 @@ export default function DashboardPage() {
                           <dd>{selected.impact}</dd>
                         </div>
                       </dl>
-                      <div className="scenario-runner-procedure">
+                      <div className={uiClass('scenario-runner-procedure')}>
                         <h3>점검 절차</h3>
                         <p>{selected.cause}</p>
                         <ol>
@@ -274,11 +329,11 @@ export default function DashboardPage() {
                           ))}
                         </ol>
                       </div>
-                      <div className="scenario-runner-footer">
+                      <div className={uiClass('scenario-runner-footer')}>
                         {selectedIncident ? (
                           <button
                             type="button"
-                            className="scenario-runner-action stop"
+                            className={uiClass('scenario-runner-action stop')}
                             onClick={() => endIncident(selected.id)}
                           >
                             시나리오 종료
@@ -286,7 +341,7 @@ export default function DashboardPage() {
                         ) : (
                           <button
                             type="button"
-                            className="scenario-runner-action"
+                            className={uiClass('scenario-runner-action')}
                             onClick={startSelectedScenario}
                           >
                             시나리오 실행
@@ -295,7 +350,7 @@ export default function DashboardPage() {
                       </div>
                     </motion.section>
                   ) : (
-                    <div className="asset-control-unavailable">
+                    <div className={uiClass('asset-control-unavailable')}>
                       이 설비에는 실행 가능한 가상 장애 시나리오가 등록되어 있지 않습니다.
                     </div>
                   )}
@@ -307,19 +362,22 @@ export default function DashboardPage() {
         </motion.section>
 
         {!showCatalog && (
-          <div className="dashboard-side-stack">
+          <div className={uiClass('dashboard-side-stack')}>
             <motion.section
-              {...panelEntrance({ x: 24, delay: 0.1 })}
-              className="dashboard-panel active-scenarios"
+              {...panelEntrance({
+                x: 24,
+                delay: 0.1,
+              })}
+              className={uiClass('dashboard-panel active-scenarios')}
               aria-labelledby="active-heading"
             >
-              <header className="dashboard-panel-heading">
+              <header className={uiClass('dashboard-panel-heading')}>
                 <div>
                   <h2 id="active-heading">진행 중 시나리오</h2>
                 </div>
                 <b>{incidents.length}건</b>
               </header>
-              <div className="active-scenario-list">
+              <div className={uiClass('active-scenario-list')}>
                 {incidents.length ? (
                   incidents.map(incident => {
                     const scenario = scenarioById.get(incident.id);
@@ -328,18 +386,20 @@ export default function DashboardPage() {
                       <article key={incident.id} aria-label={scenario.title}>
                         <button
                           type="button"
-                          className={`active-scenario-summary${selectedAsset?.id === scenario.asset ? ' selected' : ''}`}
+                          className={uiClass(
+                            `active-scenario-summary${selectedAsset?.id === scenario.asset ? ' selected' : ''}`
+                          )}
                           aria-pressed={selectedAsset?.id === scenario.asset}
                           aria-label={`${scenario.title}, ${scenario.asset} 설비 보기`}
                           onClick={() => focusIncident(incident)}
                         >
-                          <div className="active-scenario-title-row">
+                          <div className={uiClass('active-scenario-title-row')}>
                             <strong>{scenario.title.replace(scenario.asset, '').trim()}</strong>
-                            <span className="active-scenario-state">
+                            <span className={uiClass('active-scenario-state')}>
                               {scenario.status} · {scenario.level}
                             </span>
                           </div>
-                          <div className="active-scenario-summary-meta">
+                          <div className={uiClass('active-scenario-summary-meta')}>
                             <small>
                               {scenario.asset} · {steps[incident.stage]}
                             </small>
@@ -357,11 +417,15 @@ export default function DashboardPage() {
                     );
                   })
                 ) : (
-                  <p className="dashboard-empty">현재 진행 중인 장애가 없습니다.</p>
+                  <p className={uiClass('dashboard-empty')}>현재 진행 중인 장애가 없습니다.</p>
                 )}
               </div>
               {incidents.length > 0 && (
-                <button type="button" className="reset-scenarios" onClick={() => resetIncidents()}>
+                <button
+                  type="button"
+                  className={uiClass('reset-scenarios')}
+                  onClick={() => resetIncidents()}
+                >
                   모든 시나리오 종료
                 </button>
               )}

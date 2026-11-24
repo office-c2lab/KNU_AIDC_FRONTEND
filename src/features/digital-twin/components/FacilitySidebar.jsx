@@ -1,3 +1,4 @@
+import { uiClass } from '../../../styles/interfaceStyles.js';
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
@@ -14,7 +15,6 @@ import {
   panelScroll,
   subTitle,
 } from './uiStyles.js';
-
 export default function FacilitySidebar({ ready = true }) {
   const assets = useDigitalTwinStore(state => state.assetCatalog);
   const incidents = useDigitalTwinStore(state => state.incidents);
@@ -29,25 +29,29 @@ export default function FacilitySidebar({ ready = true }) {
   return (
     <>
       <motion.aside
-        {...panelEntrance({ x: -28, y: 0, delay: 0.48, ready })}
-        style={{ willChange: 'transform, opacity' }}
-        className={`${panelBase} left-panel left-[26px]`}
+        {...panelEntrance({
+          x: -28,
+          y: 0,
+          delay: 0.48,
+          ready,
+        })}
+        className={uiClass(`${panelBase} will-change-[transform,opacity] left-panel left-[26px]`)}
         aria-label="시설 현황 및 층 탐색"
       >
-        <div className={panelScroll}>
-          <section className="facility-section" aria-labelledby="facility-heading">
-            <div className={subTitle}>
+        <div className={uiClass(panelScroll)}>
+          <section className={uiClass('facility-section')} aria-labelledby="facility-heading">
+            <div className={uiClass(subTitle)}>
               <h2 id="facility-heading">전력 사용 효율</h2>
             </div>
-            <div className={`${instrumentCard} pue-scale-card`}>
-              <div className="pue-scale-value">
+            <div className={uiClass(`${instrumentCard} pue-scale-card`)}>
+              <div className={uiClass('pue-scale-value')}>
                 <strong aria-label={`추정 PUE ${pueText}`}>{pueText}</strong>
-                <span className={moduleReadout}>가상 추정 PUE</span>
+                <span className={uiClass(moduleReadout)}>가상 추정 PUE</span>
               </div>
               {pue !== null ? (
                 <>
                   <div
-                    className="pue-scale"
+                    className={uiClass('pue-scale')}
                     role="meter"
                     aria-label="전력 사용 효율 PUE"
                     aria-valuemin={1}
@@ -58,45 +62,50 @@ export default function FacilitySidebar({ ready = true }) {
                       '--pue-position': `${Math.min(100, Math.max(0, ((pue - 1) / (pueMax - 1)) * 100))}%`,
                     }}
                   >
-                    <div className="pue-scale-track" aria-hidden="true">
+                    <div className={uiClass('pue-scale-track')} aria-hidden="true">
                       <span></span>
                       <span></span>
                       <span></span>
                       <span></span>
                     </div>
-                    <span className="pue-scale-marker" aria-hidden="true"></span>
+                    <span className={uiClass('pue-scale-marker')} aria-hidden="true"></span>
                   </div>
-                  <div className="pue-scale-labels" aria-hidden="true">
+                  <div className={uiClass('pue-scale-labels')} aria-hidden="true">
                     <span>1.0 · 효율적</span>
                     <span>{pueMax.toFixed(1)} · 비효율적</span>
                   </div>
                 </>
               ) : (
-                <p className="pue-scale-note">IT 부하가 없어 산출할 수 없습니다.</p>
+                <p className={uiClass('pue-scale-note')}>IT 부하가 없어 산출할 수 없습니다.</p>
               )}
-              <p className="pue-scale-note">총 소비 전력 ÷ IT 소비 전력 · 가상 데이터</p>
+              <p className={uiClass('pue-scale-note')}>총 소비 전력 ÷ IT 소비 전력 · 가상 데이터</p>
             </div>
           </section>
 
-          <section className="power-section" aria-labelledby="power-heading">
-            <div className={subTitle}>
+          <section className={uiClass('power-section')} aria-labelledby="power-heading">
+            <div className={uiClass(subTitle)}>
               <h2 id="power-heading">전력 사용 현황</h2>
-              <span className={moduleReadout}>
-                <span className="power-total-label">총 전력</span>
+              <span className={uiClass(moduleReadout)}>
+                <span className={uiClass('power-total-label')}>총 전력</span>
                 <strong>{power.totalKw.toFixed(2)}</strong>
-                <span className="unit">kW</span>
+                <span className={uiClass('unit')}>kW</span>
               </span>
             </div>
-            <div className={`${instrumentCard} power-list`} aria-label="분류별 소비 전력, 단위 kW">
+            <div
+              className={uiClass(`${instrumentCard} power-list`)}
+              aria-label="분류별 소비 전력, 단위 kW"
+            >
               {power.rows.map(row => (
-                <div className="power-row" key={row.id}>
+                <div className={uiClass('power-row')} key={row.id}>
                   <span>{row.label}</span>
                   <div
-                    className={`bar ${row.tone}`}
-                    style={{ '--load': `${row.share}%` }}
+                    className={uiClass(`bar ${row.tone}`)}
+                    style={{
+                      '--load': `${row.share}%`,
+                    }}
                     aria-hidden="true"
                   >
-                    <div className="bar-track">
+                    <div className={uiClass('bar-track')}>
                       <i></i>
                     </div>
                   </div>
@@ -107,73 +116,81 @@ export default function FacilitySidebar({ ready = true }) {
           </section>
 
           <section aria-labelledby="floor-heading">
-            <div className={subTitle}>
+            <div className={uiClass(subTitle)}>
               <h2 id="floor-heading">층별 현황</h2>
             </div>
-            <div className={floorList} id="floor-list">
-              <button type="button" className={floorButton} data-floor="4F">
-                <span className={floorNumber}>4F</span>
-                <span className="floor-copy">
+            <div className={uiClass(floorList)} id="floor-list">
+              <button type="button" className={uiClass(floorButton)} data-floor="4F">
+                <span className={uiClass(floorNumber)}>4F</span>
+                <span className={uiClass('floor-copy')}>
                   <strong>통합 관제층</strong>
                 </span>
-                <span className={healthStatus} id="health-4F">
+                <span className={uiClass(healthStatus)} id="health-4F">
                   정상
                 </span>
               </button>
-              <button type="button" className={floorButton} data-floor="3F">
-                <span className={floorNumber}>3F</span>
-                <span className="floor-copy">
+              <button type="button" className={uiClass(floorButton)} data-floor="3F">
+                <span className={uiClass(floorNumber)}>3F</span>
+                <span className={uiClass('floor-copy')}>
                   <strong>AI / GPU 전산층</strong>
                 </span>
-                <span className={healthStatus} id="health-3F">
+                <span className={uiClass(healthStatus)} id="health-3F">
                   정상
                 </span>
               </button>
-              <button type="button" className={floorButton} data-floor="2F">
-                <span className={floorNumber}>2F</span>
-                <span className="floor-copy">
+              <button type="button" className={uiClass(floorButton)} data-floor="2F">
+                <span className={uiClass(floorNumber)}>2F</span>
+                <span className={uiClass('floor-copy')}>
                   <strong>일반 서버 전산층</strong>
                 </span>
-                <span className={healthStatus} id="health-2F">
+                <span className={uiClass(healthStatus)} id="health-2F">
                   정상
                 </span>
               </button>
-              <button type="button" className={floorButton} data-floor="1F">
-                <span className={floorNumber}>1F</span>
-                <span className="floor-copy">
+              <button type="button" className={uiClass(floorButton)} data-floor="1F">
+                <span className={uiClass(floorNumber)}>1F</span>
+                <span className={uiClass('floor-copy')}>
                   <strong>보안·통신·장비 반입</strong>
                 </span>
-                <span className={healthStatus} id="health-1F">
+                <span className={uiClass(healthStatus)} id="health-1F">
                   정상
                 </span>
               </button>
             </div>
           </section>
-          <section className="support-section" aria-labelledby="support-heading">
-            <div className={subTitle}>
+          <section className={uiClass('support-section')} aria-labelledby="support-heading">
+            <div className={uiClass(subTitle)}>
               <h2 id="support-heading">지원 시설</h2>
             </div>
-            <div className="floor-list facility-support" aria-label="전력·냉각 외부 지원 시설">
-              <button type="button" className={floorButton} data-zone="power" aria-pressed="false">
-                <span className={floorNumber}>P</span>
-                <span className="floor-copy">
+            <div
+              className={uiClass('floor-list facility-support')}
+              aria-label="전력·냉각 외부 지원 시설"
+            >
+              <button
+                type="button"
+                className={uiClass(floorButton)}
+                data-zone="power"
+                aria-pressed="false"
+              >
+                <span className={uiClass(floorNumber)}>P</span>
+                <span className={uiClass('floor-copy')}>
                   <strong>전력 설비동</strong>
                 </span>
-                <span className={healthStatus} id="health-power">
+                <span className={uiClass(healthStatus)} id="health-power">
                   정상
                 </span>
               </button>
               <button
                 type="button"
-                className={floorButton}
+                className={uiClass(floorButton)}
                 data-zone="cooling"
                 aria-pressed="false"
               >
-                <span className={floorNumber}>C</span>
-                <span className="floor-copy">
+                <span className={uiClass(floorNumber)}>C</span>
+                <span className={uiClass('floor-copy')}>
                   <strong>냉각 설비동</strong>
                 </span>
-                <span className={healthStatus} id="health-cooling">
+                <span className={uiClass(healthStatus)} id="health-cooling">
                   정상
                 </span>
               </button>

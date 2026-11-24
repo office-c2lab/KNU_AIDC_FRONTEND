@@ -1,7 +1,7 @@
+import { uiClass } from '../../styles/interfaceStyles.js';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { geoDistance, geoInterpolate } from 'd3-geo';
 import { connections, origin, getConnectionStatus } from './networkData.js';
-
 function globeArc(projection, destination, rotation, inbound) {
   const interpolate = inbound
     ? geoInterpolate(destination, origin.coordinates)
@@ -33,7 +33,6 @@ function mapArc(projection, destination, inbound) {
   const bend = Math.min(55, Math.hypot(x2 - x1, y2 - y1) * 0.14);
   return `M${x1.toFixed(2)},${y1.toFixed(2)}Q${((x1 + x2) / 2).toFixed(2)},${((y1 + y2) / 2 - bend).toFixed(2)},${x2.toFixed(2)},${y2.toFixed(2)}`;
 }
-
 function NetworkPoint({
   point,
   label,
@@ -70,40 +69,41 @@ function NetworkPoint({
   const labelY = hub ? (compact ? 13 : 17) : -39 * labelScale;
   return (
     <g
-      className={`network-point${hub ? ' hub' : ''}${selected ? ' selected' : ''}`}
+      className={uiClass(`network-point${hub ? ' hub' : ''}${selected ? ' selected' : ''}`)}
       transform={`translate(${point.join(',')})`}
-      style={{ '--connection-color': color }}
+      style={{
+        '--connection-color': color,
+      }}
     >
-      <circle r="20" fill="transparent" className="network-point-target" />
-      <circle r="5" fill={color} transform={`scale(${labelScale})`} />
+      <circle r="20" fill="transparent" className={uiClass('network-point-target')} />
+      <circle r={hub ? 6.5 : 5} fill={color} transform={`scale(${labelScale})`} />
       <g
         ref={labelRef}
-        className="network-point-label"
+        className={uiClass('network-point-label')}
         transform={`translate(${labelX},${labelY}) scale(${labelScale})`}
       >
         <rect
-          className="network-point-label-bg"
+          className={uiClass('network-point-label-bg')}
           width={width}
           height="39"
           rx="4"
           fill="#071422"
-          fillOpacity=".94"
+          fillOpacity={hub ? '.98' : '.94'}
           stroke={color}
-          strokeOpacity={hub || selected ? '.65' : '.28'}
-          strokeWidth=".7"
+          strokeOpacity={hub ? '.9' : selected ? '.65' : '.28'}
+          strokeWidth={hub ? 1 : 0.7}
         />
         <circle cx="7" cy="12" r="2" fill={color} />
-        <text className="network-point-name" x="15" y="16" fill="#eef7ff">
+        <text className={uiClass('network-point-name')} x="15" y="16" fill="#eef7ff">
           {label}
         </text>
-        <text className="network-point-detail" x="15" y="30" fill={color}>
+        <text className={uiClass('network-point-detail')} x="15" y="30" fill={color}>
           {detail}
         </text>
       </g>
     </g>
   );
 }
-
 export default function ConnectionOverlay({
   projection,
   mode,
@@ -128,7 +128,6 @@ export default function ConnectionOverlay({
           : mapArc(projection, item.coordinates, item.flow === 'inbound'),
     }));
   }, [projection, mode, rotation]);
-
   return (
     <>
       <defs>
@@ -154,7 +153,7 @@ export default function ConnectionOverlay({
       </defs>
       {[false, true].map(critical => (
         <g key={String(critical)} data-connection-layer={critical ? 'error' : 'normal'}>
-          <g className="network-connections">
+          <g className={uiClass('network-connections')}>
             {routes
               .filter(({ item }) => (item.status === 'error') === critical)
               .map(({ item, index, path }) => {
@@ -162,7 +161,7 @@ export default function ConnectionOverlay({
                 return (
                   <g
                     key={item.id}
-                    className={`network-route${selected ? ' selected' : ''}`}
+                    className={uiClass(`network-route${selected ? ' selected' : ''}`)}
                     data-destination={item.id}
                     opacity={!selectedId || selected ? 1 : 0.24}
                     onClick={() => onSelect(item)}
@@ -173,7 +172,7 @@ export default function ConnectionOverlay({
                     }}
                   >
                     <path
-                      className="network-route-target"
+                      className={uiClass('network-route-target')}
                       d={path}
                       fill="none"
                       stroke="transparent"
@@ -194,7 +193,7 @@ export default function ConnectionOverlay({
                       strokeOpacity={selected ? '.15' : '.08'}
                     />
                     <path
-                      className="network-route-line"
+                      className={uiClass('network-route-line')}
                       d={path}
                       fill="none"
                       stroke={`url(#${idPrefix}-route-${item.id})`}
@@ -204,7 +203,7 @@ export default function ConnectionOverlay({
                     {path && (
                       <>
                         <path
-                          className="network-route-flow network-route-tail"
+                          className={uiClass('network-route-flow network-route-tail')}
                           d={path}
                           fill="none"
                           pathLength="100"
@@ -214,7 +213,7 @@ export default function ConnectionOverlay({
                           strokeDasharray="4 96"
                         />
                         <path
-                          className="network-route-flow"
+                          className={uiClass('network-route-flow')}
                           d={path}
                           fill="none"
                           pathLength="100"
@@ -224,7 +223,7 @@ export default function ConnectionOverlay({
                         />
                         {item.flow === 'bidirectional' && (
                           <path
-                            className="network-route-flow network-route-reverse"
+                            className={uiClass('network-route-flow network-route-reverse')}
                             d={path}
                             fill="none"
                             pathLength="100"
@@ -240,7 +239,7 @@ export default function ConnectionOverlay({
                 );
               })}
           </g>
-          <g className="network-points">
+          <g className={uiClass('network-points')}>
             {routes
               .filter(
                 ({ item }) => (item.status === 'error') === critical && visible(item.coordinates)
@@ -248,7 +247,7 @@ export default function ConnectionOverlay({
               .map(({ item, point }) => (
                 <g
                   key={item.id}
-                  className="network-destination-point"
+                  className={uiClass('network-destination-point')}
                   data-destination={item.id}
                   opacity={!selectedId || item.id === selectedId ? 1 : 0.3}
                   onClick={() => onSelect(item)}
@@ -264,22 +263,26 @@ export default function ConnectionOverlay({
                   />
                 </g>
               ))}
-            {!critical && visible(origin.coordinates) && (
-              <g className="network-origin-point" onClick={onSelectOrigin}>
-                <NetworkPoint
-                  point={originPoint}
-                  label={origin.name}
-                  detail={`출발지 · ${origin.city}`}
-                  color={getConnectionStatus(origin.status).color}
-                  hub
-                  compact={mode === 'map'}
-                  screenScale={screenScale}
-                />
-              </g>
-            )}
           </g>
         </g>
       ))}
+      {visible(origin.coordinates) && (
+        <g
+          className={uiClass('network-origin-point')}
+          data-connection-layer="origin"
+          onClick={onSelectOrigin}
+        >
+          <NetworkPoint
+            point={originPoint}
+            label={origin.name}
+            detail={`출발지 · ${origin.city}`}
+            color="#60a5fa"
+            hub
+            compact={mode === 'map'}
+            screenScale={screenScale}
+          />
+        </g>
+      )}
     </>
   );
 }

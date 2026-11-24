@@ -1,9 +1,8 @@
+import { uiClass } from '../../../styles/interfaceStyles.js';
 import { useEffect, useRef, useState } from 'react';
 import { TerminalSquare, X } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import '@xterm/xterm/css/xterm.css';
-import '../rack-terminal.css';
-
 function TerminalWindow({ rack, close }) {
   const serverId = `${rack.id}:server`;
   const [loadError, setLoadError] = useState(false);
@@ -11,15 +10,16 @@ function TerminalWindow({ rack, close }) {
   const [status, setStatus] = useState('idle');
   const hostRef = useRef(null);
   const closeRef = useRef(null);
-
   useEffect(() => {
     const previouslyFocused = document.activeElement;
     closeRef.current?.focus();
     return () => {
-      if (previouslyFocused?.isConnected) previouslyFocused.focus({ preventScroll: true });
+      if (previouslyFocused?.isConnected)
+        previouslyFocused.focus({
+          preventScroll: true,
+        });
     };
   }, []);
-
   useEffect(() => {
     let cancelled = false;
     let terminal;
@@ -38,7 +38,11 @@ function TerminalWindow({ rack, close }) {
           fontSize: 14,
           lineHeight: 1.4,
           scrollback: 1000,
-          theme: { background: '#070e19', foreground: '#d4e7f5', cursor: '#79d7be' },
+          theme: {
+            background: '#070e19',
+            foreground: '#d4e7f5',
+            cursor: '#79d7be',
+          },
         });
         const fit = new FitAddon();
         terminal.loadAddon(fit);
@@ -96,9 +100,18 @@ function TerminalWindow({ rack, close }) {
               if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(data));
             };
             resizeSubscription = terminal.onResize(({ cols, rows }) =>
-              send({ type: 'resize', cols, rows })
+              send({
+                type: 'resize',
+                cols,
+                rows,
+              })
             );
-            input = terminal.onData(data => send({ type: 'input', data }));
+            input = terminal.onData(data =>
+              send({
+                type: 'input',
+                data,
+              })
+            );
             socket.onmessage = event => {
               if (cancelled) return;
               try {
@@ -107,7 +120,11 @@ function TerminalWindow({ rack, close }) {
                   setStatus('connected');
                   terminal.options.disableStdin = false;
                   terminal.options.cursorBlink = true;
-                  send({ type: 'resize', cols: terminal.cols, rows: terminal.rows });
+                  send({
+                    type: 'resize',
+                    cols: terminal.cols,
+                    rows: terminal.rows,
+                  });
                   terminal.focus();
                 } else if (message.type === 'data') {
                   terminal.write(
@@ -168,7 +185,6 @@ function TerminalWindow({ rack, close }) {
       terminal?.dispose();
     };
   }, [rack.id, serverId, connection]);
-
   const handleKeyDown = event => {
     event.stopPropagation();
     if (event.key === 'Escape' && !hostRef.current?.contains(event.target)) {
@@ -190,17 +206,16 @@ function TerminalWindow({ rack, close }) {
       }
     }
   };
-
   return (
-    <div className="rack-terminal-overlay" onKeyDown={handleKeyDown}>
-      <div className="rack-terminal-backdrop" onClick={close} />
+    <div className={uiClass('rack-terminal-overlay')} onKeyDown={handleKeyDown}>
+      <div className={uiClass('rack-terminal-backdrop cursor-pointer')} onClick={close} />
       <section
-        className="rack-terminal-window"
+        className={uiClass('rack-terminal-window')}
         role="dialog"
         aria-modal="true"
         aria-labelledby="rack-terminal-title"
       >
-        <header className="rack-terminal-header">
+        <header className={uiClass('rack-terminal-header')}>
           <TerminalSquare size={22} aria-hidden="true" />
           <div>
             <small>KNU AIDC / KVM CONSOLE</small>
@@ -210,7 +225,7 @@ function TerminalWindow({ rack, close }) {
             <X size={18} aria-hidden="true" />
           </button>
         </header>
-        <div className="rack-terminal-toolbar">
+        <div className={uiClass('rack-terminal-toolbar')}>
           <label>접속 대상 · 회사 홈페이지 EC2</label>
           <span role="status">
             {
@@ -245,18 +260,21 @@ function TerminalWindow({ rack, close }) {
             </button>
           )}
         </div>
-        <div className="rack-terminal-body" ref={hostRef} aria-label="서버 터미널 화면" />
+        <div
+          className={uiClass('rack-terminal-body')}
+          ref={hostRef}
+          aria-label="서버 터미널 화면"
+        />
         {loadError && (
           <p role="alert">터미널 화면을 불러오지 못했습니다. 창을 닫고 다시 열어 주세요.</p>
         )}
-        <footer className="rack-terminal-footer">
+        <footer className={uiClass('rack-terminal-footer')}>
           {rack.name} · 전체 랙 공통 테스트 EC2 연결 <span>Esc 닫기</span>
         </footer>
       </section>
     </div>
   );
 }
-
 export default function RackTerminalModal() {
   const rack = useDigitalTwinStore(state => state.terminalRack);
   const close = useDigitalTwinStore(state => state.closeRackTerminal);

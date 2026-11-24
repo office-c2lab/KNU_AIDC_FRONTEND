@@ -1,3 +1,4 @@
+import { uiClass } from '../../../styles/interfaceStyles.js';
 import { useId } from 'react';
 import {
   Area,
@@ -8,32 +9,42 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-
 const configuration = {
-  temp: { label: '장비 온도', unit: '°C', color: '#79d6fb' },
-  power: { label: '소비 전력', unit: 'kW', color: '#6ce0c2' },
+  temp: {
+    label: '장비 온도',
+    unit: '°C',
+    color: '#79d6fb',
+  },
+  power: {
+    label: '소비 전력',
+    unit: 'kW',
+    color: '#6ce0c2',
+  },
 };
 const timeLabel = minute => (minute === 0 ? '현재' : `${Math.abs(minute)}분 전`);
 const valueDomain = [
   min => Math.max(0, Math.floor((min - Math.max(0.1, Math.abs(min) * 0.01)) * 10) / 10),
   max => Math.ceil((max + Math.max(0.1, Math.abs(max) * 0.01)) * 10) / 10,
 ];
-
 export default function AssetTrendChartView({ kind, detail, range = 60 }) {
   const gradientId = useId().replace(/:/g, '');
   if (!detail) return null;
   const { label, unit, color } = configuration[kind];
-
   return (
     <div
-      className="asset-trend-chart"
+      className={uiClass('asset-trend-chart')}
       role="img"
       aria-label={`${detail.name} ${label} 최근 ${range}분 추세. 현재 ${detail[kind].toFixed(1)} ${unit}`}
     >
       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
         <AreaChart
           data={detail.trend.filter(point => point.minute >= -range)}
-          margin={{ top: 12, right: 14, bottom: 4, left: 0 }}
+          margin={{
+            top: 12,
+            right: 14,
+            bottom: 4,
+            left: 0,
+          }}
         >
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -48,7 +59,10 @@ export default function AssetTrendChartView({ kind, detail, range = 60 }) {
             domain={[-range, 0]}
             ticks={[-range, -range / 2, 0]}
             tickFormatter={timeLabel}
-            tick={{ fill: '#b8cce3', fontSize: 10 }}
+            tick={{
+              fill: '#b8cce3',
+              fontSize: 10,
+            }}
             axisLine={false}
             tickLine={false}
             tickMargin={10}
@@ -58,7 +72,10 @@ export default function AssetTrendChartView({ kind, detail, range = 60 }) {
             tickCount={4}
             width={44}
             tickFormatter={value => value.toFixed(1)}
-            tick={{ fill: '#b8cce3', fontSize: 10 }}
+            tick={{
+              fill: '#b8cce3',
+              fontSize: 10,
+            }}
             axisLine={false}
             tickLine={false}
           />
@@ -72,8 +89,13 @@ export default function AssetTrendChartView({ kind, detail, range = 60 }) {
               fontSize: 11,
               color: '#edf5ff',
             }}
-            labelStyle={{ color: '#b8cce3' }}
-            cursor={{ stroke: '#8db7dc', strokeDasharray: '3 3' }}
+            labelStyle={{
+              color: '#b8cce3',
+            }}
+            cursor={{
+              stroke: '#8db7dc',
+              strokeDasharray: '3 3',
+            }}
           />
           <Area
             type="monotone"
@@ -83,7 +105,9 @@ export default function AssetTrendChartView({ kind, detail, range = 60 }) {
             strokeWidth={2}
             fill={`url(#${gradientId})`}
             dot={false}
-            activeDot={{ r: 4 }}
+            activeDot={{
+              r: 4,
+            }}
             isAnimationActive={false}
           />
         </AreaChart>

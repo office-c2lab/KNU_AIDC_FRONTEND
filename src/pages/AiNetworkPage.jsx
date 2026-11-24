@@ -1,3 +1,4 @@
+import { uiClass } from '../styles/interfaceStyles.js';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { geoContains, geoGraticule10, geoMercator, geoOrthographic, geoPath } from 'd3-geo';
 import {
@@ -21,17 +22,23 @@ import {
   countryView,
 } from '../features/communication/countryGeography.js';
 import { connections, origin, getConnectionStatus } from '../features/communication/networkData.js';
-import '../features/communication/network.css';
-
-const geography = { type: 'MultiPolygon', coordinates: land };
-const coastline = { type: 'MultiLineString', coordinates: land.flatMap(polygon => polygon) };
+const geography = {
+  type: 'MultiPolygon',
+  coordinates: land,
+};
+const coastline = {
+  type: 'MultiLineString',
+  coordinates: land.flatMap(polygon => polygon),
+};
 const countryBorders = {
   type: 'MultiLineString',
   coordinates: countries.geometries.flatMap(geometry =>
     geometry.type === 'Polygon' ? geometry.coordinates : geometry.coordinates.flat()
   ),
 };
-const sphere = { type: 'Sphere' };
+const sphere = {
+  type: 'Sphere',
+};
 const graticule = geoGraticule10();
 const MIN_ZOOM = 0.8;
 const MAX_ZOOM = 1.6;
@@ -56,12 +63,16 @@ const countryLabels = [
   ['남아프리카', [25, -29]],
   ['멕시코', [-102, 24]],
 ];
-const stars = Array.from({ length: 80 }, (_, i) => ({
-  x: (i * 173.31 + 27) % 960,
-  y: (i * 97.73 + 11) % 660,
-  r: i % 7 === 0 ? 1.1 : 0.55,
-}));
-
+const stars = Array.from(
+  {
+    length: 80,
+  },
+  (_, i) => ({
+    x: (i * 173.31 + 27) % 960,
+    y: (i * 97.73 + 11) % 660,
+    r: i % 7 === 0 ? 1.1 : 0.55,
+  })
+);
 export default function AiNetworkPage() {
   const clipId = useId().replace(/:/g, '');
   const [selectedId, setSelectedId] = useState(null);
@@ -95,7 +106,9 @@ export default function AiNetworkPage() {
         setZoom(value => clampZoom(value * factor));
       });
     };
-    stage.addEventListener('wheel', onWheel, { passive: false });
+    stage.addEventListener('wheel', onWheel, {
+      passive: false,
+    });
     const observer = new ResizeObserver(() => {
       if (stage.clientHeight) {
         setMapAspect(stage.clientWidth / stage.clientHeight);
@@ -239,16 +252,19 @@ export default function AiNetworkPage() {
     setMode('globe');
     showAll();
   };
-
   return (
-    <main className="network-page" aria-label="AI 통신 지도">
-      <div className="network-workspace">
+    <main className={uiClass('network-page')} aria-label="AI 통신 지도">
+      <div className={uiClass('network-workspace')}>
         <section
-          className="network-visual"
+          className={uiClass('network-visual')}
           aria-label={mode === 'globe' ? 'AI 통신 지구본' : 'AI 통신 평면지도'}
         >
-          <div className="network-map-heading">
-            <div className="network-view-switch" role="group" aria-label="지도 표시 방식">
+          <div className={uiClass('network-map-heading')}>
+            <div
+              className={uiClass('network-view-switch gap-1.5')}
+              role="group"
+              aria-label="지도 표시 방식"
+            >
               <button
                 type="button"
                 aria-pressed={mode === 'globe'}
@@ -275,11 +291,11 @@ export default function AiNetworkPage() {
           </div>
           <div
             ref={stageRef}
-            className={`network-map-stage ${mode}${surfaceReady ? ' surface-ready' : ''}`}
+            className={uiClass(`network-map-stage ${mode}${surfaceReady ? ' surface-ready' : ''}`)}
           >
             <NetworkSurface mode={mode} projection={projection} onReady={setSurfaceReady} />
             <svg
-              className={`network-map ${mode}`}
+              className={uiClass(`network-map ${mode}`)}
               viewBox="0 0 960 660"
               preserveAspectRatio={mode === 'map' ? 'xMidYMid slice' : 'xMidYMid meet'}
               role="img"
@@ -375,7 +391,7 @@ export default function AiNetworkPage() {
               </defs>
               <g clipPath={`url(#${clipId})`}>
                 {mode === 'globe' && (
-                  <g aria-hidden="true" className="network-stars">
+                  <g aria-hidden="true" className={uiClass('network-stars')}>
                     {stars
                       .filter(
                         star => Math.hypot(star.x - 480, star.y - 330) > projection.scale() + 22
@@ -393,7 +409,7 @@ export default function AiNetworkPage() {
                   </g>
                 )}
                 <path
-                  className="network-ocean"
+                  className={uiClass('network-ocean')}
                   d={outlines.sphere}
                   fill={surfaceReady ? 'none' : `url(#${clipId}-ocean)`}
                   stroke={mode === 'globe' && !surfaceReady ? '#94d5fa' : 'none'}
@@ -425,7 +441,7 @@ export default function AiNetworkPage() {
                 {mode === 'map' && selectedCountry && (
                   <path
                     d={geoPath(projection)(selectedCountry)}
-                    className="network-country-highlight"
+                    className={uiClass('network-country-highlight')}
                     fill="#78bbf11a"
                     stroke="#9dd6ff"
                     strokeWidth=".9"
@@ -433,7 +449,7 @@ export default function AiNetworkPage() {
                   />
                 )}
                 {mode === 'map' && (
-                  <g className="network-country-labels" aria-hidden="true">
+                  <g className={uiClass('network-country-labels')} aria-hidden="true">
                     {countryLabels.map(([name, coordinates]) => {
                       const point = projection(coordinates);
                       if (
@@ -472,8 +488,8 @@ export default function AiNetworkPage() {
               </g>
             </svg>
           </div>
-          <div className="network-map-footer">
-            <div className="network-map-tools">
+          <div className={uiClass('network-map-footer')}>
+            <div className={uiClass('network-map-tools')}>
               <button
                 type="button"
                 aria-label="지도 확대"
@@ -496,12 +512,15 @@ export default function AiNetworkPage() {
             </div>
           </div>
         </section>
-        <aside className="network-destinations network-info-panel" aria-label="통신 목적지">
+        <aside
+          className={uiClass('network-destinations network-info-panel')}
+          aria-label="통신 목적지"
+        >
           <header>
             <h2>국가 · 통신 지점</h2>
             <span>{countryGroups.length}개 국가</span>
           </header>
-          <label className="network-search">
+          <label className={uiClass('network-search')}>
             <Search size={16} aria-hidden="true" />
             <input
               value={query}
@@ -512,7 +531,7 @@ export default function AiNetworkPage() {
           </label>
           <button
             type="button"
-            className="network-overview-button"
+            className={uiClass('network-overview-button')}
             aria-pressed={!selectedCountryCode}
             onClick={showAll}
           >
@@ -523,22 +542,33 @@ export default function AiNetworkPage() {
               국가
             </small>
           </button>
-          <div className="network-destination-list network-country-list">
+          <div className={uiClass('network-destination-list network-country-list')}>
             {countryGroups.map(({ country, sites, status }) => (
-              <section key={country.properties.code} className="network-country-group">
+              <section key={country.properties.code} className={uiClass('network-country-group')}>
                 <button
                   type="button"
-                  className="network-country-trigger"
+                  className={uiClass('network-country-trigger')}
                   aria-pressed={selectedCountryCode === country.properties.code}
                   onClick={() => selectCountry(country.properties.code)}
                 >
-                  <i style={{ background: status.color }} aria-hidden="true" />
+                  <i
+                    style={{
+                      background: status.color,
+                    }}
+                    aria-hidden="true"
+                  />
                   <span>
                     <strong>{country.properties.name}</strong>
                     <span>
                       {sites.length}개 통신 지점
                       {' · '}
-                      <span style={{ color: status.color }}>{status.label}</span>
+                      <span
+                        style={{
+                          color: status.color,
+                        }}
+                      >
+                        {status.label}
+                      </span>
                     </span>
                   </span>
                   {selectedCountryCode === country.properties.code || query.trim() ? (
@@ -548,10 +578,14 @@ export default function AiNetworkPage() {
                   )}
                 </button>
                 {(selectedCountryCode === country.properties.code || query.trim()) && (
-                  <div className="network-country-locations">
+                  <div className={uiClass('network-country-locations')}>
                     {country.properties.code === origin.countryCode && (
                       <button type="button" aria-pressed={originFocused} onClick={selectOrigin}>
-                        <i style={{ background: getConnectionStatus(origin.status).color }} />
+                        <i
+                          style={{
+                            background: getConnectionStatus(origin.status).color,
+                          }}
+                        />
                         <span>
                           <strong>{origin.city}</strong>
                           <span>{origin.name} · 출발지</span>
@@ -565,7 +599,11 @@ export default function AiNetworkPage() {
                         aria-pressed={selectedId === item.id}
                         onClick={() => select(item)}
                       >
-                        <i style={{ background: getConnectionStatus(item.status).color }} />
+                        <i
+                          style={{
+                            background: getConnectionStatus(item.status).color,
+                          }}
+                        />
                         <span>
                           <strong>{item.city}</strong>
                           <span>
@@ -578,7 +616,9 @@ export default function AiNetworkPage() {
                 )}
               </section>
             ))}
-            {!countryGroups.length && <p className="network-empty">검색 결과가 없습니다.</p>}
+            {!countryGroups.length && (
+              <p className={uiClass('network-empty')}>검색 결과가 없습니다.</p>
+            )}
           </div>
         </aside>
         <CountryConnectionDetails

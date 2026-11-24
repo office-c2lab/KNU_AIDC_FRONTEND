@@ -1,12 +1,20 @@
+import { uiClass } from '../../styles/interfaceStyles.js';
 import { useEffect, useRef, useState } from 'react';
-
 export default function CampusPreview({ zone, onSelectZone, issues }) {
   const hostRef = useRef(null);
   const viewerRef = useRef(null);
-  const latestRef = useRef({ zone, issues, onSelectZone });
+  const latestRef = useRef({
+    zone,
+    issues,
+    onSelectZone,
+  });
   const [state, setState] = useState('loading');
   useEffect(() => {
-    latestRef.current = { zone, issues, onSelectZone };
+    latestRef.current = {
+      zone,
+      issues,
+      onSelectZone,
+    };
     viewerRef.current?.update(zone, issues);
   }, [zone, issues, onSelectZone]);
   useEffect(() => {
@@ -35,9 +43,9 @@ export default function CampusPreview({ zone, onSelectZone, issues }) {
     };
   }, []);
   return (
-    <div className="ops-campus-canvas" ref={hostRef}>
+    <div className={uiClass('ops-campus-canvas')} ref={hostRef}>
       {state !== 'ready' && (
-        <div className="ops-campus-placeholder" role="status">
+        <div className={uiClass('ops-campus-placeholder')} role="status">
           <strong>
             {state === 'loading' ? '시설 모델 준비 중' : '시설 모델을 표시할 수 없습니다'}
           </strong>
@@ -48,7 +56,9 @@ export default function CampusPreview({ zone, onSelectZone, issues }) {
           </span>
         </div>
       )}
-      {state === 'ready' && <span className="ops-campus-help">드래그 회전 · 층 선택</span>}
+      {state === 'ready' && (
+        <span className={uiClass('ops-campus-help')}>드래그 회전 · 층 선택</span>
+      )}
     </div>
   );
 }

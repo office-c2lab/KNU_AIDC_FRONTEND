@@ -20,10 +20,10 @@ import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import { createIncidentSelectors } from '../features/digital-twin/scene/systems/createIncidentSelectors.js';
 import { calculateFacilityPower } from '../features/digital-twin/calculateFacilityPower.js';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
-import DashboardPanel from '../features/dashboard/DashboardPanel.jsx';
+import { motion } from 'framer-motion';
+import { panelEntrance } from '../utils/panelMotion.js';
 import { applyDashboardTrendProfile } from '../features/dashboard/dashboardTrend.js';
 import { createMockOperationLogs } from '../features/dashboard/mockOperationLogs.js';
-import '../features/dashboard/operations-dashboard.css';
 
 const scenarioById = new Map(SCENARIOS.map(item => [item.id, item]));
 const colors = {
@@ -36,6 +36,8 @@ const colors = {
   송신: '#73e1c0',
 };
 const powerColors = ['#87bce9', '#73e1c0', '#eac476', '#9da9c9'];
+const trendChartClassName =
+  '[&_.recharts-surface]:overflow-visible [&_.recharts-cartesian-axis-tick-value]:tabular-nums w-full min-w-0 h-[clamp(185px,calc(20vh_+_20px),225px)] max-[560px]:h-[200px]';
 const powerColorByLabel = Object.fromEntries(
   ['IT 부하', '냉각 부하', '전력 설비', '기타·지원'].map((label, index) => [
     label,
@@ -75,14 +77,17 @@ const display = (value, digits = 1) => (Number.isFinite(value) ? value.toFixed(d
 function ChartTooltip({ active, payload, label, unit = '%' }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="ops-chart-tooltip">
-      <div className="ops-chart-tooltip-heading">
+    <div className="min-w-[185px] rounded-lg border border-[#658bad80] bg-[#0b192cf5] px-3.5 py-3 text-[13px] text-[#edf5ff] shadow-[0_8px_24px_#01081366]">
+      <div className="mb-2.5 border-b border-[#3e5a7666] pb-2 text-xs/[1.5] text-[#bfd1e5] tabular-nums">
         {unit === 'kW' ? '전력 구성' : `${label} · 운영 추이`}
       </div>
       {payload
         .filter(item => Number.isFinite(item.value))
         .map((item, index) => (
-          <div className="ops-chart-tooltip-row" key={item.dataKey ?? item.name}>
+          <div
+            className="mt-2 flex items-center gap-3 [&>span]:flex [&>span]:flex-1 [&>span]:items-center [&>span]:gap-[7px] [&_i]:size-[7px] [&_i]:rounded-full [&_strong]:font-semibold [&_small]:ml-1 [&_small]:text-[11px] [&_small]:font-normal [&_small]:text-[#bfd1e5] [&_em]:text-[11px] [&_em]:text-[#bfd1e5] [&_em]:not-italic"
+            key={item.dataKey ?? item.name}
+          >
             <span>
               <i
                 style={{
@@ -189,7 +194,7 @@ function Axes({ percent = true, ticks }) {
 }
 function Legend({ keys, current, percent = true, showValues = true }) {
   return (
-    <div className="ops-chart-legend">
+    <div className="mt-2 flex flex-wrap items-center gap-x-[22px] gap-y-1.5 text-sm/[1.5] font-medium text-[#d1deed] max-[1000px]:gap-x-3 [&>span]:inline-flex [&>span]:items-center [&>span]:gap-[5px] [&_i]:inline-block [&_i]:size-2 [&_i]:shrink-0 [&_i]:rounded-full [&_strong]:font-medium [&_[data-series=GPU]_i]:size-[9px] [&_[data-series=GPU]_i]:rounded-[2px]">
       {keys.map(key => (
         <span key={key} data-series={key}>
           <i style={{ background: colors[key] }} />
@@ -207,7 +212,7 @@ function Legend({ keys, current, percent = true, showValues = true }) {
 }
 function TrendChart({ data, keys, chartId, percent = true, label }) {
   return (
-    <div className="ops-line-chart" role="img" aria-label={label}>
+    <div className={trendChartClassName} role="img" aria-label={label}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 14, right: 20, bottom: 2, left: 0 }}>
           <defs>
@@ -242,9 +247,16 @@ function TrendChart({ data, keys, chartId, percent = true, label }) {
 }
 function Panel({ title, children, extra, className = '' }) {
   return (
-    <DashboardPanel title={title} extra={extra} className={`ops-panel ${className}`}>
+    <motion.section
+      {...panelEntrance({ delay: 0 })}
+      className={`flex min-w-0 flex-col rounded-md border border-[#324f72] bg-[#101e32] px-5 py-[18px] max-[1000px]:p-3 ${className}`}
+    >
+      <header className="mb-2 flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+        <h2 className="m-0 text-[17px] leading-[1.4] font-semibold text-[#f3f8ff]">{title}</h2>
+        {extra}
+      </header>
       {children}
-    </DashboardPanel>
+    </motion.section>
   );
 }
 function eventCategory(event, scenario, assets) {
@@ -339,23 +351,36 @@ export default function OperationsDashboardPage() {
   );
 
   return (
-    <main className="operations-dashboard" aria-label="운영 대시보드">
-      <div className="ops-content">
-        <div className="ops-kpis" aria-label="전체 운영 요약">
+    <main
+      className="fixed inset-x-[26px] top-[92px] bottom-7 z-5 overflow-y-auto text-[#dce9f8] [scrollbar-width:thin] [scrollbar-color:#41658c_transparent] max-[560px]:inset-x-4 max-[560px]:bottom-5 [&_strong]:tabular-nums [&_time]:tabular-nums [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-[#87bce9] [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-[#87bce9]"
+      aria-label="운영 대시보드"
+    >
+      <div className="mx-auto grid w-full min-w-0 max-w-[1360px] gap-4 pt-px pr-[3px] pb-[3px] pl-px">
+        <div
+          className="grid grid-cols-4 gap-4 max-[560px]:grid-cols-2 max-[560px]:gap-2.5"
+          aria-label="전체 운영 요약"
+        >
           {kpis.map(([title, value, unit, note, tone]) => (
-            <section className={`ops-kpi ${tone}`} key={title}>
-              <h2>{title}</h2>
-              <strong>
+            <section
+              className="min-w-0 rounded-md border border-[#324f72] bg-[#101e32] px-5 py-4 max-[1000px]:px-3 max-[1000px]:py-[11px]"
+              key={title}
+            >
+              <h2 className="m-0 text-[15px] font-medium text-[#d1deed]">{title}</h2>
+              <strong
+                className={`mt-[5px] block text-[34px] leading-[1.2] font-semibold tracking-[-0.5px] max-[1000px]:text-[28px] ${tone === 'green' ? 'text-[#73e1c0]' : tone === 'red' ? 'text-[#ff8188]' : 'text-[#eaf6ff]'}`}
+              >
                 {value}
-                <small>{unit}</small>
+                <small className="ml-1 text-sm/[1.2] font-medium tracking-normal text-[#c1d2e5]">
+                  {unit}
+                </small>
               </strong>
-              <p>{note}</p>
+              <p className="mt-1 mb-0 text-sm/[1.5] leading-[1.65] text-[#b6c9df]">{note}</p>
             </section>
           ))}
         </div>
-        <div className="ops-chart-grid">
+        <div className="grid grid-cols-2 gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-2.5">
           <Panel title="GPU 자원 사용 현황">
-            <p className="ops-chart-summary green">
+            <p className="mb-1.5 flex flex-wrap items-baseline gap-[7px] text-sm/[1.5] text-[#d1deed] [&>strong]:text-[27px] [&>strong]:leading-[1.5] [&>strong]:font-semibold [&_small]:ml-[3px] [&_small]:text-[15px] [&_small]:font-medium [&>strong]:text-[#73e1c0]">
               <strong>
                 {display(current.GPU)}
                 <small>%</small>
@@ -363,7 +388,7 @@ export default function OperationsDashboardPage() {
               평균 GPU 사용률
             </p>
             <div
-              className="ops-line-chart"
+              className={trendChartClassName}
               role="img"
               aria-label="최근 1시간 가상 GPU 사용률과 GPU 메모리 사용률"
             >
@@ -399,10 +424,10 @@ export default function OperationsDashboardPage() {
             </div>
             <Legend keys={['GPU', 'GPU 메모리']} current={current} showValues={false} />
           </Panel>
-          <Panel title="전력 및 냉각 현황" className="ops-power-panel">
-            <div className="ops-power-body">
+          <Panel title="전력 및 냉각 현황">
+            <div className="grid flex-1 grid-cols-[minmax(110px,0.9fr)_minmax(0,1.3fr)] items-center gap-[18px] max-[1000px]:gap-2.5">
               <div
-                className="ops-power-donut"
+                className="relative w-full max-w-[195px] justify-self-center h-[clamp(170px,calc(19vh_+_20px),205px)] max-[560px]:h-[180px]"
                 role="img"
                 aria-label={`총 소비 전력 ${display(power.totalKw)} kW`}
               >
@@ -462,13 +487,13 @@ export default function OperationsDashboardPage() {
                     )}
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="ops-power-donut-total">
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center [&>span]:text-sm/[1.5] [&>span]:text-[#b6c9df] [&>strong]:text-[30px] [&>strong]:leading-[1.25] [&>strong]:font-semibold [&>strong]:text-[#eaf6ff] [&>small]:text-sm/[1.5] [&>small]:text-[#b6c9df]">
                   <span>총 소비 전력</span>
                   <strong>{display(power.totalKw)}</strong>
                   <small>kW</small>
                 </div>
               </div>
-              <div className="ops-power-legend">
+              <div className="grid min-w-0 gap-2.5 font-medium [&>div]:flex [&>div]:items-center [&>div]:justify-between [&>div]:gap-4 [&>div]:text-sm/[1.5] [&_span]:flex [&_span]:items-center [&_span]:gap-1.5 [&_span]:text-[#d1deed] [&_i]:inline-block [&_i]:size-2 [&_i]:shrink-0 [&_i]:rounded-full [&_strong]:text-right [&_strong]:font-medium [&_strong]:whitespace-nowrap [&_small]:ml-1 [&_small]:text-sm/[1.5] [&_small]:font-medium [&_small]:text-[#b6c9df]">
                 {power.rows.map((row, index) => (
                   <div key={row.id}>
                     <span>
@@ -478,19 +503,21 @@ export default function OperationsDashboardPage() {
                     <strong>
                       {display(row.kw)}
                       <small>kW</small>
-                      <em className="ops-power-percentage">{display(row.share)}%</em>
+                      <em className="mt-0.5 block text-[11px] leading-[1.5] text-[#a9bfd7] not-italic">
+                        {display(row.share)}%
+                      </em>
                     </strong>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="ops-power-pue">
+            <div className="mt-3 flex justify-between gap-2.5 border-t border-[#304a6870] pt-3 text-sm/[1.5] [&>strong]:text-[17px] [&>strong]:font-medium [&>strong]:text-[#73e1c0]">
               <span>전력효율지수 (PUE)</span>
               <strong>{display(power.pueEstimate, 2)}</strong>
             </div>
           </Panel>
           <Panel title="서버 자원 사용 현황">
-            <p className="ops-chart-summary">
+            <p className="mb-1.5 flex flex-wrap items-baseline gap-[7px] text-sm/[1.5] text-[#d1deed] [&>strong]:text-[27px] [&>strong]:leading-[1.5] [&>strong]:font-semibold [&_small]:ml-[3px] [&_small]:text-[15px] [&_small]:font-medium [&>strong]:text-[#eaf6ff]">
               <strong>
                 {display(current.CPU)}
                 <small>%</small>
@@ -506,7 +533,7 @@ export default function OperationsDashboardPage() {
             <Legend keys={['CPU', '메모리', '스토리지']} current={current} />
           </Panel>
           <Panel title="네트워크 트래픽 현황">
-            <p className="ops-chart-summary">
+            <p className="mb-1.5 flex flex-wrap items-baseline gap-[7px] text-sm/[1.5] text-[#d1deed] [&>strong]:text-[27px] [&>strong]:leading-[1.5] [&>strong]:font-semibold [&_small]:ml-[3px] [&_small]:text-[15px] [&_small]:font-medium [&>strong]:text-[#eaf6ff]">
               <strong>
                 {display(current.수신)}
                 <small>Gbps</small>
@@ -525,11 +552,11 @@ export default function OperationsDashboardPage() {
         </div>
         <Panel
           title="최근 운영 및 이벤트 로그"
-          className="ops-events"
+          className="font-medium"
           extra={
             <button
               type="button"
-              className="ops-all-logs"
+              className="border-0 bg-transparent p-0 text-sm/[1.5]! text-[#a8c9e6] hover:text-[#eaf6ff]"
               aria-expanded={allLogs}
               onClick={() => setAllLogs(value => !value)}
             >
@@ -537,12 +564,17 @@ export default function OperationsDashboardPage() {
             </button>
           }
         >
-          <div className="ops-log-toolbar">
-            <div className="ops-log-filters" role="group" aria-label="이벤트 구분 필터">
+          <div className="mt-[5px] mb-3.5 flex flex-wrap items-center justify-between gap-2.5">
+            <div
+              className="flex flex-wrap gap-1 rounded-md border border-[#3b55724d] bg-[#09172780] p-1 font-medium"
+              role="group"
+              aria-label="이벤트 구분 필터"
+            >
               {['전체', '시스템', '시설', '보안', '장애'].map(filter => (
                 <button
                   type="button"
                   key={filter}
+                  className="flex items-center gap-[7px] rounded-sm border border-transparent bg-transparent px-2.5 py-1.5 text-sm/[1.5]! text-[#b6c9df] hover:text-[#eaf6ff] aria-pressed:border-[#6487a580] aria-pressed:bg-[#29465f] aria-pressed:text-[#dcefff] [&>span]:min-w-[18px] [&>span]:rounded-[3px] [&>span]:bg-[#7298bd15] [&>span]:px-1 [&>span]:py-px [&>span]:text-center [&>span]:text-xs/[1.5] [&>span]:text-[#bfd1e5] [&>span]:tabular-nums"
                   aria-pressed={eventFilter === filter}
                   onClick={() => setEventFilter(filter)}
                 >
@@ -559,42 +591,86 @@ export default function OperationsDashboardPage() {
                 </button>
               ))}
             </div>
-            <span className="ops-log-order">최신순</span>
+            <span className="text-xs/[1.5] text-[#b6c9df]">최신순</span>
           </div>
-          <div className="ops-table-scroll">
-            <table aria-label="최근 운영 및 이벤트 로그">
+          <div className="max-h-[360px] min-w-0 overflow-auto [scrollbar-width:thin]">
+            <table
+              className="w-full border-collapse text-left text-sm/[1.5] leading-normal max-[560px]:min-w-[500px]"
+              aria-label="최근 운영 및 이벤트 로그"
+            >
               <thead>
                 <tr>
-                  <th scope="col">발생 시각</th>
-                  <th scope="col">구분</th>
-                  <th scope="col">대상 장비</th>
-                  <th scope="col">이벤트 내용</th>
-                  <th scope="col">상태</th>
+                  <th
+                    className="sticky top-0 border-b border-[#304a68] bg-[#16273b] px-3.5 py-[11px] text-sm/[1.5] font-medium text-[#b6c9df] whitespace-nowrap w-[22%]"
+                    scope="col"
+                  >
+                    발생 시각
+                  </th>
+                  <th
+                    className="sticky top-0 border-b border-[#304a68] bg-[#16273b] px-3.5 py-[11px] text-sm/[1.5] font-medium text-[#b6c9df] whitespace-nowrap w-[10%]"
+                    scope="col"
+                  >
+                    구분
+                  </th>
+                  <th
+                    className="sticky top-0 border-b border-[#304a68] bg-[#16273b] px-3.5 py-[11px] text-sm/[1.5] font-medium text-[#b6c9df] whitespace-nowrap w-[18%]"
+                    scope="col"
+                  >
+                    대상 장비
+                  </th>
+                  <th
+                    className="sticky top-0 border-b border-[#304a68] bg-[#16273b] px-3.5 py-[11px] text-sm/[1.5] font-medium text-[#b6c9df] whitespace-nowrap"
+                    scope="col"
+                  >
+                    이벤트 내용
+                  </th>
+                  <th
+                    className="sticky top-0 border-b border-[#304a68] bg-[#16273b] px-3.5 py-[11px] text-sm/[1.5] font-medium text-[#b6c9df] whitespace-nowrap w-[10%]"
+                    scope="col"
+                  >
+                    상태
+                  </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="[&_tr:last-child_td]:border-b-0">
                 {filteredLogs.slice(0, allLogs ? 50 : 4).map(event => (
-                  <tr key={event.id} data-kind={event.kind}>
-                    <td>
-                      <time dateTime={event.timestamp}>{formatLogTimestamp(event.timestamp)}</time>
+                  <tr
+                    key={event.id}
+                    data-kind={event.kind}
+                    className="data-[kind=danger]:bg-[#ff818807] hover:bg-[#9bcaff08]"
+                  >
+                    <td className="border-b border-[#304a6844] px-3.5 py-[13px] align-middle text-[#dce9f8]">
+                      <time
+                        className="text-sm/[1.5] text-[#c1d2e5] whitespace-nowrap"
+                        dateTime={event.timestamp}
+                      >
+                        {formatLogTimestamp(event.timestamp)}
+                      </time>
                     </td>
-                    <td>
-                      <span className="ops-log-category">{event.category}</span>
+                    <td className="border-b border-[#304a6844] px-3.5 py-[13px] align-middle text-[#dce9f8]">
+                      <span className="text-[#bcd8ee] whitespace-nowrap">{event.category}</span>
                     </td>
-                    <td>
-                      <span className="ops-log-asset">
+                    <td className="border-b border-[#304a6844] px-3.5 py-[13px] align-middle text-[#dce9f8]">
+                      <span className="grid min-w-[120px] gap-1 tabular-nums [&>strong]:font-mono [&>strong]:text-[15px] [&>strong]:font-semibold [&>strong]:tracking-[0.3px] [&>strong]:text-[#edf5ff] [&>strong]:whitespace-nowrap [&>small]:text-[13px] [&>small]:leading-normal [&>small]:font-normal [&>small]:text-[#b6c9df]">
                         <strong>{event.asset}</strong>
                         {assetLabels.get(event.asset) && (
                           <small>{assetLabels.get(event.asset)}</small>
                         )}
                       </span>
                     </td>
-                    <td>
-                      <strong className="ops-log-description">{event.description}</strong>
+                    <td className="border-b border-[#304a6844] px-3.5 py-[13px] align-middle text-[#dce9f8]">
+                      <strong className="block min-w-[200px] text-sm/[1.5] leading-[1.65] font-medium text-[#e5eff9]">
+                        {event.description}
+                      </strong>
                     </td>
-                    <td>
-                      <span className={`ops-event-state ${event.kind}`}>
-                        <i aria-hidden="true" />
+                    <td className="border-b border-[#304a6844] px-3.5 py-[13px] align-middle text-[#dce9f8]">
+                      <span
+                        className={`inline-flex items-center gap-1.5 text-sm/[1.5] whitespace-nowrap ${event.kind === 'danger' ? 'text-[#ff8188]' : event.kind === 'success' || event.kind === 'normal' ? 'text-[#73e1c0]' : event.kind === 'warning' ? 'text-[#eac476]' : 'text-[#d1deed]'}`}
+                      >
+                        <i
+                          className="size-1.5 shrink-0 rounded-full bg-current"
+                          aria-hidden="true"
+                        />
                         {event.statusLabel ??
                           (event.kind === 'danger'
                             ? '장애'
@@ -607,8 +683,11 @@ export default function OperationsDashboardPage() {
                 ))}
                 {!filteredLogs.length && (
                   <tr>
-                    <td className="ops-empty-cell" colSpan={5}>
-                      <div className="ops-log-empty">
+                    <td
+                      className="px-3.5 py-7 text-center text-[#b6c9df] [&_a]:ml-2 [&_a]:text-[#d1deed]"
+                      colSpan={5}
+                    >
+                      <div className="flex flex-col items-center gap-2 [&>svg]:mb-[3px] [&>svg]:text-[#87bce9] [&>strong]:text-sm/[1.5] [&>strong]:font-medium [&>strong]:text-[#dce9f8] [&>span]:text-[13px] [&>span]:leading-[1.6] [&>span]:whitespace-normal [&>a]:text-[13px] [&>a]:leading-[1.6] [&>a]:whitespace-normal">
                         <ListChecks size={26} strokeWidth={1.5} aria-hidden="true" />
                         <strong>
                           {eventFilter === '전체'
@@ -628,7 +707,7 @@ export default function OperationsDashboardPage() {
               </tbody>
             </table>
           </div>
-          <div className="ops-log-footer">
+          <div className="mt-3 flex flex-wrap justify-between gap-x-3.5 gap-y-1.5 border-t border-[#304a6844] pt-[11px] text-xs/[1.5] text-[#a6bcd4]">
             <span>
               {Math.min(filteredLogs.length, allLogs ? 50 : 4)} / {filteredLogs.length}건 표시
             </span>

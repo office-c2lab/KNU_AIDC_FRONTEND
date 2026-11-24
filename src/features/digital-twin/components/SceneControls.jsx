@@ -1,34 +1,45 @@
+import { uiClass } from '../../../styles/interfaceStyles.js';
 import { House } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { panelEntrance } from '../../../utils/panelMotion.js';
-
 const dockButton = 'dock-button';
-
 export default function SceneControls({ ready = true, onEntranceComplete }) {
   const viewMode = useDigitalTwinStore(state => state.viewMode);
   const utilities = useDigitalTwinStore(state => state.utilities);
   const agentsVisible = useDigitalTwinStore(state => state.agentsVisible);
-
   return (
     <>
       <motion.div
-        {...panelEntrance({ y: 22, delay: 1.52, ready })}
+        {...panelEntrance({
+          y: 22,
+          delay: 1.52,
+          ready,
+        })}
         onAnimationComplete={onEntranceComplete}
-        className="center-status"
+        className={uiClass('center-status')}
       >
-        <div className="control-dock" role="toolbar" aria-label="데이터센터 3D 관제 도구">
-          <div className="dock-group dock-home-group">
-            <button type="button" className={dockButton} id="btn-fit" title="전체 시설 보기">
+        <div
+          className={uiClass('control-dock')}
+          role="toolbar"
+          aria-label="데이터센터 3D 관제 도구"
+        >
+          <div className={uiClass('dock-group dock-home-group')}>
+            <button
+              type="button"
+              className={uiClass(dockButton)}
+              id="btn-fit"
+              title="전체 시설 보기"
+            >
               <House size={14} aria-hidden="true" />
               <span>전체 시설</span>
             </button>
           </div>
 
-          <div className="dock-group" role="group" aria-label="분석 모드">
+          <div className={uiClass('dock-group')} role="group" aria-label="분석 모드">
             <button
               type="button"
-              className={`${dockButton}${viewMode === 'thermal' ? ' active' : ''}`}
+              className={uiClass(`${dockButton}${viewMode === 'thermal' ? ' active' : ''}`)}
               data-mode="thermal"
               aria-pressed={viewMode === 'thermal'}
               title="온도 분포를 켜거나 끕니다"
@@ -37,10 +48,10 @@ export default function SceneControls({ ready = true, onEntranceComplete }) {
             </button>
           </div>
 
-          <div className="dock-group" role="group" aria-label="표시 레이어">
+          <div className={uiClass('dock-group')} role="group" aria-label="표시 레이어">
             <button
               type="button"
-              className={`${dockButton}${utilities.power ? ' active' : ''}`}
+              className={uiClass(`${dockButton}${utilities.power ? ' active' : ''}`)}
               data-mode="power"
               title="전력 A/B 계통을 켜거나 끕니다"
               aria-pressed={utilities.power}
@@ -49,7 +60,7 @@ export default function SceneControls({ ready = true, onEntranceComplete }) {
             </button>
             <button
               type="button"
-              className={`${dockButton}${utilities.coolant ? ' active' : ''}`}
+              className={uiClass(`${dockButton}${utilities.coolant ? ' active' : ''}`)}
               data-mode="coolant"
               title="냉수 공급·회수 계통을 켜거나 끕니다"
               aria-pressed={utilities.coolant}
@@ -58,10 +69,10 @@ export default function SceneControls({ ready = true, onEntranceComplete }) {
             </button>
           </div>
 
-          <div className="dock-group">
+          <div className={uiClass('dock-group')}>
             <button
               type="button"
-              className={`${dockButton}${agentsVisible ? ' active' : ''}`}
+              className={uiClass(`${dockButton}${agentsVisible ? ' active' : ''}`)}
               id="btn-agent-visibility"
               aria-pressed={agentsVisible}
               title="AI 운영 요원을 표시하거나 숨깁니다"
@@ -72,7 +83,7 @@ export default function SceneControls({ ready = true, onEntranceComplete }) {
         </div>
       </motion.div>
       <div id="floor-separation-hint" hidden></div>
-      <div className="v9-logic" aria-hidden="true">
+      <div className={uiClass('v9-logic')} aria-hidden="true">
         <span id="stat-assets"></span>
         <span id="stat-healthy"></span>
         <span id="stat-alerts"></span>
