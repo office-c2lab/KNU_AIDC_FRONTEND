@@ -36,6 +36,9 @@ export function LoginFrame() {
     'M58 8H466Q492 8 492 34V494Q492 510 481 521L460 542Q450 552 436 552H34Q8 552 8 526V70Q8 50 22 36L42 16Q50 8 58 8Z';
   const inner =
     'M61 19H461Q481 19 481 40V491L449 527Q442 537 428 537H39Q21 537 21 519V76L53 27Q57 19 61 19Z';
+  const cornerAccent =
+    'M319 537L330 528H426Q434 528 439 522L481 481V501L449 535Q444 541 432 541H319Z';
+  const oppositeCorner = 'rotate(180 251 278)';
   return (
     <svg
       className="pointer-events-none absolute inset-0 size-full overflow-visible"
@@ -87,12 +90,12 @@ export function LoginFrame() {
         filter={url('glow')}
       />
       <path d={inner} fill="none" stroke={url('blue')} strokeWidth="1.3" />
-      <path d="M21 76L53 27Q57 19 61 19H181L169 28H67Q63 28 60 33L21 92Z" fill={url('gold')} />
-      <path
-        d="M319 537L330 528H426Q434 528 439 522L481 481V501L449 535Q444 541 432 541H319Z"
-        fill={url('gold')}
-      />
-      <path d="M63 20H167M339 537H427" stroke="#fff6ba" strokeWidth="2" filter={url('glow')} />
+      <path d={cornerAccent} transform={oppositeCorner} fill={url('gold')} />
+      <path d={cornerAccent} fill={url('gold')} />
+      <g stroke="#fff6ba" strokeWidth="2" filter={url('glow')}>
+        <path d="M339 537H427" transform={oppositeCorner} />
+        <path d="M339 537H427" />
+      </g>
       <ellipse cx="447" cy="19" rx="33" ry="6" fill={url('spark')} />
       <ellipse cx="58" cy="537" rx="30" ry="5" fill={url('spark')} />
     </svg>
