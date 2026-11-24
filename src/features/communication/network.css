@@ -1,6 +1,7 @@
 .network-page {
   --network-panel-width: 280px;
   --network-panel-inset: 32px;
+  --network-hover-background: #203c54;
   position: relative;
   height: var(--app-viewport-height, 100dvh);
   overflow: hidden;
@@ -146,15 +147,8 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.network-route:hover,
-.network-destination-point:hover {
-  opacity: 1;
-}
 .network-route-line {
   transition: stroke-width 0.2s;
-}
-.network-route:hover .network-route-line {
-  stroke-width: 2.2px;
 }
 .network-route-flow {
   pointer-events: none;
@@ -249,7 +243,6 @@
   color: #c2def2;
   text-align: left;
 }
-.network-country-site:hover,
 .network-country-site.active {
   border-color: #8bbddf;
   background: #21415d;
@@ -304,10 +297,6 @@
   transition:
     stroke-opacity 0.2s,
     fill 0.2s;
-}
-.network-destination-point:hover .network-point-label-bg {
-  fill: #102a3d;
-  stroke-opacity: 0.85;
 }
 .network-map .network-point-label text {
   stroke: none;
@@ -383,9 +372,6 @@
   border-radius: 4px;
   color: #c4d9ed;
   background: #13283e;
-}
-.network-map-tools button:hover {
-  background: #294a67;
 }
 .network-map-tools button:disabled {
   opacity: 0.35;
@@ -512,10 +498,6 @@
   color: #9fb7d1;
   font-size: 10px;
 }
-.network-overview-button:hover {
-  background: #203e59;
-  border-color: #709abb;
-}
 .network-overview-button[aria-pressed='true'] {
   background: #21415dc9;
   border-color: #6c9ac0;
@@ -532,9 +514,6 @@
   border: 1px solid transparent;
   border-radius: 5px;
   color: #dce9f8;
-}
-.network-destination-list button:hover {
-  background: #182f48;
 }
 .network-destination-list button[aria-pressed='true'] {
   background: #1e3d59;
@@ -594,20 +573,6 @@
 .network-destination-list button > span:nth-child(2) > span {
   font-size: 10px;
   color: #8fa9c4;
-}
-.network-destination-list button > span:last-child {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-.network-destination-list button > span:last-child small {
-  font-size: 9px;
-  color: #8fa9c4;
-}
-.network-destination-list button > span:last-child svg {
-  margin-left: 4px;
 }
 .network-detail > p {
   margin: 0 18px 14px;
@@ -716,6 +681,28 @@
 .network-activity-scope {
   font-size: 10px;
   color: #91adc6;
+}
+.network-detail-place-heading {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  min-width: 0;
+}
+.network-detail > header {
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+.network-detail > header > .network-activity-status {
+  flex: none;
+  white-space: nowrap;
+  font-size: 10px;
+}
+.network-detail-place-heading > span {
+  font-size: 10px;
+  color: #91adc6;
+  line-height: 1.5;
 }
 .network-activity-summary h3 {
   margin: 5px 0 9px;
@@ -841,7 +828,6 @@
   color: #dce9f8;
   text-align: left;
 }
-.network-history-list button:hover,
 .network-history-list button:focus-visible {
   background: #1c354a80;
   border-color: #4d799c;
@@ -956,7 +942,6 @@
 .network-connection-card[data-status='error'] {
   background: transparent;
 }
-.network-connection-card:hover,
 .network-connection-card:focus-visible {
   background: #203c54;
 }
@@ -1008,17 +993,8 @@
   gap: 3px;
   color: #bad9ee;
 }
-.network-detail-list-back {
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 16px 0;
-  border: 0;
+.network-detail .detail-back-navigation > button:not(:disabled):hover {
   background: transparent;
-  color: #bad9ee;
-  text-align: left;
-  font-size: 10px;
 }
 @media (max-width: 900px) {
   .network-connection-cards {
@@ -1119,6 +1095,11 @@
   }
   .network-legend {
     gap: 12px;
+  }
+}
+@media (hover: hover) {
+  .network-page button:not(:disabled):hover {
+    background: var(--network-hover-background);
   }
 }
 @media (prefers-reduced-motion: reduce) {

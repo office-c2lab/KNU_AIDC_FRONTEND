@@ -1,7 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { geoContains, geoGraticule10, geoMercator, geoOrthographic, geoPath } from 'd3-geo';
 import {
-  ArrowUpRight,
   ChevronDown,
   ChevronRight,
   Globe2,
@@ -557,7 +556,6 @@ export default function AiNetworkPage() {
                           <strong>{origin.city}</strong>
                           <span>{origin.name} · 출발지</span>
                         </span>
-                        <ArrowUpRight size={14} />
                       </button>
                     )}
                     {sites.map(item => (
@@ -574,7 +572,6 @@ export default function AiNetworkPage() {
                             {item.region} · {item.service}
                           </span>
                         </span>
-                        <ArrowUpRight size={14} />
                       </button>
                     ))}
                   </div>

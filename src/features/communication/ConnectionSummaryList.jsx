@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowUpRight } from 'lucide-react';
+import DetailBackNavigation from '../../components/DetailBackNavigation.jsx';
 import { getConnectionStatus } from './networkData.js';
 import { connectionHistory, formatHistoryTime } from './networkHistory.js';
 
@@ -19,22 +19,21 @@ export default function ConnectionSummaryList({ country, sites, onSelect, onOver
   return (
     <aside className="network-detail network-info-panel" aria-label="AI 통신 연결 목록">
       <header>
-        <h2>AI 통신</h2>
+        <h2>AI 통신이력</h2>
       </header>
+      {country && (
+        <DetailBackNavigation onBack={onOverview} label="통신 목록 탐색">
+          전체 통신 목록으로 돌아가기
+        </DetailBackNavigation>
+      )}
       <div className="network-connection-list-heading">
         <div>
           <h3>{country ? country.properties.name : '전체 통신 연결'}</h3>
           <span>{sites.length}개 지점 · 이상 우선</span>
         </div>
-        {country && (
-          <button type="button" className="network-country-back" onClick={onOverview}>
-            <ArrowLeft size={12} />
-            전체 국가 보기
-          </button>
-        )}
         <div className="network-connection-filters" role="group" aria-label="통신 상태 필터">
           {[
-            ['all', '전체'],
+            ['all', '전체 상태'],
             ['error', '이상'],
             ['warning', '지연'],
           ].map(([status, label]) => (
@@ -85,9 +84,6 @@ export default function ConnectionSummaryList({ country, sites, onSelect, onOver
               <div className="network-connection-card-footer">
                 <span>
                   {site.latency} ms · {site.traffic} Mbps
-                </span>
-                <span>
-                  <ArrowUpRight size={12} />
                 </span>
               </div>
             </button>

@@ -1,5 +1,5 @@
-import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { useRef } from 'react';
+import DetailBackNavigation from '../../components/DetailBackNavigation.jsx';
 import ConnectionSummaryList from './ConnectionSummaryList.jsx';
 import { connections, origin, getConnectionStatus } from './networkData.js';
 import { connectionHistory, formatHistoryTime } from './networkHistory.js';
@@ -62,21 +62,21 @@ export default function CountryConnectionDetails({
   return (
     <aside className="network-detail network-info-panel" aria-label="AI 통신 현황 및 이력">
       <header>
-        <h2>통신 상세</h2>
-      </header>
-      <button type="button" className="network-detail-list-back" onClick={backToList}>
-        <ArrowLeft size={13} />
-        연결 목록 보기
-      </button>
-      <div className="network-activity-summary">
-        <span className="network-activity-scope">
-          {site ? `${site.country} · ${site.region}` : country ? '선택 국가' : '전체 연결'}
-        </span>
-        <h3>{site ? site.city : country ? country.properties.name : '전체 통신 현황'}</h3>
+        <div className="network-detail-place-heading">
+          <h2>{site.city}</h2>
+          <span>
+            {site.country} · {site.region}
+          </span>
+        </div>
         <span className="network-activity-status" style={{ color: status.color }}>
           <i style={{ background: status.color }} />
           {status.label}
         </span>
+      </header>
+      <DetailBackNavigation onBack={backToList} label="통신 상세 탐색">
+        통신 목록으로 돌아가기
+      </DetailBackNavigation>
+      <div className="network-activity-summary">
         {selected ? (
           <dl className="network-activity-facts">
             {[
@@ -145,11 +145,6 @@ export default function CountryConnectionDetails({
                         {target.country} · {target.region}
                       </small>
                     )}
-                    <ArrowUpRight
-                      className="network-history-event-arrow"
-                      size={12}
-                      aria-hidden="true"
-                    />
                   </button>
                 </li>
               );

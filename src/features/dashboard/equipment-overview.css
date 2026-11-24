@@ -2,26 +2,6 @@
   container-type: inline-size;
 }
 
-.scenario-detail-navigation {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  padding: 10px 18px 0;
-}
-.scenario-detail-navigation > button {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  color: #91aac4;
-  font-size: 12px;
-}
-.scenario-detail-navigation > button:hover {
-  color: #dce9f8;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
 .scenario-workspace-scroll {
   display: grid;
   align-content: start;

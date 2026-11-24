@@ -1,4 +1,5 @@
 import ScenarioFacilitySidebar from '../features/dashboard/ScenarioFacilitySidebar.jsx';
+import DetailBackNavigation from '../components/DetailBackNavigation.jsx';
 import EquipmentOverview from '../features/dashboard/EquipmentOverview.jsx';
 import ScenarioHistory from '../features/dashboard/ScenarioHistory.jsx';
 import EquipmentCatalog from '../features/dashboard/EquipmentCatalog.jsx';
@@ -231,13 +232,11 @@ export default function DashboardPage() {
               />
             ) : (
               <>
-                <nav className="scenario-detail-navigation" aria-label="설비 상세 탐색">
-                  <button type="button" onClick={backToCatalog}>
-                    {catalogReturn.facilityId === 'all'
-                      ? '전체 설비로 돌아가기'
-                      : `${facilityGroups.find(group => group.id === catalogReturn.facilityId)?.name ?? '설비 목록'}으로 돌아가기`}
-                  </button>
-                </nav>
+                <DetailBackNavigation onBack={backToCatalog} label="설비 상세 탐색">
+                  {catalogReturn.facilityId === 'all'
+                    ? '전체 설비로 돌아가기'
+                    : `${facilityGroups.find(group => group.id === catalogReturn.facilityId)?.name ?? '설비 목록'}으로 돌아가기`}
+                </DetailBackNavigation>
                 <EquipmentOverview
                   asset={selectedAsset}
                   stage={selectedIncident ? steps[selectedIncident.stage] : null}
