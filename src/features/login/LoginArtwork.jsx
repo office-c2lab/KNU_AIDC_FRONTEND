@@ -87,12 +87,12 @@ export function LoginFrame() {
         filter={url('glow')}
       />
       <path d={inner} fill="none" stroke={url('blue')} strokeWidth="1.3" />
-      <path d="M21 76V53L48 28Q53 23 63 23H181L169 32H66Q60 32 56 38Z" fill={url('gold')} />
+      <path d="M21 76L53 27Q57 19 61 19H181L169 28H67Q63 28 60 33L21 92Z" fill={url('gold')} />
       <path
         d="M319 537L330 528H426Q434 528 439 522L481 481V501L449 535Q444 541 432 541H319Z"
         fill={url('gold')}
       />
-      <path d="M66 24H167M339 537H427" stroke="#fff6ba" strokeWidth="2" filter={url('glow')} />
+      <path d="M63 20H167M339 537H427" stroke="#fff6ba" strokeWidth="2" filter={url('glow')} />
       <ellipse cx="447" cy="19" rx="33" ry="6" fill={url('spark')} />
       <ellipse cx="58" cy="537" rx="30" ry="5" fill={url('spark')} />
     </svg>

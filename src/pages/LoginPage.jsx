@@ -1,5 +1,6 @@
 import { Check, Eye, EyeOff, LockKeyhole, LogIn, UserRound, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import loginImage from '../assets/login.png';
 import { LoginBackdrop, LoginFrame, UniversityWordmark } from '../features/login/LoginArtwork.jsx';
 
@@ -15,12 +16,11 @@ const inputClass =
   'h-[var(--login-field-height,54px)] w-full rounded-[10px] border border-[#4f80a9] bg-linear-to-r from-[#19354a99] to-[#11243980] pr-12 pl-14 text-[15px] text-[#edf7ff] shadow-[inset_0_1px_#a8daf00a] outline-none transition-colors placeholder:text-[#b0bed0] hover:border-[#71a9d2] focus:border-[#6ee3ff] focus:ring-2 focus:ring-[#30beff26] max-[420px]:h-[50px] max-[420px]:pl-12 max-[420px]:text-[14px]';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [initialId] = useState(readSavedId);
   const [username, setUsername] = useState(initialId);
   const [remember, setRemember] = useState(Boolean(initialId));
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const usernameRef = useRef(null);
   const helpRef = useRef(null);
 
   useEffect(() => {
@@ -33,19 +33,14 @@ export default function LoginPage() {
 
   const submit = event => {
     event.preventDefault();
-    if (!username.trim()) {
-      setError('아이디를 입력해주세요.');
-      usernameRef.current?.focus();
-      return;
-    }
     try {
-      if (remember) localStorage.setItem(savedIdKey, username.trim());
+      if (remember && username.trim()) localStorage.setItem(savedIdKey, username.trim());
       else localStorage.removeItem(savedIdKey);
     } catch {
       /* Login remains usable when browser storage is unavailable. */
     }
-    // No account authentication endpoint is available in this application yet.
-    setError('현재 로그인 서비스를 이용할 수 없습니다. 관리자에게 문의해주세요.');
+    // Temporary navigation until account authentication is connected.
+    navigate('/dashboard', { replace: true });
   };
 
   return (
@@ -105,7 +100,7 @@ export default function LoginPage() {
                 className="h-px min-w-4 flex-1 bg-linear-to-l from-transparent to-[#68d8ff]"
               />
             </div>
-            <form onSubmit={submit} aria-label="로그인 정보" className="flex flex-col">
+            <form onSubmit={submit} noValidate aria-label="로그인 정보" className="flex flex-col">
               <label htmlFor="login-username" className="sr-only">
                 아이디
               </label>
@@ -117,22 +112,18 @@ export default function LoginPage() {
                   className="pointer-events-none absolute top-1/2 left-[18px] -translate-y-1/2 text-[#ebf1f9] max-[420px]:left-4"
                 />
                 <input
-                  ref={usernameRef}
                   id="login-username"
                   name="username"
                   type="text"
                   autoComplete="username"
                   autoCapitalize="none"
                   spellCheck="false"
-                  required
                   value={username}
                   onChange={event => {
                     setUsername(event.target.value);
-                    setError('');
                   }}
                   placeholder="아이디를 입력하세요"
                   className={inputClass}
-                  aria-describedby={error ? 'login-error' : undefined}
                 />
               </div>
               <label htmlFor="login-password" className="sr-only">
@@ -150,11 +141,8 @@ export default function LoginPage() {
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
-                  required
                   placeholder="비밀번호를 입력하세요"
                   className={inputClass}
-                  onInput={() => setError('')}
-                  aria-describedby={error ? 'login-error' : undefined}
                 />
                 <button
                   type="button"
@@ -211,15 +199,6 @@ export default function LoginPage() {
                 <LogIn size={23} strokeWidth={1.8} aria-hidden="true" />
                 로그인
               </button>
-              {error && (
-                <p
-                  id="login-error"
-                  role="alert"
-                  className="mt-4 text-[12px] leading-relaxed text-[#ffb4a9]"
-                >
-                  {error}
-                </p>
-              )}
             </form>
           </div>
         </section>
