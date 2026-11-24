@@ -164,7 +164,7 @@ export default function ConnectionOverlay({
                     key={item.id}
                     className={`network-route${selected ? ' selected' : ''}`}
                     data-destination={item.id}
-                    opacity={critical || !selectedId || selected ? 1 : 0.24}
+                    opacity={!selectedId || selected ? 1 : 0.24}
                     onClick={() => onSelect(item)}
                     style={{
                       '--connection-color': getConnectionStatus(item.status).color,
@@ -250,7 +250,7 @@ export default function ConnectionOverlay({
                   key={item.id}
                   className="network-destination-point"
                   data-destination={item.id}
-                  opacity={critical || !selectedId || item.id === selectedId ? 1 : 0.3}
+                  opacity={!selectedId || item.id === selectedId ? 1 : 0.3}
                   onClick={() => onSelect(item)}
                 >
                   <NetworkPoint

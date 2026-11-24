@@ -590,7 +590,6 @@ export default function AiNetworkPage() {
           selected={selected}
           originFocused={originFocused}
           onSelect={select}
-          onSelectOrigin={selectOrigin}
           onCountry={selectCountry}
           onOverview={showAll}
         />
