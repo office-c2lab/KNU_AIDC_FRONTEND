@@ -1,15 +1,29 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
-import { ArrowUpRight, Circle } from 'lucide-react';
+import { ArrowUpRight, Circle, X } from 'lucide-react';
 import { SelectedOperatingMetrics } from './OperatingMetrics.jsx';
 import { instrumentCard, moduleReadout, panelBase, panelScroll, subTitle } from './uiStyles.js';
-export default function OperationsSidebar() {
+export default function OperationsSidebar({ open = true, onClose }) {
   return (
     <>
       <aside
         className={uiClass(`${panelBase} right-panel right-[26px]`)}
         aria-label="시설 상세 및 운영 안내"
+        aria-hidden={!open}
+        hidden={!open}
+        style={{ right: '82px', zIndex: 19 }}
       >
-        <div className={uiClass(panelScroll)}>
+        <button
+          type="button"
+          className={uiClass(
+            'absolute right-[10px] top-[8px] z-[5] grid h-[28px] w-[28px] place-items-center rounded-[3px] border border-[#45678d] bg-[#132944] text-[#b8cce3] hover:bg-[#284b70] hover:text-white'
+          )}
+          aria-label="선택 대상 상세 패널 닫기"
+          title="닫기"
+          onClick={onClose}
+        >
+          <X size={15} aria-hidden="true" />
+        </button>
+        <div className={uiClass(panelScroll)} style={{ paddingTop: '34px' }}>
           <section aria-labelledby="equipment-heading">
             <div className={uiClass(subTitle)}>
               <h2 id="equipment-heading">선택 대상 상세</h2>

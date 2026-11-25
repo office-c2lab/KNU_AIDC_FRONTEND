@@ -12,8 +12,7 @@ const initialState = {
   splitLevel: 0,
   viewMode: 'normal',
   utilities: { power: false, coolant: false },
-  highQuality: true,
-  agentsVisible: true,
+  agentsVisible: false,
   autoRotate: false,
   chosenScenarioId: 'gpu',
   selectedIncidentId: null,
@@ -79,7 +78,6 @@ export const useDigitalTwinStore = create(set => ({
 
       return { viewMode, utilities };
     }),
-  setHighQuality: highQuality => set({ highQuality }),
   setAgentsVisible: agentsVisible => set({ agentsVisible }),
   toggleAgentsVisible: () => set(state => ({ agentsVisible: !state.agentsVisible })),
   setAutoRotate: autoRotate => set({ autoRotate }),

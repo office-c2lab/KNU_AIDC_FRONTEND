@@ -108,7 +108,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   let focusTween = null;
   let lastPointer = { x: 0, y: 0 };
 
-  let highQuality = initialTwinState.highQuality;
+  const highQuality = true;
   const twinActions = digitalTwinStore.getState();
   const syncIncidentStore = () => {
     twinActions.setScenarioState({ chosenScenarioId, selectedIncidentId });
@@ -2844,9 +2844,6 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   function applyAgentVisibility(show) {
     agentsVisible = Boolean(show);
     for (const agent of aiAgents.values()) agent.root.visible = agentsVisible;
-    const btn = $('#btn-agent-visibility');
-    btn.classList.toggle('active', agentsVisible);
-    btn.setAttribute('aria-pressed', String(agentsVisible));
     if (!agentsVisible && selectedId && aiAgents.has(selectedId)) setZone(activeZone, null, false);
   }
 
@@ -4422,11 +4419,6 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       controls.autoRotate = autoRotate;
       $('#btn-auto').classList.toggle('is-on', autoRotate);
     }
-    if (state.highQuality !== previous.highQuality) {
-      highQuality = state.highQuality;
-      applyRenderQuality();
-      updateDistanceDetails();
-    }
   });
   function toggleDoor(id) {
     const door = doors.find(d => d.id === id);
@@ -5124,23 +5116,13 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       setInspectorTab('scenario');
     }
   });
-  $('#btn-agent-visibility').addEventListener('click', twinActions.toggleAgentsVisible);
   $('#btn-fit').addEventListener('click', () => setZone('overview'));
   $('#btn-auto').addEventListener('click', () => {
     twinActions.toggleAutoRotate();
   });
-  root.querySelectorAll('[data-quality]').forEach(button =>
-    button.addEventListener('click', () => {
-      twinActions.setHighQuality(button.dataset.quality === 'high');
-    })
-  );
   $('#topChip').addEventListener('click', () => {
     const target = activeFloor ? [0, FLOOR_Y[activeFloor] + 1, 0] : [0, 8, 0];
     animateCamera([0, activeFloor ? FLOOR_Y[activeFloor] + 41 : 85, 0.2], target, 900);
-  });
-  $('#btn-view-reset').addEventListener('click', () => {
-    if (activeFloor) setZone('f' + activeFloor[0]);
-    else setZone('overview');
   });
   root.querySelector('.right-panel').addEventListener('click', e => {
     const zoneButton = e.target.closest('[data-infra-focus]');

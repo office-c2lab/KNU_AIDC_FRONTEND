@@ -30,11 +30,6 @@ export function createRenderingCore({ THREE, OrbitControls, host, root, zones, g
 
     renderer.setPixelRatio(chosenDpr);
     renderer.setSize(w, h, false);
-    root.querySelectorAll('[data-quality]').forEach(button => {
-      const active = (button.dataset.quality === 'high') === highQuality;
-      button.classList.toggle('active', active);
-      button.setAttribute('aria-pressed', String(active));
-    });
   }
 
   renderer.shadowMap.enabled = true;
