@@ -24,37 +24,25 @@ function StatusDot({ fault }) {
   );
 }
 
-function FacilitySummary({ power, expanded, onClick }) {
+function MetricSummary({ label, value, unit, expanded, onClick, controls }) {
   return (
-    <div className={uiClass(`${panelSurface} rounded-full border-l-[#5dcfff]`)}>
+    <div className={uiClass(`${panelSurface} w-[280px] max-w-full rounded-full`)}>
       <button
         type="button"
         className={uiClass(
           `${panelTab} flex h-[42px] w-full items-center justify-between gap-[10px] rounded-full px-[14px]`
         )}
-        aria-label="시설 효율 및 소비 전력 상세"
+        aria-label={`${label} 상세`}
         aria-expanded={expanded}
-        aria-controls="compact-power-card"
+        aria-controls={controls}
         onClick={onClick}
       >
-        <Zap
-          size={18}
-          aria-hidden="true"
-          className={uiClass('flex-none text-[#8cddff] [filter:drop-shadow(0_0_5px_#27afff)]')}
-        />
-        <span className={uiClass('flex items-baseline gap-[8px] whitespace-nowrap text-[13px]')}>
-          <span>PUE</span>
+        <span className={uiClass('text-[14px] whitespace-nowrap')}>{label}</span>
+        <span className={uiClass('ml-auto flex items-baseline gap-[6px] whitespace-nowrap')}>
           <strong className={uiClass('text-[16px] font-semibold tabular-nums text-[#edf6ff]')}>
-            {power.pueEstimate === null ? '—' : power.pueEstimate.toFixed(2)}
+            {value}
           </strong>
-        </span>
-        <span aria-hidden="true" className={uiClass('h-[16px] w-px flex-none bg-[#638bb066]')} />
-        <span className={uiClass('flex items-baseline gap-[6px] whitespace-nowrap text-[13px]')}>
-          <span>소비 전력</span>
-          <strong className={uiClass('text-[16px] font-semibold tabular-nums text-[#edf6ff]')}>
-            {power.totalKw.toFixed(2)}
-          </strong>
-          <span className={uiClass('text-[12px] text-[#a9bfd9]')}>kW</span>
+          {unit && <span className={uiClass('text-[12px] text-[#a9bfd9]')}>{unit}</span>}
         </span>
         <ChevronDown
           size={13}
@@ -150,10 +138,37 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
         role="toolbar"
         aria-label="시설 정보"
       >
-        <FacilitySummary
-          power={power}
+        <div
+          className={uiClass(
+            `${panelSurface} flex h-[42px] w-fit items-center gap-[12px] rounded-full px-[16px]`
+          )}
+          aria-label={`PUE ${power.pueEstimate === null ? '산출 불가' : power.pueEstimate.toFixed(2)}`}
+        >
+          <Zap
+            size={16}
+            aria-hidden="true"
+            className={uiClass(
+              'block flex-none text-[#8cddff] [filter:drop-shadow(0_0_5px_#27afff)]'
+            )}
+          />
+          <span className={uiClass('flex items-center gap-[8px] whitespace-nowrap leading-none')}>
+            <span className={uiClass('text-[13px] leading-none text-[#b8cce3]')}>PUE</span>
+            <strong
+              className={uiClass(
+                'text-[16px] leading-none font-semibold tabular-nums text-[#edf6ff]'
+              )}
+            >
+              {power.pueEstimate === null ? '—' : power.pueEstimate.toFixed(2)}
+            </strong>
+          </span>
+        </div>
+        <MetricSummary
+          label="소비 전력"
+          value={power.totalKw.toFixed(2)}
+          unit="kW"
           expanded={openPanel === 'power'}
           onClick={() => togglePanel('power')}
+          controls="compact-power-card"
         />
         {openPanel === 'power' && <PowerWidget power={power} />}
       </div>

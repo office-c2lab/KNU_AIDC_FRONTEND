@@ -32,7 +32,7 @@ export default function FacilitySidebar({ open = true, section = null, onClose }
         aria-label="시설 현황 및 층 탐색"
         aria-hidden={!open}
         hidden={!open}
-        style={{ left: '282px', zIndex: 19 }}
+        style={{ left: '322px', zIndex: 19 }}
       >
         <button
           type="button"
