@@ -33,6 +33,8 @@ const colors = {
   송신: '#73e1c0',
 };
 const powerColors = ['#87bce9', '#73e1c0', '#eac476', '#9da9c9'];
+const glassCardClassName =
+  'rounded-md border border-[#5274a280] border-t-[#88b5df80] bg-[radial-gradient(ellipse_at_15%_0%,#5b97cb14,transparent_60%),linear-gradient(155deg,#13294099,#09182b8c)] shadow-[inset_0_1px_0_#c2e6ff14,0_10px_28px_#01071333] backdrop-blur-[14px] max-[560px]:backdrop-blur-[8px]';
 const trendChartClassName =
   '[&_.recharts-surface]:overflow-visible [&_.recharts-cartesian-axis-tick-value]:tabular-nums w-full min-w-0 h-[clamp(185px,calc(20vh_+_20px),225px)] max-[560px]:h-[200px]';
 const powerColorByLabel = Object.fromEntries(
@@ -243,7 +245,7 @@ function TrendChart({ data, keys, chartId, percent = true, label }) {
 function Panel({ title, children, extra, className = '' }) {
   return (
     <section
-      className={`flex min-w-0 flex-col rounded-md border border-[#324f72] bg-[#101e32] px-5 py-[18px] max-[1000px]:p-3 ${className}`}
+      className={`${glassCardClassName} flex min-w-0 flex-col px-5 py-[18px] max-[1000px]:p-3 ${className}`}
     >
       <header className="mb-2 flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
         <h2 className="m-0 text-[17px] leading-[1.4] font-semibold text-[#f3f8ff]">{title}</h2>
@@ -354,7 +356,7 @@ export default function OperationsDashboardPage() {
         >
           {kpis.map(([title, value, unit, note, tone]) => (
             <section
-              className="min-w-0 rounded-md border border-[#324f72] bg-[#101e32] px-5 py-4 max-[1000px]:px-3 max-[1000px]:py-[11px]"
+              className={`${glassCardClassName} min-w-0 px-5 py-4 max-[1000px]:px-3 max-[1000px]:py-[11px]`}
               key={title}
             >
               <h2 className="m-0 text-[15px] font-medium text-[#d1deed]">{title}</h2>

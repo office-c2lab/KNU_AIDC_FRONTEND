@@ -113,7 +113,7 @@ export default function AppHeader() {
         <HeaderClock />
         <button
           type="button"
-          className={`relative grid size-8 shrink-0 place-items-center rounded-[3px] border transition-colors ${notificationsOpen ? 'border-[#e6bc5f] bg-[#493d214d] text-[#ffe4a5]' : 'border-[#3c638673] bg-[#11253d80] text-[#aacae5] hover:border-[#76b9ed] hover:bg-[#193553] hover:text-[#ecf7ff]'}`}
+          className={`relative grid size-8 shrink-0 place-items-center rounded-[3px] border transition-colors ${notificationsOpen ? 'border-[#76b9ed] bg-[#193553] text-[#ecf7ff]' : 'border-[#3c638673] bg-[#11253d80] text-[#aacae5] hover:border-[#76b9ed] hover:bg-[#193553] hover:text-[#ecf7ff]'}`}
           id="header-alarm"
           aria-expanded={notificationsOpen}
           aria-controls="notifications-panel"
