@@ -1,0 +1,124 @@
+#asset-modal .asset-modal-backdrop {
+  background: #010711cc;
+  backdrop-filter: none;
+}
+
+#asset-modal .asset-modal-window {
+  border-color: #214a68;
+  border-top-color: #3c9ac4;
+  border-radius: 7px;
+  background: #0b172d;
+  box-shadow: 0 16px 56px #01071380;
+}
+
+#asset-modal .asset-modal-window::before {
+  background: none;
+}
+
+#asset-modal .asset-modal-window::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: calc(50% - 11px);
+  width: 22px;
+  height: 1px;
+  background: #eed18c;
+  pointer-events: none;
+}
+
+#asset-modal .asset-modal-top,
+#asset-modal .asset-pane-heading {
+  background: #0b172d;
+  border-color: #214a68;
+}
+
+#asset-modal .asset-modal-top h2 {
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+#asset-modal .asset-modal-sub,
+#asset-modal .asset-pane-heading small,
+#asset-modal .asset-modal-view-note,
+#asset-modal .signal-foot {
+  font-size: 12px;
+  color: #99b4cb;
+}
+
+#asset-modal .asset-modal-body {
+  padding: 16px;
+  gap: 16px;
+}
+
+#asset-modal .asset-modal-card,
+#asset-modal .operating-metrics {
+  border-color: #214a68;
+  border-radius: 5px;
+  background: #0b172d;
+  box-shadow: none;
+}
+
+#asset-modal .asset-modal-card::before,
+#asset-modal .asset-modal-card::after {
+  display: none;
+}
+
+#asset-modal .asset-modal-meta,
+#asset-modal .agent-modal-header,
+#asset-modal .agent-modal-tile,
+#asset-modal .agent-modal-section {
+  background: #0b172d;
+  border-color: #214a68;
+}
+
+#asset-modal .asset-pane-heading,
+#asset-modal .asset-signal-title,
+#asset-modal .asset-modal-meta h3,
+#asset-modal .asset-chart-title strong,
+#asset-modal .asset-modal-note h3,
+#asset-modal .agent-modal-section h4 {
+  font-size: 14px;
+}
+
+#asset-modal .asset-modal-meta p,
+#asset-modal .asset-meta-grid,
+#asset-modal .asset-chart-title small {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+#asset-modal .asset-signal-card {
+  padding: 16px;
+  gap: 12px;
+}
+
+#asset-modal .asset-signal-value {
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.3;
+}
+
+#asset-modal .asset-modal-close,
+#asset-modal .asset-modal-open-door {
+  background: #0b2438;
+  border-color: #398eb2;
+  border-radius: 4px;
+  color: #b5cadd;
+  font-size: 14px;
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    color 150ms;
+}
+
+#asset-modal .asset-modal-close:hover,
+#asset-modal .asset-modal-open-door:hover {
+  background: #10354b;
+  border-color: #83d8f2;
+  color: #edf8ff;
+}
+
+@media (max-width: 750px) {
+  #asset-modal .asset-modal-body {
+    padding: 12px;
+  }
+}

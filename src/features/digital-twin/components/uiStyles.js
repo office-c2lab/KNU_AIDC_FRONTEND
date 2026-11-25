@@ -1,10 +1,10 @@
 export const buttonSurface =
-  'overflow-hidden border border-[#214a68] border-t-[#3c9ac4] [background:linear-gradient(90deg,transparent,#68ceef,transparent)_center_top/100%_1px_no-repeat,linear-gradient(#061424,#061424)] shadow-[0_6px_20px_#01071359]';
+  'overflow-hidden border border-[#214a68] border-t-[#3c9ac4] [background:linear-gradient(90deg,transparent,#68ceef,transparent)_center_top/100%_1px_no-repeat,linear-gradient(#0b172d,#0b172d)] shadow-[0_6px_20px_#01071359]';
 
 export const panelSurface =
-  'overflow-hidden border border-[#214a68] border-t-[#3c9ac4] [background:linear-gradient(90deg,transparent,#68ceef,transparent)_center_top/100%_1px_no-repeat,linear-gradient(90deg,#ab833e,#eed18c,#ab833e)_center_bottom/22px_1px_no-repeat,linear-gradient(#061424,#061424)] shadow-[0_6px_20px_#01071359]';
+  'overflow-hidden border border-[#214a68] border-t-[#3c9ac4] [background:linear-gradient(90deg,transparent,#68ceef,transparent)_center_top/100%_1px_no-repeat,linear-gradient(90deg,#ab833e,#eed18c,#ab833e)_center_bottom/22px_1px_no-repeat,linear-gradient(#0b172d,#0b172d)] shadow-[0_6px_20px_#01071359]';
 
-export const panelBase = `panel fixed top-[92px] bottom-[34px] z-[15] ${panelSurface} [background:#061424]! [backdrop-filter:none]! [box-shadow:0_6px_20px_#01071359]! [border-color:#214a68]! [&::before]:hidden! [&::after]:hidden!`;
+export const panelBase = `panel fixed top-[92px] bottom-[34px] z-[15] ${panelSurface} [background:#0b172d]! [backdrop-filter:none]! [box-shadow:0_6px_20px_#01071359]! [border-color:#214a68]! [&::before]:hidden! [&::after]:hidden!`;
 
 export const tooltipSurface = `${panelSurface} pointer-events-none rounded-[6px] px-[12px] py-[8px] text-[14px] font-medium leading-normal text-[#e5efff] [font-family:var(--font-interface)]`;
 
@@ -16,7 +16,7 @@ export const panelScroll = 'panel-scroll relative z-[3] h-full overflow-y-auto o
 export const headerButtonStyle = `${buttonSurface} ${panelTab} [&[aria-expanded=false]]:border-[#398eb2] [&[aria-expanded=false]:hover]:border-[#83d8f2] [&[aria-expanded=false]:hover]:[background:#0b2438] [&.active]:[background:#0c2a3f] [&.active:hover]:[background:#10354b]`;
 
 export const sectionTitle =
-  'section-title -mx-4 mb-3.5 flex h-[46px] items-center justify-between gap-2 border-b border-[#214a68] bg-[#081b2d] px-[17px] text-[13px] font-semibold tracking-[0.2px]';
+  'section-title -mx-4 mb-3.5 flex h-[46px] items-center justify-between gap-2 border-b border-[#214a68] bg-[#0b172d] px-[17px] text-[13px] font-semibold tracking-[0.2px]';
 
 export const subTitle =
   'sub-title mt-[18px] mb-2.5 flex items-center gap-2 text-[13px] font-semibold text-[#dce9f8]';
@@ -24,7 +24,7 @@ export const subTitle =
 export const moduleReadout =
   'module-readout whitespace-nowrap text-[11px] font-semibold tabular-nums text-[#b9d5f6]';
 
-export const instrumentCard = 'border border-[#214a68] bg-[#081b2d]';
+export const instrumentCard = 'border border-[#214a68] bg-[#0b172d]';
 
 export const floorList = 'floor-list grid gap-1.5';
 

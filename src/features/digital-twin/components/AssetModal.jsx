@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import AssetTrendChart from './AssetTrendChart.jsx';
 import { AssetOperatingMetrics } from './OperatingMetrics.jsx';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
+import './AssetModal.css';
 export default function AssetModal() {
   const detail = useDigitalTwinStore(state => state.assetDetail);
   const catalog = useDigitalTwinStore(state => state.assetCatalog);
