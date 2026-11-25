@@ -1,5 +1,5 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
-import { Bot, House, RotateCw, Snowflake, Thermometer, View, Zap } from 'lucide-react';
+import { Bot, House, Orbit, Snowflake, Thermometer, View, Zap } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { panelSurface, panelTab } from './uiStyles.js';
 const dockSurface = `${panelSurface} pointer-events-auto flex items-center h-[56px] px-[12px] rounded-[7px]`;
@@ -73,7 +73,7 @@ export default function SceneControls() {
               aria-label="자동 회전"
               aria-pressed={autoRotate}
             >
-              <RotateCw aria-hidden="true" />
+              <Orbit aria-hidden="true" />
             </button>
           </div>
         </div>

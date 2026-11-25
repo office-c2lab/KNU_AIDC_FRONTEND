@@ -27,11 +27,11 @@ function StatusDot({ fault }) {
 
 function MetricSummary({ label, value, unit, expanded, onClick, controls }) {
   return (
-    <div className={uiClass(`${metricSurface} w-[280px] max-w-full rounded-full`)}>
+    <div className={uiClass(`${metricSurface} w-[280px] max-w-full rounded-[7px]`)}>
       <button
         type="button"
         className={uiClass(
-          `${panelTab} flex h-[42px] w-full items-center justify-between gap-[10px] rounded-full px-[14px]`
+          `${panelTab} flex h-[42px] w-full items-center justify-between gap-[10px] rounded-[6px] px-[14px]`
         )}
         aria-label={`${label} 상세`}
         aria-expanded={expanded}
@@ -157,7 +157,7 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
       >
         <div
           className={uiClass(
-            `${metricSurface} flex h-[42px] w-fit items-center gap-[12px] rounded-full px-[16px]`
+            `${metricSurface} relative flex h-[42px] w-fit items-center gap-[12px] rounded-[7px] px-[16px]`
           )}
           aria-label={`PUE ${power.pueEstimate === null ? '산출 불가' : power.pueEstimate.toFixed(2)}`}
         >
@@ -178,6 +178,20 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
               {power.pueEstimate === null ? '—' : power.pueEstimate.toFixed(2)}
             </strong>
           </span>
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              width: 22,
+              height: 2,
+              transform: 'translateX(-50%)',
+              background: 'linear-gradient(90deg, #ab833e, #eed18c, #ab833e)',
+              pointerEvents: 'none',
+              zIndex: 2,
+            }}
+          />
         </div>
         <MetricSummary
           label="소비 전력"

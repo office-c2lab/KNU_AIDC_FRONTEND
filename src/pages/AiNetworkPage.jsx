@@ -1,21 +1,13 @@
 import { uiClass } from '../styles/interfaceStyles.js';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { geoContains, geoGraticule10, geoMercator, geoOrthographic, geoPath } from 'd3-geo';
-import {
-  ChevronDown,
-  ChevronRight,
-  Globe2,
-  Map,
-  Minus,
-  Plus,
-  RotateCcw,
-  Search,
-} from 'lucide-react';
+import { ChevronDown, ChevronRight, Globe2, Map, RotateCcw, Search } from 'lucide-react';
 import land from '../features/communication/land.json';
 import countries from '../features/communication/countries.json';
 import NetworkSurface from '../features/communication/NetworkSurface.jsx';
 import ConnectionOverlay from '../features/communication/ConnectionOverlay.jsx';
 import CountryConnectionDetails from '../features/communication/CountryConnectionDetails.jsx';
+import { panelSurface, panelTab } from '../features/digital-twin/components/uiStyles.js';
 import {
   countryByCode,
   countryFeatures,
@@ -259,33 +251,66 @@ export default function AiNetworkPage() {
           className={uiClass('network-visual')}
           aria-label={mode === 'globe' ? 'AI 통신 지구본' : 'AI 통신 평면지도'}
         >
-          <div className={uiClass('network-map-heading')}>
+          <div
+            className={uiClass(
+              'fixed bottom-[36px] left-[20px] right-[20px] z-[18] flex flex-wrap justify-center gap-[12px] pointer-events-none'
+            )}
+          >
             <div
-              className={uiClass('network-view-switch gap-1.5')}
-              role="group"
+              className={uiClass(
+                `${panelSurface} pointer-events-auto flex h-[56px] items-center gap-[10px] rounded-[7px] px-[12px]`
+              )}
+              role="toolbar"
               aria-label="지도 표시 방식"
             >
               <button
                 type="button"
+                className={uiClass(
+                  `${panelTab} grid h-[38px] w-[42px] place-items-center rounded-[4px]${mode === 'globe' ? ' active' : ''}`
+                )}
+                aria-label="지구본"
+                title="지구본"
                 aria-pressed={mode === 'globe'}
                 onClick={() => {
                   setMode('globe');
                   setZoom(1);
                 }}
               >
-                <Globe2 size={15} />
-                지구본
+                <Globe2 size={18} aria-hidden="true" />
               </button>
               <button
                 type="button"
+                className={uiClass(
+                  `${panelTab} grid h-[38px] w-[42px] place-items-center rounded-[4px]${mode === 'map' ? ' active' : ''}`
+                )}
+                aria-label="평면지도"
+                title="평면지도"
                 aria-pressed={mode === 'map'}
                 onClick={() => {
                   setMode('map');
                   setZoom(1);
                 }}
               >
-                <Map size={15} />
-                평면지도
+                <Map size={18} aria-hidden="true" />
+              </button>
+            </div>
+            <div
+              className={uiClass(
+                `${panelSurface} pointer-events-auto flex h-[56px] items-center rounded-[7px] px-[12px]`
+              )}
+              role="toolbar"
+              aria-label="지도 초기화"
+            >
+              <button
+                type="button"
+                className={uiClass(
+                  `${panelTab} grid h-[38px] w-[42px] place-items-center rounded-[4px]`
+                )}
+                aria-label="전체 지구본으로 초기화"
+                title="전체 지구본으로 초기화"
+                onClick={reset}
+              >
+                <RotateCcw size={18} aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -487,29 +512,6 @@ export default function AiNetworkPage() {
                 />
               </g>
             </svg>
-          </div>
-          <div className={uiClass('network-map-footer')}>
-            <div className={uiClass('network-map-tools')}>
-              <button
-                type="button"
-                aria-label="지도 확대"
-                disabled={zoom >= MAX_ZOOM}
-                onClick={() => setZoom(value => clampZoom(value + 0.2))}
-              >
-                <Plus size={16} />
-              </button>
-              <button
-                type="button"
-                aria-label="지도 축소"
-                disabled={zoom <= MIN_ZOOM}
-                onClick={() => setZoom(value => clampZoom(value - 0.2))}
-              >
-                <Minus size={16} />
-              </button>
-              <button type="button" aria-label="전체 지구본으로 초기화" onClick={reset}>
-                <RotateCcw size={16} />
-              </button>
-            </div>
           </div>
         </section>
         <aside
