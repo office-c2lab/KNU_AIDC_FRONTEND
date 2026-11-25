@@ -14,6 +14,7 @@ import { buildUtilityZones } from '../zones/buildUtilityZones.js';
 import { createGeometryToolkit } from '../core/createGeometryToolkit.js';
 import { createRenderingCore } from '../core/createRenderingCore.js';
 import { createIncidentSelectors } from '../systems/createIncidentSelectors.js';
+import { placeAssetPopup } from '../systems/placeAssetPopup.js';
 import { createFacilityAlertOutline } from '../systems/createFacilityAlertOutline.js';
 import { createFloorIncidentLabels } from '../systems/createFloorIncidentLabels.js';
 import { animateRackMechanism, syncRackPreview } from '../systems/rackMechanism.js';
@@ -5065,6 +5066,11 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     const hit = hitTest(e),
       tip = $('#hover-tooltip');
     if (hit) {
+      if (hit.id && hit.id === selectedId) {
+        tip.style.display = 'none';
+        renderer.domElement.style.cursor = 'pointer';
+        return;
+      }
       const name = hit.id
         ? hit.name
         : hit.isFloor
@@ -5130,6 +5136,12 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
   $('#btn-camera-reset').addEventListener('click', () => {
     twinActions.setAutoRotate(false);
     moveTo(activeFloor ? 'f' + activeFloor[0] : activeZone);
+  });
+  $('#selected-asset-details').addEventListener('click', () => {
+    if (selectedId) openAssetModal(selectedId);
+  });
+  $('#selected-asset-close').addEventListener('click', () => {
+    setZone(activeZone, null, false);
   });
   $('#btn-auto').addEventListener('click', () => {
     twinActions.toggleAutoRotate();
@@ -5209,6 +5221,74 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     fineTileLinesVisible = visible;
     for (const seam of fineTileLines) seam.visible = visible;
     grid.visible = visible;
+  }
+  const selectedPopup = $('#selected-asset-popup');
+  const selectedConnector = $('#selected-asset-connector');
+  function updateSelectedPopup() {
+    if (!selectedPopup || !selectedConnector) return;
+    const asset = selectedId && registry.get(selectedId);
+    if (!asset || assetModalId || selectedPopup.hidden) {
+      selectedPopup.style.visibility = 'hidden';
+      selectedConnector.style.visibility = 'hidden';
+      return;
+    }
+    const point = assetWorldPoint(asset);
+    point.y += 1.4;
+    point.project(camera);
+    const w = host.clientWidth, h = host.clientHeight;
+    if (point.z < -1 || point.z > 1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1) {
+      selectedPopup.style.visibility = 'hidden';
+      selectedConnector.style.visibility = 'hidden';
+      return;
+    }
+    const x = (point.x * 0.5 + 0.5) * w;
+    const y = (-point.y * 0.5 + 0.5) * h;
+    const width = selectedPopup.offsetWidth, height = selectedPopup.offsetHeight;
+    const bounds = { left: x, right: x, top: y, bottom: y };
+    const localBounds = pickBounds.get(asset.id);
+    if (localBounds) {
+      bounds.left = bounds.top = Infinity;
+      bounds.right = bounds.bottom = -Infinity;
+      asset.root.updateWorldMatrix(true, false);
+      for (const bx of [localBounds.min.x, localBounds.max.x])
+        for (const by of [localBounds.min.y, localBounds.max.y])
+          for (const bz of [localBounds.min.z, localBounds.max.z]) {
+            const corner = new THREE.Vector3(bx, by, bz).applyMatrix4(asset.root.matrixWorld).project(camera);
+            const sx = (corner.x * 0.5 + 0.5) * w;
+            const sy = (-corner.y * 0.5 + 0.5) * h;
+            bounds.left = Math.min(bounds.left, sx);
+            bounds.right = Math.max(bounds.right, sx);
+            bounds.top = Math.min(bounds.top, sy);
+            bounds.bottom = Math.max(bounds.bottom, sy);
+          }
+    }
+    const placement = placeAssetPopup(bounds, { width, height }, { width: w, height: h });
+    if (!placement) {
+      selectedPopup.style.visibility = 'hidden';
+      selectedConnector.style.visibility = 'hidden';
+      return;
+    }
+    const { left, top, side } = placement;
+    selectedPopup.style.left = `${left}px`;
+    selectedPopup.style.top = `${top}px`;
+    selectedPopup.style.visibility = 'visible';
+    selectedConnector.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    selectedConnector.style.visibility = 'visible';
+    const horizontal = side === 'right' || side === 'left';
+    const startX = horizontal ? (side === 'right' ? left : left + width) : clamp(x, left + 20, left + width - 20);
+    const startY = horizontal ? clamp(y, top + 20, top + height - 20) : (side === 'top' ? top + height : top);
+    const endX = horizontal ? (side === 'right' ? bounds.right : bounds.left) : clamp(x, bounds.left, bounds.right);
+    const endY = horizontal ? clamp(y, bounds.top, bounds.bottom) : (side === 'top' ? bounds.top : bounds.bottom);
+    const tone = '#68ceef';
+    const line = selectedConnector.querySelector('path');
+    line.setAttribute('d', horizontal
+      ? `M${startX},${startY} H${(startX + endX) / 2} V${endY} H${endX}`
+      : `M${startX},${startY} V${(startY + endY) / 2} H${endX} V${endY}`);
+    line.setAttribute('stroke', tone);
+    const dot = selectedConnector.querySelector('circle');
+    dot.setAttribute('cx', endX);
+    dot.setAttribute('cy', endY);
+    dot.setAttribute('fill', tone);
   }
   function updateLabels() {
     if (!renderer?.domElement) return;
@@ -5519,11 +5599,12 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
     if (selected) {
       const v = assetWorldPoint(selected);
       selectedHalo.position.set(v.x, v.y + 0.07, v.z);
-      selectedHalo.material.color.setHex(getAssetStatus(selected) === '장애' ? 0xff6872 : 0x69e2f2);
+      selectedHalo.material.color.setHex(0x68ceef);
       selectedHalo.rotation.z = t * 0.3;
     }
     updateDistanceDetails();
     updateLabels();
+    updateSelectedPopup();
     updateAlertLabels();
     syncDeviceFx(t);
     updateEngineeringFx(t);

@@ -1,0 +1,115 @@
+.selected-asset-popup {
+  position: absolute;
+  z-index: 12;
+  width: min(330px, calc(100% - 32px));
+  padding: 14px;
+  border-radius: 7px;
+  color: #edf7ff;
+  pointer-events: auto;
+  visibility: hidden;
+}
+.selected-asset-popup header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.selected-asset-popup header > svg {
+  flex: none;
+  color: #80c8e3;
+}
+.selected-asset-copy {
+  flex: 1;
+  min-width: 0;
+}
+.selected-asset-copy h3 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.selected-asset-copy p {
+  margin: 2px 0 0;
+  color: #a9bfd3;
+  font-size: 12px;
+}
+.selected-asset-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--popup-tone);
+  white-space: nowrap;
+  font-size: 12px;
+}
+.selected-asset-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.selected-asset-popup button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+.selected-asset-popup button:hover {
+  color: #edf7ff;
+  background: #10354b;
+  border-color: #83d8f2;
+}
+.selected-asset-popup button:focus-visible {
+  outline: 2px solid #76ddff;
+  outline-offset: 3px;
+}
+#selected-asset-close {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  padding: 0;
+}
+.selected-asset-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+.selected-asset-metrics > div + div {
+  border-left: 1px solid #214a68;
+  padding-left: 10px;
+}
+.selected-asset-metrics span {
+  display: block;
+  color: #a9bfd3;
+  font-size: 12px;
+}
+.selected-asset-metrics strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.selected-asset-metrics small {
+  font-size: 12px;
+  margin-left: 3px;
+  font-weight: 400;
+}
+.selected-asset-track {
+  height: 4px;
+  margin-top: 5px;
+  background: #20374a;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.selected-asset-track i {
+  display: block;
+  height: 100%;
+  background: #68ceef;
+}
+.selected-asset-popup .selected-asset-details {
+  width: 100%;
+  min-height: 32px;
+  gap: 4px;
+  border-color: #398eb2;
+  color: #b5cadd;
+  font-size: 14px;
+}

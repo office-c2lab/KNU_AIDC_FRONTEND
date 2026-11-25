@@ -1,5 +1,6 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
 import { tooltipSurface } from './uiStyles.js';
+import SelectedAssetPopup from './SelectedAssetPopup.jsx';
 export default function SceneViewport() {
   return (
     <>
@@ -21,6 +22,16 @@ export default function SceneViewport() {
           role="tooltip"
         ></div>
         <div className={uiClass('world-labels')} id="world-labels"></div>
+        <svg
+          id="selected-asset-connector"
+          className="pointer-events-none absolute inset-0 z-[11] h-full w-full"
+          aria-hidden="true"
+          style={{ visibility: 'hidden' }}
+        >
+          <path fill="none" strokeWidth="1.5" />
+          <circle r="4" />
+        </svg>
+        <SelectedAssetPopup />
         <div
           className={uiClass('world-alerts')}
           id="world-alerts"
