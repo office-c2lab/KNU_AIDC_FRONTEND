@@ -5074,9 +5074,7 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       const rect = host.getBoundingClientRect();
       const description = hit.id
         ? (selectedId === hit.id ? '한 번 더 클릭해 상세 보기' : '클릭해서 이동 · 더블클릭 상세')
-        : hit.isFloor
-          ? FLOOR_INFO[hit.floor].sub
-          : zones[hit.zone]?.sub;
+        : null;
       tip.textContent = description ? `${name} · ${description}` : name;
       const pointerX = (e.clientX - rect.left) * host.clientWidth / rect.width;
       const pointerY = (e.clientY - rect.top) * host.clientHeight / rect.height;

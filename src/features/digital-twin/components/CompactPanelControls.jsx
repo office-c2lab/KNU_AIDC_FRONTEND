@@ -170,7 +170,6 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
           data-zone="overview"
           aria-label="전체 시설 보기"
           title="전체 시설 보기"
-          data-tooltip-description="본관 1~4층과 전력·냉각 지원 시설"
           aria-pressed={activeZone === 'overview'}
           onClick={() => onPanelChange(null)}
         >
@@ -184,7 +183,6 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
             data-zone={`f${floor}`}
             aria-label={`${floor}층 선택`}
             title={`${floor}F · ${FLOOR_INFO[`${floor}F`].name}`}
-            data-tooltip-description={FLOOR_INFO[`${floor}F`].sub}
             aria-pressed={activeZone === `f${floor}`}
             onClick={() => onPanelChange(null)}
           >
@@ -204,7 +202,6 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
             data-zone={zone}
             aria-label={label}
             title={zones[zone].name}
-            data-tooltip-description={zones[zone].sub}
             aria-pressed={activeZone === zone}
             onClick={() => onPanelChange(null)}
           >
