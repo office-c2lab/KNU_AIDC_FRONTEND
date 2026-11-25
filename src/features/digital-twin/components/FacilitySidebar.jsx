@@ -1,8 +1,6 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
-import { panelEntrance } from '../../../utils/panelMotion.js';
 import { calculateFacilityPower } from '../calculateFacilityPower.js';
 import {
   floorButton,
@@ -15,7 +13,7 @@ import {
   panelScroll,
   subTitle,
 } from './uiStyles.js';
-export default function FacilitySidebar({ ready = true }) {
+export default function FacilitySidebar() {
   const assets = useDigitalTwinStore(state => state.assetCatalog);
   const incidents = useDigitalTwinStore(state => state.incidents);
   const simulationTime = useDigitalTwinStore(state => state.simulationTime);
@@ -28,14 +26,8 @@ export default function FacilitySidebar({ ready = true }) {
   const pueText = pue === null ? '—' : pue.toFixed(2);
   return (
     <>
-      <motion.aside
-        {...panelEntrance({
-          x: -28,
-          y: 0,
-          delay: 0.48,
-          ready,
-        })}
-        className={uiClass(`${panelBase} will-change-[transform,opacity] left-panel left-[26px]`)}
+      <aside
+        className={uiClass(`${panelBase} left-panel left-[26px]`)}
         aria-label="시설 현황 및 층 탐색"
       >
         <div className={uiClass(panelScroll)}>
@@ -197,7 +189,7 @@ export default function FacilitySidebar({ ready = true }) {
             </div>
           </section>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 }

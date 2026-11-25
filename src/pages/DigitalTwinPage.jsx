@@ -7,18 +7,15 @@ import OperationsSidebar from '../features/digital-twin/components/OperationsSid
 import SceneControls from '../features/digital-twin/components/SceneControls.jsx';
 import SceneViewport from '../features/digital-twin/components/SceneViewport.jsx';
 import useDigitalTwinScene from '../features/digital-twin/useDigitalTwinScene.js';
-import { useCallback, useState } from 'react';
 export default function DigitalTwinPage() {
-  const [startScene, setStartScene] = useState(false);
-  const onInterfaceReady = useCallback(() => setStartScene(true), []);
-  const rootRef = useDigitalTwinScene(startScene);
+  const rootRef = useDigitalTwinScene();
   return (
     <div ref={rootRef} className={uiClass('digital-twin-scene')}>
       <SceneViewport />
       <BreadcrumbToolbar />
       <FacilitySidebar />
       <OperationsSidebar />
-      <SceneControls onEntranceComplete={onInterfaceReady} />
+      <SceneControls />
       <AssetModal />
       <RackTerminalModal />
     </div>

@@ -1,24 +1,14 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
 import { House } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
-import { panelEntrance } from '../../../utils/panelMotion.js';
 const dockButton = 'dock-button';
-export default function SceneControls({ ready = true, onEntranceComplete }) {
+export default function SceneControls() {
   const viewMode = useDigitalTwinStore(state => state.viewMode);
   const utilities = useDigitalTwinStore(state => state.utilities);
   const agentsVisible = useDigitalTwinStore(state => state.agentsVisible);
   return (
     <>
-      <motion.div
-        {...panelEntrance({
-          y: 22,
-          delay: 1.52,
-          ready,
-        })}
-        onAnimationComplete={onEntranceComplete}
-        className={uiClass('center-status')}
-      >
+      <div className={uiClass('center-status')}>
         <div
           className={uiClass('control-dock')}
           role="toolbar"
@@ -81,7 +71,7 @@ export default function SceneControls({ ready = true, onEntranceComplete }) {
             </button>
           </div>
         </div>
-      </motion.div>
+      </div>
       <div id="floor-separation-hint" hidden></div>
       <div className={uiClass('v9-logic')} aria-hidden="true">
         <span id="stat-assets"></span>

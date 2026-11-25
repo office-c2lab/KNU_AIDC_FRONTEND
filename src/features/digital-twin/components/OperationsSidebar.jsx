@@ -1,20 +1,12 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
 import { ArrowUpRight, Circle } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { SelectedOperatingMetrics } from './OperatingMetrics.jsx';
 import { instrumentCard, moduleReadout, panelBase, panelScroll, subTitle } from './uiStyles.js';
-import { panelEntrance } from '../../../utils/panelMotion.js';
-export default function OperationsSidebar({ ready = true }) {
+export default function OperationsSidebar() {
   return (
     <>
-      <motion.aside
-        {...panelEntrance({
-          x: 28,
-          y: 0,
-          delay: 0.96,
-          ready,
-        })}
-        className={uiClass(`${panelBase} will-change-[transform,opacity] right-panel right-[26px]`)}
+      <aside
+        className={uiClass(`${panelBase} right-panel right-[26px]`)}
         aria-label="시설 상세 및 운영 안내"
       >
         <div className={uiClass(panelScroll)}>
@@ -119,7 +111,7 @@ export default function OperationsSidebar({ ready = true }) {
             <div id="scenario-view"></div>
           </div>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 }

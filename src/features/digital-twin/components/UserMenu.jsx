@@ -47,9 +47,7 @@ export default function UserMenu() {
   const initialFocusRef = useRef(0);
   const closeNotifications = useDigitalTwinStore(state => state.setNotificationsOpen);
   const showClock = useUserPreferencesStore(state => state.showClock);
-  const reducePanelMotion = useUserPreferencesStore(state => state.reducePanelMotion);
   const setShowClock = useUserPreferencesStore(state => state.setShowClock);
-  const setReducePanelMotion = useUserPreferencesStore(state => state.setReducePanelMotion);
 
   useEffect(() => {
     if (!open) return;
@@ -216,13 +214,6 @@ export default function UserMenu() {
                 description="넓은 화면에서 현재 시각을 표시합니다."
               >
                 헤더 시계 표시
-              </PreferenceToggle>
-              <PreferenceToggle
-                checked={reducePanelMotion}
-                onChange={setReducePanelMotion}
-                description="패널이 나타날 때 이동 효과를 줄입니다."
-              >
-                패널 이동 효과 줄이기
               </PreferenceToggle>
               <p className="py-4 text-[12px] text-[#93abc5]">
                 설정은 이 브라우저에 자동 저장됩니다.

@@ -1,8 +1,6 @@
 import { uiClass } from '../../styles/interfaceStyles.js';
 import { ChevronDown, Search, X } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { SCENARIOS } from '../digital-twin/scene/config/scenarioConfig.js';
-import { panelEntrance } from '../../utils/panelMotion.js';
 import { equipmentStatusLabels } from './equipmentStatus.js';
 import {
   floorButton,
@@ -48,12 +46,7 @@ export default function ScenarioFacilitySidebar({
     .filter(group => !query || group.assets.length);
   const resultCount = groups.reduce((count, group) => count + group.assets.length, 0);
   return (
-    <motion.aside
-      {...panelEntrance({
-        x: -24,
-        y: 0,
-        delay: 0.48,
-      })}
+    <aside
       ref={navigationRef}
       className={uiClass(
         `${panelBase} relative! top-auto! bottom-auto! z-auto! flex min-h-0 flex-col`
@@ -229,6 +222,6 @@ export default function ScenarioFacilitySidebar({
           </p>
         )}
       </nav>
-    </motion.aside>
+    </aside>
   );
 }

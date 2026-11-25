@@ -20,11 +20,8 @@ import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
 import { createIncidentSelectors } from '../features/digital-twin/scene/systems/createIncidentSelectors.js';
 import { calculateFacilityPower } from '../features/digital-twin/calculateFacilityPower.js';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
-import { motion } from 'framer-motion';
-import { panelEntrance } from '../utils/panelMotion.js';
 import { applyDashboardTrendProfile } from '../features/dashboard/dashboardTrend.js';
 import { createMockOperationLogs } from '../features/dashboard/mockOperationLogs.js';
-
 const scenarioById = new Map(SCENARIOS.map(item => [item.id, item]));
 const colors = {
   CPU: '#9dd1ff',
@@ -107,7 +104,6 @@ function ChartTooltip({ active, payload, label, unit = '%' }) {
     </div>
   );
 }
-
 function LatestPoint({ cx, cy, index, lastIndex, color }) {
   return index === lastIndex && Number.isFinite(cx) && Number.isFinite(cy) ? (
     <circle cx={cx} cy={cy} r={3} fill={color} stroke="#101e32" strokeWidth={1.5} />
@@ -115,7 +111,6 @@ function LatestPoint({ cx, cy, index, lastIndex, color }) {
     <g />
   );
 }
-
 function readAssets(assets, incidents, time) {
   const selectors = createIncidentSelectors({
     clock: { elapsedTime: time },
@@ -247,8 +242,7 @@ function TrendChart({ data, keys, chartId, percent = true, label }) {
 }
 function Panel({ title, children, extra, className = '' }) {
   return (
-    <motion.section
-      {...panelEntrance({ delay: 0 })}
+    <section
       className={`flex min-w-0 flex-col rounded-md border border-[#324f72] bg-[#101e32] px-5 py-[18px] max-[1000px]:p-3 ${className}`}
     >
       <header className="mb-2 flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
@@ -256,7 +250,7 @@ function Panel({ title, children, extra, className = '' }) {
         {extra}
       </header>
       {children}
-    </motion.section>
+    </section>
   );
 }
 function eventCategory(event, scenario, assets) {
@@ -266,7 +260,6 @@ function eventCategory(event, scenario, assets) {
     return '시설';
   return '시스템';
 }
-
 export default function OperationsDashboardPage() {
   const assets = useDigitalTwinStore(state => state.assetCatalog);
   const incidents = useDigitalTwinStore(state => state.incidents);
@@ -349,7 +342,6 @@ export default function OperationsDashboardPage() {
       eventFilter === '전체' ||
       (eventFilter === '장애' ? event.kind === 'danger' : event.category === eventFilter)
   );
-
   return (
     <main
       className="fixed inset-x-[26px] top-[108px] bottom-7 z-5 overflow-y-auto text-[#dce9f8] [scrollbar-width:thin] [scrollbar-color:#41658c_transparent] max-[560px]:inset-x-4 max-[560px]:bottom-5 [&_strong]:tabular-nums [&_time]:tabular-nums [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-[#87bce9] [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-[#87bce9]"

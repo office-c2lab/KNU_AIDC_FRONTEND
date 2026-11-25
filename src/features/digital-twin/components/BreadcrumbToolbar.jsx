@@ -1,9 +1,7 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 import { Check, ChevronDown, ChevronRight, House, RotateCcw, RotateCw } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
-import { panelEntrance } from '../../../utils/panelMotion.js';
 const chip = 'chip control-menu-trigger';
 const menuItem = 'control-menu-item';
 function Menu({ id, label, summary, openMenu, setOpenMenu, children }) {
@@ -38,7 +36,7 @@ function Menu({ id, label, summary, openMenu, setOpenMenu, children }) {
 function SelectedMark({ selected }) {
   return selected ? <Check size={13} aria-hidden="true" /> : <span aria-hidden="true" />;
 }
-export default function BreadcrumbToolbar({ ready = true }) {
+export default function BreadcrumbToolbar() {
   const [openMenu, setOpenMenu] = useState(null);
   const toolbarRef = useRef(null);
   const splitLevel = useDigitalTwinStore(state => state.splitLevel);
@@ -65,14 +63,7 @@ export default function BreadcrumbToolbar({ ready = true }) {
     };
   }, [openMenu]);
   return (
-    <motion.div
-      {...panelEntrance({
-        y: -16,
-        delay: 1.44,
-        ready,
-      })}
-      className={uiClass('breadcrumbs')}
-    >
+    <div className={uiClass('breadcrumbs')}>
       <div className={uiClass('crumb-path')}>
         <House size={14} aria-hidden="true" />
         <ChevronRight className={uiClass('sep')} size={12} aria-hidden="true" />
@@ -173,6 +164,6 @@ export default function BreadcrumbToolbar({ ready = true }) {
           </button>
         </Menu>
       </div>
-    </motion.div>
+    </div>
   );
 }

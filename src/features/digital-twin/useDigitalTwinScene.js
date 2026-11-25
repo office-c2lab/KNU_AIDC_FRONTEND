@@ -15,13 +15,6 @@ export default function useDigitalTwinScene(enabled = true) {
         .then(({ initDigitalTwin }) => {
           if (active && rootRef.current) {
             disposeScene = initDigitalTwin(rootRef.current);
-            const canvas = rootRef.current.querySelector('#render-host > canvas');
-            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-              canvas?.animate?.([{ opacity: 0 }, { opacity: 1 }], {
-                duration: 350,
-                easing: 'ease-out',
-              });
-            }
           }
         })
         .catch(error => {
@@ -35,7 +28,7 @@ export default function useDigitalTwinScene(enabled = true) {
           console.error('[KNU AIDC] Three.js scene initialization failed', error);
         });
 
-    // Let the final UI animation frame paint before importing/building the heavy scene.
+    // Let the static UI paint before importing/building the heavy scene.
     firstFrame = requestAnimationFrame(() => {
       secondFrame = requestAnimationFrame(initialize);
     });

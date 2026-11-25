@@ -1,18 +1,13 @@
-import { motion } from 'framer-motion';
-import { panelEntrance } from '../../utils/panelMotion.js';
-
 export default function DashboardPanel({
   title,
   titleId,
   subtitle,
   extra,
   className = '',
-  delay = 0,
   children,
 }) {
   return (
-    <motion.section
-      {...panelEntrance({ delay })}
+    <section
       className={`flex min-w-0 flex-col rounded-dashboard-panel border border-dashboard-border bg-dashboard-surface p-dashboard-panel shadow-dashboard-panel ${className}`}
       aria-labelledby={titleId}
     >
@@ -28,6 +23,6 @@ export default function DashboardPanel({
         {extra}
       </header>
       {children}
-    </motion.section>
+    </section>
   );
 }

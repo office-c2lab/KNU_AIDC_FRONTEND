@@ -22,7 +22,6 @@ export default function ScenarioHistory() {
       title="시나리오 이력"
       titleId="scenario-history-title"
       extra={<span>최근 {events.length}건</span>}
-      delay={0.18}
       className={uiClass('scenario-history')}
     >
       <div className={uiClass('scenario-history-body')}>

@@ -1,13 +1,10 @@
 import { Bell } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
-import { panelEntrance } from '../../../utils/panelMotion.js';
 import HeaderFrame from './HeaderFrame.jsx';
 import UserMenu from './UserMenu.jsx';
 import { useUserPreferencesStore } from '../../../stores/userPreferencesStore.js';
-
 const clockFormatter = new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul',
   hour: '2-digit',
@@ -15,7 +12,6 @@ const clockFormatter = new Intl.DateTimeFormat('ko-KR', {
   second: '2-digit',
   hour12: false,
 });
-
 function HeaderClock() {
   const showClock = useUserPreferencesStore(state => state.showClock);
   const [now, setNow] = useState(() => new Date());
@@ -35,7 +31,6 @@ function HeaderClock() {
     </time>
   );
 }
-
 function HeaderLink({ to, end, children }) {
   return (
     <NavLink
@@ -63,16 +58,12 @@ function HeaderLink({ to, end, children }) {
     </NavLink>
   );
 }
-
-export default function AppHeader({ ready = true }) {
+export default function AppHeader() {
   const notificationsOpen = useDigitalTwinStore(state => state.notificationsOpen);
   const setNotificationsOpen = useDigitalTwinStore(state => state.setNotificationsOpen);
   const incidentCount = useDigitalTwinStore(state => state.incidents.length);
   return (
-    <motion.header
-      {...panelEntrance({ y: -96, ready })}
-      className="fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[minmax(0,1fr)_48%_minmax(0,1fr)] items-center isolate rounded-t-[22px] bg-linear-to-b from-[#06101ee8] via-[#071528f5] to-[#030d1bf5] shadow-[0_8px_24px_#01050f40] will-change-[transform,opacity] before:pointer-events-none before:absolute before:inset-x-[24px] before:top-px before:h-px before:bg-linear-to-r before:from-[#1476bca6] before:via-[#97d8ff] before:to-[#1476bca6] before:shadow-[0_0_7px_#148aff66] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-[5px] after:h-px after:bg-[linear-gradient(90deg,#275c85_0%,#dca43c_8%,#fff1bb_13%,#bc862e_19%,#249ce9_28%,#249ce9_72%,#bc862e_81%,#fff1bb_88%,#dca43c_94%,#275c85_100%)] after:shadow-[0_0_5px_#d6ac5559] max-[1100px]:grid-cols-[minmax(0,1fr)_43%_minmax(0,1fr)] max-[1000px]:grid-cols-[minmax(0,1fr)_auto]"
-    >
+    <header className="fixed inset-x-[10px] top-[9px] z-20 grid h-[76px] grid-cols-[minmax(0,1fr)_48%_minmax(0,1fr)] items-center isolate rounded-t-[22px] bg-linear-to-b from-[#06101ee8] via-[#071528f5] to-[#030d1bf5] shadow-[0_8px_24px_#01050f40] before:pointer-events-none before:absolute before:inset-x-[24px] before:top-px before:h-px before:bg-linear-to-r before:from-[#1476bca6] before:via-[#97d8ff] before:to-[#1476bca6] before:shadow-[0_0_7px_#148aff66] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-[5px] after:h-px after:bg-[linear-gradient(90deg,#275c85_0%,#dca43c_8%,#fff1bb_13%,#bc862e_19%,#249ce9_28%,#249ce9_72%,#bc862e_81%,#fff1bb_88%,#dca43c_94%,#275c85_100%)] after:shadow-[0_0_5px_#d6ac5559] max-[1100px]:grid-cols-[minmax(0,1fr)_43%_minmax(0,1fr)] max-[1000px]:grid-cols-[minmax(0,1fr)_auto]">
       <span
         aria-hidden="true"
         className="pointer-events-none absolute bottom-px left-[4%] h-[10px] w-[18%] bg-[radial-gradient(ellipse,#fff7d5_0%,#ffd36d80_12%,#b77e2633_40%,transparent_72%)] blur-[1.5px]"
@@ -140,6 +131,6 @@ export default function AppHeader({ ready = true }) {
         </button>
         <UserMenu />
       </div>
-    </motion.header>
+    </header>
   );
 }

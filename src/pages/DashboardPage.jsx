@@ -5,10 +5,8 @@ import EquipmentOverview from '../features/dashboard/EquipmentOverview.jsx';
 import ScenarioHistory from '../features/dashboard/ScenarioHistory.jsx';
 import EquipmentCatalog from '../features/dashboard/EquipmentCatalog.jsx';
 import { useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 import { SCENARIOS } from '../features/digital-twin/scene/config/scenarioConfig.js';
 import { useDigitalTwinStore } from '../stores/digitalTwinStore.js';
-import { panelEntrance } from '../utils/panelMotion.js';
 import { createIncidentSelectors } from '../features/digital-twin/scene/systems/createIncidentSelectors.js';
 import { equipmentStatusKey } from '../features/dashboard/equipmentStatus.js';
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
@@ -254,11 +252,7 @@ export default function DashboardPage() {
             );
           }}
         />
-        <motion.section
-          {...panelEntrance({
-            y: 20,
-            delay: 0.96,
-          })}
+        <section
           className={uiClass('scenario-workspace flex min-h-0 min-w-0 flex-col overflow-hidden')}
           aria-label={
             showCatalog
@@ -295,11 +289,7 @@ export default function DashboardPage() {
                 />
                 <div className={uiClass('scenario-operation-grid')}>
                   {selected ? (
-                    <motion.section
-                      {...panelEntrance({
-                        y: 22,
-                        delay: 0.12,
-                      })}
+                    <section
                       className={uiClass('scenario-runner')}
                       aria-labelledby="scenario-runner-title"
                     >
@@ -348,7 +338,7 @@ export default function DashboardPage() {
                           </button>
                         )}
                       </div>
-                    </motion.section>
+                    </section>
                   ) : (
                     <div className={uiClass('asset-control-unavailable')}>
                       이 설비에는 실행 가능한 가상 장애 시나리오가 등록되어 있지 않습니다.
@@ -359,15 +349,11 @@ export default function DashboardPage() {
               </>
             )}
           </div>
-        </motion.section>
+        </section>
 
         {!showCatalog && (
           <div className={uiClass('dashboard-side-stack')}>
-            <motion.section
-              {...panelEntrance({
-                x: 24,
-                delay: 0.1,
-              })}
+            <section
               className={uiClass('dashboard-panel active-scenarios')}
               aria-labelledby="active-heading"
             >
@@ -429,7 +415,7 @@ export default function DashboardPage() {
                   모든 시나리오 종료
                 </button>
               )}
-            </motion.section>
+            </section>
           </div>
         )}
       </div>
