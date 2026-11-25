@@ -11,6 +11,10 @@ const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]))
 
 const rail = `${panelSurface} flex flex-none flex-col gap-[8px] p-[7px] rounded-[7px]`;
 const railButton = `${panelTab} relative grid h-[46px] w-[46px] flex-none place-items-center rounded-[4px] [&_svg]:h-[18px] [&_svg]:w-[18px]`;
+const metricSurface = panelSurface.replace(
+  /\[background:[^\]]+\]/,
+  '[background:radial-gradient(ellipse_135%_140px_at_52%_-29px,#3d64a940,transparent_83%),_radial-gradient(ellipse_118%_105px_at_50%_101%,#3f65b432,transparent_90%),_linear-gradient(90deg,#2e518520,transparent_15%_85%,#2e518520),_linear-gradient(175deg,#111e37f4,#0a1328f5_52%,#0d1934f3)]'
+);
 
 function StatusDot({ fault }) {
   return (
@@ -26,7 +30,7 @@ function StatusDot({ fault }) {
 
 function MetricSummary({ label, value, unit, expanded, onClick, controls }) {
   return (
-    <div className={uiClass(`${panelSurface} w-[280px] max-w-full rounded-full`)}>
+    <div className={uiClass(`${metricSurface} w-[280px] max-w-full rounded-full`)}>
       <button
         type="button"
         className={uiClass(
@@ -66,7 +70,7 @@ function PowerWidget({ power }) {
       id="compact-power-card"
       role="region"
       aria-label="소비 전력 분류별 상세, 단위 kW"
-      className={uiClass(`${panelSurface} rounded-[8px]`)}
+      className={uiClass(`${metricSurface} rounded-[8px]`)}
     >
       <div className={uiClass('px-[12px] py-[14px]')}>
         <div
@@ -140,7 +144,7 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
       >
         <div
           className={uiClass(
-            `${panelSurface} flex h-[42px] w-fit items-center gap-[12px] rounded-full px-[16px]`
+            `${metricSurface} flex h-[42px] w-fit items-center gap-[12px] rounded-full px-[16px]`
           )}
           aria-label={`PUE ${power.pueEstimate === null ? '산출 불가' : power.pueEstimate.toFixed(2)}`}
         >
