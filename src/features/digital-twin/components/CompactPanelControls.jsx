@@ -2,6 +2,7 @@ import { uiClass } from '../../../styles/interfaceStyles.js';
 import { Activity, Building2, Snowflake, Zap } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { SCENARIOS } from '../scene/config/scenarioConfig.js';
+import { FLOOR_INFO, zones } from '../scene/config/facilityConfig.js';
 import { panelSurface, panelTab } from './uiStyles.js';
 
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
@@ -80,6 +81,7 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
           data-zone="overview"
           aria-label="전체 시설 보기"
           title="전체 시설 보기"
+          data-tooltip-description="본관 1~4층과 전력·냉각 지원 시설"
           aria-pressed={activeZone === 'overview'}
           onClick={() => onPanelChange(null)}
         >
@@ -92,7 +94,8 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
             className={uiClass(`${railButton}${activeZone === `f${floor}` ? ' active' : ''}`)}
             data-zone={`f${floor}`}
             aria-label={`${floor}층 선택`}
-            title={`${floor}층 선택`}
+            title={`${floor}F · ${FLOOR_INFO[`${floor}F`].name}`}
+            data-tooltip-description={FLOOR_INFO[`${floor}F`].sub}
             aria-pressed={activeZone === `f${floor}`}
             onClick={() => onPanelChange(null)}
           >
@@ -111,7 +114,8 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
             className={uiClass(`${railButton}${activeZone === zone ? ' active' : ''}`)}
             data-zone={zone}
             aria-label={label}
-            title={label}
+            title={zones[zone].name}
+            data-tooltip-description={zones[zone].sub}
             aria-pressed={activeZone === zone}
             onClick={() => onPanelChange(null)}
           >

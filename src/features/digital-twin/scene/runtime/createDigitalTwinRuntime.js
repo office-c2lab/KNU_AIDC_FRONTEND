@@ -5072,9 +5072,22 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
           : zones[hit.zone]?.name || '시설';
       tip.style.display = 'block';
       const rect = host.getBoundingClientRect();
-      tip.style.left = `${(e.clientX - rect.left) * host.clientWidth / rect.width + 13}px`;
-      tip.style.top = `${(e.clientY - rect.top) * host.clientHeight / rect.height + 14}px`;
-      tip.textContent = `${name} · ${hit.id ? (selectedId === hit.id ? '한 번 더 클릭해 상세 보기' : '클릭해서 이동 · 더블클릭 상세') : '클릭하여 이동'}`;
+      const description = hit.id
+        ? (selectedId === hit.id ? '한 번 더 클릭해 상세 보기' : '클릭해서 이동 · 더블클릭 상세')
+        : hit.isFloor
+          ? FLOOR_INFO[hit.floor].sub
+          : zones[hit.zone]?.sub;
+      tip.textContent = description ? `${name} · ${description}` : name;
+      const pointerX = (e.clientX - rect.left) * host.clientWidth / rect.width;
+      const pointerY = (e.clientY - rect.top) * host.clientHeight / rect.height;
+      const x = pointerX + 16 + tip.offsetWidth > host.clientWidth - 12
+        ? pointerX - tip.offsetWidth - 16
+        : pointerX + 16;
+      const y = pointerY + 20 + tip.offsetHeight > host.clientHeight - 12
+        ? pointerY - tip.offsetHeight - 20
+        : pointerY + 20;
+      tip.style.left = `${Math.max(12, x)}px`;
+      tip.style.top = `${Math.max(12, y)}px`;
       renderer.domElement.style.cursor = 'pointer';
     } else {
       tip.style.display = 'none';

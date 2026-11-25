@@ -1,4 +1,5 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
+import { tooltipSurface } from './uiStyles.js';
 export default function SceneViewport() {
   return (
     <>
@@ -12,7 +13,13 @@ export default function SceneViewport() {
           <strong>3D 데이터센터를 준비하고 있습니다</strong>
           <span>Three.js 장면과 설비를 구성하는 중</span>
         </div>
-        <div className={uiClass('hover-tooltip')} id="hover-tooltip"></div>
+        <div
+          className={uiClass(
+            `${tooltipSurface} absolute z-[10] hidden max-w-[min(440px,calc(100%_-_24px))] whitespace-normal [overflow-wrap:break-word]`
+          )}
+          id="hover-tooltip"
+          role="tooltip"
+        ></div>
         <div className={uiClass('world-labels')} id="world-labels"></div>
         <div
           className={uiClass('world-alerts')}

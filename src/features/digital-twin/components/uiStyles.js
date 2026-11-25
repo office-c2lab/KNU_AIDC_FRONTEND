@@ -3,6 +3,8 @@ export const panelSurface =
 
 export const panelBase = `panel fixed top-[92px] bottom-[34px] z-[15] ${panelSurface}`;
 
+export const tooltipSurface = `${panelSurface} pointer-events-none rounded-[6px] px-[12px] py-[8px] text-[14px] font-medium leading-normal text-[#e5efff] [font-family:var(--font-interface)]`;
+
 export const panelTab =
   'border border-transparent bg-transparent text-[#afc8e4] transition-[background,border-color,box-shadow,color] duration-150 hover:border-[#7799c3a6] hover:text-[#edf6ff] hover:[background:linear-gradient(175deg,#34558280,#172c4cd9)] hover:[box-shadow:inset_0_1px_0_#b9d8ff26,inset_0_-8px_16px_-12px_#79adff80] [&.active]:border-[#8aafd9bf] [&.active]:text-[#f1f7ff] [&.active]:[background:radial-gradient(ellipse_at_50%_0%,#668ec54d,transparent_80%),linear-gradient(175deg,#304e79e6,#182b4bef)] [&.active]:[box-shadow:inset_0_1px_0_#c4dfff40,inset_0_-10px_18px_-14px_#8dbbffb3] [&.active:hover]:border-[#b3d3f5] [&.active:hover]:[box-shadow:inset_0_1px_0_#c4dfff66,inset_0_-10px_18px_-14px_#8dbbff] focus-visible:outline-2 focus-visible:outline-[#a6cbff] focus-visible:outline-offset-2';
 

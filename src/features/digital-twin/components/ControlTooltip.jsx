@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { uiClass } from '../../../styles/interfaceStyles.js';
-import { panelSurface } from './uiStyles.js';
+import { tooltipSurface } from './uiStyles.js';
 
 export default function ControlTooltip({ rootRef }) {
   const [tooltip, setTooltip] = useState(null);
@@ -37,6 +37,7 @@ export default function ControlTooltip({ rootRef }) {
       const side = rect.left < 100 ? 'right' : 'top';
       setTooltip({
         label,
+        description: button.dataset.tooltipDescription,
         side,
         x: side === 'right' ? rect.right + 14 : rect.left + rect.width / 2,
         y: side === 'right' ? rect.top + rect.height / 2 : rect.top - 24,
@@ -75,16 +76,19 @@ export default function ControlTooltip({ rootRef }) {
     <div
       id={tooltipId}
       role="tooltip"
-      className={uiClass(
-        `${panelSurface} pointer-events-none fixed z-[200] rounded-[6px] px-[12px] py-[8px] text-[14px] font-medium leading-normal text-[#e5efff] whitespace-nowrap [font-family:var(--font-interface)]`
-      )}
+      className={uiClass(`${tooltipSurface} fixed z-[200] max-w-[360px]`)}
       style={{
         left: tooltip.x,
         top: tooltip.y,
         transform: tooltip.side === 'right' ? 'translateY(-50%)' : 'translate(-50%, -100%)',
       }}
     >
-      {tooltip.label}
+      <div>{tooltip.label}</div>
+      {tooltip.description && (
+        <div className={uiClass('mt-[5px] text-[13px] font-normal leading-relaxed text-[#b8cce3]')}>
+          {tooltip.description}
+        </div>
+      )}
     </div>,
     document.body
   );
