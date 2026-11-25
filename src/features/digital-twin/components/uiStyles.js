@@ -1,17 +1,17 @@
 export const panelSurface =
-  'overflow-hidden border border-[#5274a2a6] border-t-[#7a9dcebf] border-b-[#7aa4e0b8] [background:radial-gradient(ellipse_135%_140px_at_52%_-29px,#3d64a965,transparent_83%),_radial-gradient(ellipse_118%_105px_at_50%_101%,#3f65b450,transparent_90%),_linear-gradient(90deg,#2e518520,transparent_15%_85%,#2e518520),_linear-gradient(175deg,#111e37f4,#0a1328f5_52%,#0d1934f3)] [box-shadow:inset_0_0_0_1px_#7ba4e217,inset_0_-10px_22px_-18px_#79adff,0_10px_36px_#01061369] backdrop-blur-[13px]';
+  'overflow-hidden border border-[#214a68] border-t-[#3c9ac4] [background:linear-gradient(90deg,transparent,#68ceef,transparent)_center_top/100%_1px_no-repeat,linear-gradient(90deg,#ab833e,#eed18c,#ab833e)_center_bottom/22px_1px_no-repeat,linear-gradient(#061424,#061424)] shadow-[0_6px_20px_#01071359]';
 
-export const panelBase = `panel fixed top-[92px] bottom-[34px] z-[15] ${panelSurface}`;
+export const panelBase = `panel fixed top-[92px] bottom-[34px] z-[15] ${panelSurface} [background:#061424]! [backdrop-filter:none]! [box-shadow:0_6px_20px_#01071359]! [border-color:#214a68]! [&::before]:hidden! [&::after]:hidden!`;
 
 export const tooltipSurface = `${panelSurface} pointer-events-none rounded-[6px] px-[12px] py-[8px] text-[14px] font-medium leading-normal text-[#e5efff] [font-family:var(--font-interface)]`;
 
 export const panelTab =
-  'border border-transparent bg-transparent text-[#afc8e4] transition-[background,border-color,box-shadow,color] duration-150 hover:border-[#7799c3a6] hover:text-[#edf6ff] hover:[background:linear-gradient(175deg,#34558280,#172c4cd9)] hover:[box-shadow:inset_0_1px_0_#b9d8ff26,inset_0_-8px_16px_-12px_#79adff80] [&.active]:border-[#8aafd9bf] [&.active]:text-[#f1f7ff] [&.active]:[background:radial-gradient(ellipse_at_50%_0%,#668ec54d,transparent_80%),linear-gradient(175deg,#304e79e6,#182b4bef)] [&.active]:[box-shadow:inset_0_1px_0_#c4dfff40,inset_0_-10px_18px_-14px_#8dbbffb3] [&.active:hover]:border-[#b3d3f5] [&.active:hover]:[box-shadow:inset_0_1px_0_#c4dfff66,inset_0_-10px_18px_-14px_#8dbbff] focus-visible:outline-2 focus-visible:outline-[#a6cbff] focus-visible:outline-offset-2';
+  'border border-transparent bg-transparent text-[#b5cadd] transition-[background-color,border-color,box-shadow,color] duration-150 hover:border-[#398eb2] hover:text-[#edf8ff] hover:bg-[#0b2438] [&.active]:border-[#50b9dc] [&.active]:text-[#f5edda] [&.active]:bg-[#0c2a3f] [&.active]:[box-shadow:inset_0_-2px_0_#d8b361] [&.active:hover]:border-[#83d8f2] [&.active:hover]:bg-[#10354b] focus-visible:outline-2 focus-visible:outline-[#76ddff] focus-visible:outline-offset-2';
 
 export const panelScroll = 'panel-scroll relative z-[3] h-full overflow-y-auto overscroll-contain';
 
 export const sectionTitle =
-  'section-title -mx-4 mb-3.5 flex h-[46px] items-center justify-between gap-2 border-b border-[#5c7fab73] bg-[#172744cc] px-[17px] text-[13px] font-semibold tracking-[0.2px]';
+  'section-title -mx-4 mb-3.5 flex h-[46px] items-center justify-between gap-2 border-b border-[#214a68] bg-[#081b2d] px-[17px] text-[13px] font-semibold tracking-[0.2px]';
 
 export const subTitle =
   'sub-title mt-[18px] mb-2.5 flex items-center gap-2 text-[13px] font-semibold text-[#dce9f8]';
@@ -19,7 +19,7 @@ export const subTitle =
 export const moduleReadout =
   'module-readout whitespace-nowrap text-[11px] font-semibold tabular-nums text-[#b9d5f6]';
 
-export const instrumentCard = 'border border-[#2b4566a6] bg-[#101d34cc]';
+export const instrumentCard = 'border border-[#214a68] bg-[#081b2d]';
 
 export const floorList = 'floor-list grid gap-1.5';
 

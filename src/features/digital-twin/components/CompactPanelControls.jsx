@@ -11,10 +11,7 @@ const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]))
 
 const rail = `${panelSurface} flex flex-none flex-col gap-[8px] p-[7px] rounded-[7px]`;
 const railButton = `${panelTab} relative grid h-[46px] w-[46px] flex-none place-items-center rounded-[4px] [&_svg]:h-[18px] [&_svg]:w-[18px]`;
-const metricSurface = panelSurface.replace(
-  /\[background:[^\]]+\]/,
-  '[background:radial-gradient(ellipse_135%_140px_at_52%_-29px,#3d64a940,transparent_83%),_radial-gradient(ellipse_118%_105px_at_50%_101%,#3f65b432,transparent_90%),_linear-gradient(90deg,#2e518520,transparent_15%_85%,#2e518520),_linear-gradient(175deg,#111e37f4,#0a1328f5_52%,#0d1934f3)]'
-);
+const metricSurface = panelSurface;
 
 function StatusDot({ fault }) {
   return (
