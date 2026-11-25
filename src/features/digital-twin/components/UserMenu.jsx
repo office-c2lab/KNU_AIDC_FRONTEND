@@ -4,9 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { useUserPreferencesStore } from '../../../stores/userPreferencesStore.js';
 import { useDemoSessionStore } from '../../../stores/demoSessionStore.js';
+import { panelSurface, panelTab } from './uiStyles.js';
 
-const itemClass =
-  'flex min-h-10 w-full items-center gap-3 rounded-md px-3 text-left text-[14px] font-medium text-[#d6e4f3] transition-colors hover:bg-[#28415d80] hover:text-white focus-visible:bg-[#28415d80] focus-visible:outline-2 focus-visible:outline-[#80b5e5] disabled:text-[#788ca3] disabled:hover:bg-transparent disabled:hover:text-[#788ca3]';
+const itemClass = `${panelTab} flex min-h-10 w-full items-center gap-3 rounded-[4px] px-3 text-left text-[14px] font-medium disabled:pointer-events-none disabled:opacity-45`;
 
 function PreferenceToggle({ checked, onChange, children, description }) {
   return (
@@ -101,9 +101,9 @@ export default function UserMenu() {
               showMenu(event.key === 'ArrowUp');
             }
           }}
-          className={`flex h-9 items-center gap-2 rounded-full border py-0.5 pr-2.5 pl-0.5 text-[#cfdfef] transition-colors focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#80b5e5] max-[700px]:gap-1 max-[700px]:pr-1.5 ${open ? 'border-[#7ca5cc80] bg-[#19304a]' : 'border-[#55739126] bg-[#020a1459] hover:border-[#7ca5cc66] hover:bg-[#192e47]'}`}
+          className={`${panelSurface} ${panelTab} flex h-9 items-center gap-2 rounded-[7px] px-2.5 max-[700px]:gap-1 max-[700px]:px-1.5${open ? ' active' : ''}`}
         >
-          <span className="grid size-[29px] place-items-center rounded-full border border-[#6c8daf4d] bg-linear-to-b from-[#2b415a] to-[#17283e] shadow-[inset_0_1px_#b5d6f21a]">
+          <span className="grid size-[24px] place-items-center">
             <UserRound size={20} strokeWidth={1.7} aria-hidden="true" />
           </span>
           <ChevronDown
@@ -118,7 +118,7 @@ export default function UserMenu() {
             id={menuId}
             role="menu"
             aria-label="사용자 메뉴"
-            className="absolute top-[calc(100%+12px)] right-0 z-50 w-[224px] rounded-xl border border-[#55739180] bg-linear-to-b from-[#182a40fa] to-[#0c192bfA] p-1.5 shadow-[0_14px_36px_#01071399,inset_0_1px_#b5d6f210] backdrop-blur-xl"
+            className={`${panelSurface} absolute top-[calc(100%+12px)] right-0 z-50 w-[224px] rounded-[7px] p-1.5`}
             onKeyDown={event => {
               const items = [
                 ...menuRef.current.querySelectorAll('[role="menuitem"]:not(:disabled)'),
@@ -190,7 +190,7 @@ export default function UserMenu() {
           )
             dialogRef.current.close();
         }}
-        className="fixed inset-0 m-auto max-h-[calc(100dvh-48px)] w-[440px] max-w-[calc(100vw-32px)] overflow-y-auto rounded-xl border border-[#55739180] bg-[#101f33] p-0 text-[#dce9f8] shadow-[0_24px_80px_#01071399] backdrop:bg-[#010711b3] backdrop:backdrop-blur-sm"
+        className={`${panelSurface} fixed inset-0 m-auto max-h-[calc(100dvh-48px)] w-[440px] max-w-[calc(100vw-32px)] overflow-y-auto rounded-[7px] p-0 text-[#dce9f8] backdrop:bg-[#010711b3] backdrop:backdrop-blur-sm`}
       >
         <header className="flex items-center justify-between border-b border-[#344e6a] px-6 py-4">
           <h2 id={titleId} className="text-[17px] font-semibold">
@@ -200,7 +200,7 @@ export default function UserMenu() {
             type="button"
             aria-label="사용자 창 닫기"
             onClick={closeDialog}
-            className="grid size-8 place-items-center rounded-md text-[#a8bfd8] hover:bg-[#27405c] hover:text-white"
+            className={`${panelTab} grid size-8 place-items-center rounded-[4px]`}
           >
             <X size={18} aria-hidden="true" />
           </button>

@@ -74,18 +74,31 @@ function PowerWidget({ power }) {
     >
       <div className={uiClass('px-[12px] py-[14px]')}>
         <div
-          className={uiClass('relative flex h-[10px] overflow-hidden rounded-[1px] bg-[#15283f]')}
+          className={uiClass('relative flex h-[10px] rounded-[1px] bg-[#15283f]')}
           role="img"
           aria-label={power.rows.map(row => `${row.label} ${row.kw.toFixed(2)} kW`).join(', ')}
         >
           {power.rows.map(row => (
             <span
               key={row.id}
+              className={uiClass('relative')}
               style={{
                 width: `${row.share}%`,
                 background: `linear-gradient(0deg, ${powerTones[row.id]}99, ${powerTones[row.id]})`,
+                boxShadow: `0 0 7px ${powerTones[row.id]}33`,
               }}
-            />
+            >
+              {row.share > 0 && (
+                <i
+                  aria-hidden="true"
+                  className={uiClass('absolute -top-px -bottom-px right-0 z-[1] w-px')}
+                  style={{
+                    background: powerTones[row.id],
+                    boxShadow: `0 0 5px ${powerTones[row.id]}`,
+                  }}
+                />
+              )}
+            </span>
           ))}
           <span
             className={uiClass(
@@ -101,7 +114,10 @@ function PowerWidget({ power }) {
             >
               <span
                 className={uiClass('h-[6px] w-[6px] flex-none rounded-[1px]')}
-                style={{ background: powerTones[row.id] }}
+                style={{
+                  background: powerTones[row.id],
+                  boxShadow: `0 0 5px ${powerTones[row.id]}99`,
+                }}
               />
               <span>
                 {{ it: 'IT 부하', cooling: '냉각', power: '전력', other: '기타' }[row.id]}
