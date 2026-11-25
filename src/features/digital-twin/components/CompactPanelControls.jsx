@@ -2,13 +2,12 @@ import { uiClass } from '../../../styles/interfaceStyles.js';
 import { Activity, Building2, Snowflake, Zap } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { SCENARIOS } from '../scene/config/scenarioConfig.js';
+import { panelSurface, panelTab } from './uiStyles.js';
 
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
 
-const rail =
-  'flex flex-none flex-col gap-[8px] p-[7px] rounded-[7px] border border-[#557aa4a6] bg-[#0b192ee8] shadow-[0_10px_30px_#02081788] backdrop-blur-[12px]';
-const railButton =
-  'relative grid h-[46px] w-[46px] place-items-center rounded-[4px] border border-transparent bg-transparent text-[#aec8e5] transition-colors hover:border-[#527aa5] hover:bg-[#1b3858] hover:text-white [&.active]:border-[#75a9d9] [&.active]:bg-[#23517b] [&.active]:text-white [&_svg]:h-[18px] [&_svg]:w-[18px]';
+const rail = `${panelSurface} flex flex-none flex-col gap-[8px] p-[7px] rounded-[7px]`;
+const railButton = `${panelTab} relative grid h-[46px] w-[46px] flex-none place-items-center rounded-[4px] [&_svg]:h-[18px] [&_svg]:w-[18px]`;
 
 function StatusDot({ fault }) {
   return (
@@ -49,12 +48,12 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
   const togglePanel = panel => onPanelChange(openPanel === panel ? null : panel);
 
   return (
-    <div
-      className={uiClass(
-        'fixed z-[19] top-[104px] bottom-[108px] left-[26px] flex flex-col items-start gap-[16px] overflow-y-auto [scrollbar-width:none]'
-      )}
-    >
-      <div className={uiClass(rail)} role="toolbar" aria-label="시설 정보">
+    <>
+      <div
+        className={uiClass(`${rail} fixed z-[19] top-[104px] left-[26px]`)}
+        role="toolbar"
+        aria-label="시설 정보"
+      >
         <RailButton
           active={openPanel === 'efficiency'}
           label="시설 효율 현황"
@@ -68,7 +67,13 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
           onClick={() => togglePanel('power')}
         />
       </div>
-      <div className={uiClass(rail)} role="toolbar" aria-label="층 및 외부 시설 선택">
+      <div
+        className={uiClass(
+          `${rail} fixed z-[19] top-1/2 left-[26px] -translate-y-1/2 max-h-[max(100px,calc(100%_-_480px))] overflow-y-auto [scrollbar-width:none]`
+        )}
+        role="toolbar"
+        aria-label="층 및 외부 시설 선택"
+      >
         <button
           type="button"
           className={uiClass(`${railButton}${activeZone === 'overview' ? ' active' : ''}`)}
@@ -115,6 +120,6 @@ export default function CompactPanelControls({ openPanel, onPanelChange }) {
           </button>
         ))}
       </div>
-    </div>
+    </>
   );
 }

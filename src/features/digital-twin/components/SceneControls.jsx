@@ -1,8 +1,10 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
 import { Bot, House, RotateCw, Snowflake, Thermometer, View, Zap } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
-const dockButton =
-  'grid h-[38px] w-[42px] flex-none place-items-center rounded-[4px] border border-transparent bg-transparent p-[0] text-[#afc8e4] transition-colors hover:border-[#4d7198] hover:bg-[#193554] hover:text-white [&.active]:border-[#73a8dc] [&.active]:bg-[#224a73] [&.active]:text-white [&_svg]:h-[18px] [&_svg]:w-[18px]';
+import { panelSurface, panelTab } from './uiStyles.js';
+const dockSurface = `${panelSurface} pointer-events-auto flex items-center h-[56px] px-[12px] rounded-[7px]`;
+const dockGroup = 'relative flex flex-none items-center gap-[10px]';
+const dockButton = `${panelTab} grid h-[38px] w-[42px] flex-none place-items-center rounded-[4px] p-[0] [&_svg]:h-[18px] [&_svg]:w-[18px]`;
 function LayerButton({ active, label, icon: Icon, onClick }) {
   return (
     <button
@@ -43,14 +45,14 @@ export default function SceneControls() {
           'fixed bottom-[36px] left-[20px] right-[20px] z-[18] flex flex-wrap justify-center gap-[12px] pointer-events-none'
         )}
       >
-        <div className={uiClass('control-dock')} role="toolbar" aria-label="시점 도구">
-          <div className={uiClass('dock-group')}>
+        <div className={uiClass(dockSurface)} role="toolbar" aria-label="시점 도구">
+          <div className={uiClass(dockGroup)}>
             <button
               type="button"
               className={uiClass(dockButton)}
-              id="btn-fit"
-              title="전체 시설 보기"
-              aria-label="전체 시설 보기"
+              id="btn-camera-reset"
+              title="현재 시설 시점 초기화"
+              aria-label="현재 시설 시점 초기화"
             >
               <House aria-hidden="true" />
             </button>
@@ -75,8 +77,8 @@ export default function SceneControls() {
             </button>
           </div>
         </div>
-        <div className={uiClass('control-dock')} role="toolbar" aria-label="층 배치">
-          <div className={uiClass('dock-group')}>
+        <div className={uiClass(dockSurface)} role="toolbar" aria-label="층 배치">
+          <div className={uiClass(dockGroup)}>
             {['기본 배치', '층 분리 1단계', '층 분리 2단계'].map((label, level) => (
               <button
                 key={label}
@@ -94,8 +96,8 @@ export default function SceneControls() {
             ))}
           </div>
         </div>
-        <div className={uiClass('control-dock')} role="toolbar" aria-label="온도 및 표시 레이어">
-          <div className={uiClass('dock-group')}>
+        <div className={uiClass(dockSurface)} role="toolbar" aria-label="온도 및 표시 레이어">
+          <div className={uiClass(dockGroup)}>
             <button
               type="button"
               className={uiClass(`${dockButton}${viewMode === 'thermal' ? ' active' : ''}`)}

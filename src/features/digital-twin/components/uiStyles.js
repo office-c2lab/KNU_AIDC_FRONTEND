@@ -1,7 +1,10 @@
 export const panelSurface =
-  'overflow-hidden border border-[#5274a2a6] bg-[#0a1328f5] shadow-[0_10px_36px_#01061369] backdrop-blur-xl';
+  'overflow-hidden border border-[#5274a2a6] border-t-[#7a9dcebf] border-b-[#7aa4e0b8] [background:radial-gradient(ellipse_135%_140px_at_52%_-29px,#3d64a965,transparent_83%),_radial-gradient(ellipse_118%_105px_at_50%_101%,#3f65b450,transparent_90%),_linear-gradient(90deg,#2e518520,transparent_15%_85%,#2e518520),_linear-gradient(175deg,#111e37f4,#0a1328f5_52%,#0d1934f3)] [box-shadow:inset_0_0_0_1px_#7ba4e217,inset_0_-10px_22px_-18px_#79adff,0_10px_36px_#01061369] backdrop-blur-[13px]';
 
 export const panelBase = `panel fixed top-[92px] bottom-[34px] z-[15] ${panelSurface}`;
+
+export const panelTab =
+  'border border-transparent bg-transparent text-[#afc8e4] transition-[background,border-color,box-shadow,color] duration-150 hover:border-[#7799c3a6] hover:text-[#edf6ff] hover:[background:linear-gradient(175deg,#34558280,#172c4cd9)] hover:[box-shadow:inset_0_1px_0_#b9d8ff26,inset_0_-8px_16px_-12px_#79adff80] [&.active]:border-[#8aafd9bf] [&.active]:text-[#f1f7ff] [&.active]:[background:radial-gradient(ellipse_at_50%_0%,#668ec54d,transparent_80%),linear-gradient(175deg,#304e79e6,#182b4bef)] [&.active]:[box-shadow:inset_0_1px_0_#c4dfff40,inset_0_-10px_18px_-14px_#8dbbffb3] [&.active:hover]:border-[#b3d3f5] [&.active:hover]:[box-shadow:inset_0_1px_0_#c4dfff66,inset_0_-10px_18px_-14px_#8dbbff] focus-visible:outline-2 focus-visible:outline-[#a6cbff] focus-visible:outline-offset-2';
 
 export const panelScroll = 'panel-scroll relative z-[3] h-full overflow-y-auto overscroll-contain';
 

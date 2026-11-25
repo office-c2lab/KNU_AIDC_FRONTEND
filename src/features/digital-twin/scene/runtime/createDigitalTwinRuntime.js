@@ -5116,7 +5116,10 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       setInspectorTab('scenario');
     }
   });
-  $('#btn-fit').addEventListener('click', () => setZone('overview'));
+  $('#btn-camera-reset').addEventListener('click', () => {
+    twinActions.setAutoRotate(false);
+    moveTo(activeFloor ? 'f' + activeFloor[0] : activeZone);
+  });
   $('#btn-auto').addEventListener('click', () => {
     twinActions.toggleAutoRotate();
   });

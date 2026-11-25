@@ -7,6 +7,7 @@ import OperationsSidebar from '../features/digital-twin/components/OperationsSid
 import SceneControls from '../features/digital-twin/components/SceneControls.jsx';
 import SceneViewport from '../features/digital-twin/components/SceneViewport.jsx';
 import CompactPanelControls from '../features/digital-twin/components/CompactPanelControls.jsx';
+import ControlTooltip from '../features/digital-twin/components/ControlTooltip.jsx';
 import useDigitalTwinScene from '../features/digital-twin/useDigitalTwinScene.js';
 export default function DigitalTwinPage() {
   const rootRef = useDigitalTwinScene();
@@ -22,6 +23,7 @@ export default function DigitalTwinPage() {
       />
       <OperationsSidebar open={openPanel === 'details'} onClose={() => setOpenPanel(null)} />
       <SceneControls />
+      <ControlTooltip rootRef={rootRef} />
       <AssetModal />
       <RackTerminalModal />
     </div>
