@@ -13,6 +13,8 @@ export const panelTab =
 
 export const panelScroll = 'panel-scroll relative z-[3] h-full overflow-y-auto overscroll-contain';
 
+export const headerButtonStyle = `${buttonSurface} ${panelTab} [&[aria-expanded=false]]:border-[#398eb2] [&[aria-expanded=false]:hover]:border-[#83d8f2] [&[aria-expanded=false]:hover]:[background:#0b2438] [&.active]:[background:#0c2a3f] [&.active:hover]:[background:#10354b]`;
+
 export const sectionTitle =
   'section-title -mx-4 mb-3.5 flex h-[46px] items-center justify-between gap-2 border-b border-[#214a68] bg-[#081b2d] px-[17px] text-[13px] font-semibold tracking-[0.2px]';
 

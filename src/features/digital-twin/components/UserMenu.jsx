@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { useUserPreferencesStore } from '../../../stores/userPreferencesStore.js';
 import { useDemoSessionStore } from '../../../stores/demoSessionStore.js';
-import { buttonSurface, panelSurface, panelTab } from './uiStyles.js';
+import { headerButtonStyle, panelSurface, panelTab } from './uiStyles.js';
 
 const itemClass = `${panelTab} flex min-h-10 w-full items-center gap-3 rounded-[4px] px-3 text-left text-[14px] font-medium disabled:pointer-events-none disabled:opacity-45`;
 
@@ -101,7 +101,7 @@ export default function UserMenu() {
               showMenu(event.key === 'ArrowUp');
             }
           }}
-          className={`${buttonSurface} ${panelTab} flex h-9 items-center gap-2 rounded-[7px] px-2.5 [&[aria-expanded=false]]:border-[#398eb2] max-[700px]:gap-1 max-[700px]:px-1.5${open ? ' active' : ''}`}
+          className={`${headerButtonStyle} flex h-9 items-center gap-2 rounded-[7px] px-2.5 max-[700px]:gap-1 max-[700px]:px-1.5${open ? ' active' : ''}`}
         >
           <span className="grid size-[24px] place-items-center">
             <UserRound size={20} strokeWidth={1.7} aria-hidden="true" />

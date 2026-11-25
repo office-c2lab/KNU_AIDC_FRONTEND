@@ -5,7 +5,7 @@ import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import HeaderFrame from './HeaderFrame.jsx';
 import UserMenu from './UserMenu.jsx';
 import { useUserPreferencesStore } from '../../../stores/userPreferencesStore.js';
-import { buttonSurface, panelTab } from './uiStyles.js';
+import { headerButtonStyle } from './uiStyles.js';
 const clockFormatter = new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul',
   hour: '2-digit',
@@ -23,7 +23,7 @@ function HeaderClock() {
   if (!showClock) return null;
   return (
     <time
-      className="shrink-0 text-[11px] font-medium text-[#9fb8d4] tabular-nums max-[1200px]:hidden"
+      className="shrink-0 text-[14px] font-medium text-[#9fb8d4] tabular-nums max-[1200px]:hidden"
       id="clock"
       dateTime={now.toISOString()}
       title="한국 표준시 (KST)"
@@ -114,7 +114,7 @@ export default function AppHeader() {
         <HeaderClock />
         <button
           type="button"
-          className={`${buttonSurface} ${panelTab} relative grid size-9 shrink-0 place-items-center overflow-visible! rounded-[7px] [&[aria-expanded=false]]:border-[#398eb2]${notificationsOpen ? ' active' : ''}`}
+          className={`${headerButtonStyle} relative grid size-9 shrink-0 place-items-center overflow-visible! rounded-[7px]${notificationsOpen ? ' active' : ''}`}
           id="header-alarm"
           aria-expanded={notificationsOpen}
           aria-controls="notifications-panel"
