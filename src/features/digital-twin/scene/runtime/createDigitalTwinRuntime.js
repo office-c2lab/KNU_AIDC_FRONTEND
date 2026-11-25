@@ -4356,9 +4356,6 @@ export function initDigitalTwin(root, { modelsOnly = false } = {}) {
       b.classList.toggle('active', isActive);
       b.setAttribute('aria-pressed', String(isActive));
     });
-    $('#crumb-current').textContent = asset
-      ? (asset.floor ? asset.floor + ' / ' : '') + asset.id
-      : zones[zone].name || zones[zone].title;
     twinActions.setNavigation({ activeZone, activeFloor, selectedId });
     twinActions.setAutoRotate(false);
     updateFloorLayout();

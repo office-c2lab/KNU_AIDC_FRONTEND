@@ -1,6 +1,6 @@
 import { uiClass } from '../../../styles/interfaceStyles.js';
 import { useEffect, useRef, useState } from 'react';
-import { Check, ChevronDown, ChevronRight, House, RotateCcw, RotateCw } from 'lucide-react';
+import { Check, ChevronDown, RotateCcw, RotateCw } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 const chip = 'chip control-menu-trigger';
 const menuItem = 'control-menu-item';
@@ -64,16 +64,9 @@ export default function BreadcrumbToolbar() {
   }, [openMenu]);
   return (
     <div className={uiClass('breadcrumbs')}>
-      <div className={uiClass('crumb-path')}>
-        <House size={14} aria-hidden="true" />
-        <ChevronRight className={uiClass('sep')} size={12} aria-hidden="true" />
-        <span>KNU AIDC</span>
-        <ChevronRight className={uiClass('sep')} size={12} aria-hidden="true" />
-        <b id="crumb-current">시설 전체</b>
-      </div>
       <div
         ref={toolbarRef}
-        className={uiClass('view-actions')}
+        className={uiClass('view-actions ml-auto')}
         role="toolbar"
         aria-label="시설 층 배치, 시점 및 보기 설정"
       >
