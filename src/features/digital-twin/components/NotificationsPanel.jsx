@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { SCENARIOS } from '../scene/config/scenarioConfig.js';
 import { panelSurface } from './uiStyles.js';
+import './NotificationsPanel.css';
 const scenarioById = new Map(SCENARIOS.map(scenario => [scenario.id, scenario]));
 export default function NotificationsPanel({ dashboardMode = false }) {
   const open = useDigitalTwinStore(state => state.notificationsOpen);
@@ -45,7 +46,7 @@ export default function NotificationsPanel({ dashboardMode = false }) {
       inert={!open}
       ref={panelRef}
       id="notifications-panel"
-      className={`notifications-panel ${panelSurface} fixed top-[78px] right-[26px] z-[100] w-[min(360px,calc(var(--app-viewport-width,100vw)-32px))] max-h-[calc(var(--app-viewport-height,100dvh)-100px)] overflow-y-auto rounded-[7px]`}
+      className={`notifications-panel ${panelSurface} fixed top-[78px] right-[26px] z-[100] w-[min(400px,calc(var(--app-viewport-width,100vw)-32px))] max-h-[calc(var(--app-viewport-height,100dvh)-100px)] overflow-y-auto rounded-[7px]`}
       role="region"
       aria-labelledby="alarm-heading"
       hidden={!open}

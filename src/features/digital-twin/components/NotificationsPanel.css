@@ -1,0 +1,33 @@
+#notifications-panel .notifications-heading {
+  padding: 16px;
+}
+
+#notifications-panel .notifications-heading h2 {
+  font-size: 15px;
+}
+
+#notifications-panel #alarm-count {
+  font-size: 12px;
+}
+
+#notifications-panel .alarm-item {
+  padding: 16px 12px;
+}
+
+#notifications-panel .alarm-copy b {
+  font-size: 14px;
+}
+
+#notifications-panel .alarm-level {
+  margin-top: 8px;
+}
+
+#notifications-panel .alarm-copy small,
+#notifications-panel .alarm-time,
+#notifications-panel .alarm-severity {
+  font-size: 12px;
+}
+
+#notifications-panel .dashboard-empty {
+  font-size: 14px;
+}
