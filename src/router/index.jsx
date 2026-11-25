@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout.jsx';
+import DemoSessionGate from '../components/DemoSessionGate.jsx';
 import DigitalTwinPage from '../pages/DigitalTwinPage.jsx';
 import DashboardPage from '../pages/DashboardPage.jsx';
 
@@ -12,7 +13,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <DemoSessionGate>
+        <AppLayout />
+      </DemoSessionGate>
+    ),
     children: [
       {
         path: 'ai-network',

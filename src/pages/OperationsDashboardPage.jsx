@@ -352,7 +352,7 @@ export default function OperationsDashboardPage() {
 
   return (
     <main
-      className="fixed inset-x-[26px] top-[92px] bottom-7 z-5 overflow-y-auto text-[#dce9f8] [scrollbar-width:thin] [scrollbar-color:#41658c_transparent] max-[560px]:inset-x-4 max-[560px]:bottom-5 [&_strong]:tabular-nums [&_time]:tabular-nums [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-[#87bce9] [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-[#87bce9]"
+      className="fixed inset-x-[26px] top-[108px] bottom-7 z-5 overflow-y-auto text-[#dce9f8] [scrollbar-width:thin] [scrollbar-color:#41658c_transparent] max-[560px]:inset-x-4 max-[560px]:bottom-5 [&_strong]:tabular-nums [&_time]:tabular-nums [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-[#87bce9] [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-[#87bce9]"
       aria-label="운영 대시보드"
     >
       <div className="mx-auto grid w-full min-w-0 max-w-[1360px] gap-4 pt-px pr-[3px] pb-[3px] pl-px">

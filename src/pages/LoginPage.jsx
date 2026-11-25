@@ -2,7 +2,9 @@ import { Check, Eye, EyeOff, LockKeyhole, LogIn, UserRound, X } from 'lucide-rea
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import loginImage from '../assets/login.png';
-import { LoginBackdrop, LoginFrame, UniversityWordmark } from '../features/login/LoginArtwork.jsx';
+import { useDemoSessionStore } from '../stores/demoSessionStore.js';
+import { LoginFrame, UniversityWordmark } from '../features/login/LoginArtwork.jsx';
+import CampusBackdrop from '../components/CampusBackdrop.jsx';
 
 const savedIdKey = 'knu-aidc-saved-login-id';
 function readSavedId() {
@@ -17,6 +19,7 @@ const inputClass =
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const enterSession = useDemoSessionStore(state => state.enter);
   const [initialId] = useState(readSavedId);
   const [username, setUsername] = useState(initialId);
   const [remember, setRemember] = useState(Boolean(initialId));
@@ -39,16 +42,17 @@ export default function LoginPage() {
     } catch {
       /* Login remains usable when browser storage is unavailable. */
     }
-    // Temporary navigation until account authentication is connected.
+    // Temporary entry flow until account authentication is connected.
+    enterSession();
     navigate('/dashboard', { replace: true });
   };
 
   return (
     <main
-      className="relative flex h-dvh min-h-0 w-full flex-col overflow-x-hidden overflow-y-auto bg-[#001022] font-interface min-[1001px]:[@media(max-height:740px)]:[--login-field-height:46px] min-[1001px]:[@media(max-height:740px)]:[--login-card-top:44px] min-[1001px]:[@media(max-height:740px)]:[--login-card-bottom:36px] min-[1001px]:[@media(max-height:740px)]:[--login-caption-gap:28px] min-[1001px]:[@media(max-height:740px)]:[--login-logo-size:50px] min-[1001px]:[@media(max-height:740px)]:[--login-university-size:27px] [scrollbar-width:thin] [scrollbar-color:#55779a_transparent] text-[#edf4ff] [background-image:radial-gradient(ellipse_at_35%_43%,#06396666,transparent_52%),radial-gradient(ellipse_at_80%_35%,#00295266,transparent_43%),linear-gradient(135deg,#020d1c,#00162b_55%,#010c1c)]"
+      className="relative flex h-dvh min-h-0 w-full flex-col overflow-x-hidden overflow-y-auto bg-[#001022] font-interface min-[1001px]:[@media(max-height:740px)]:[--login-field-height:46px] min-[1001px]:[@media(max-height:740px)]:[--login-card-top:44px] min-[1001px]:[@media(max-height:740px)]:[--login-card-bottom:36px] min-[1001px]:[@media(max-height:740px)]:[--login-logo-size:50px] min-[1001px]:[@media(max-height:740px)]:[--login-university-size:27px] [scrollbar-width:thin] [scrollbar-color:#55779a_transparent] text-[#edf4ff]"
       aria-label="KNU AIDC 로그인"
     >
-      <LoginBackdrop />
+      <CampusBackdrop />
       <div className="relative mx-auto grid w-full max-w-[1540px] flex-1 grid-cols-[minmax(0,1.35fr)_minmax(360px,.9fr)] items-center gap-7 min-[1001px]:content-center px-[clamp(24px,4vw,64px)] pt-8 pb-4 max-[1000px]:max-w-[620px] max-[1000px]:grid-cols-1 max-[1000px]:gap-6 max-[1000px]:pt-10 max-[480px]:px-4 max-[480px]:pt-7">
         <section className="relative min-w-0 self-center" aria-labelledby="login-heading">
           <div className="relative z-10 -ml-[1.4%] max-[1000px]:ml-0 max-[1000px]:text-center">
@@ -87,20 +91,25 @@ export default function LoginPage() {
             <div className="flex justify-center">
               <UniversityWordmark />
             </div>
-            <div className="mt-7 mb-[var(--login-caption-gap,36px)] flex items-center justify-center gap-4 max-[420px]:gap-2">
+            <div className="mt-6 flex items-center justify-center gap-4 max-[420px]:gap-2">
               <span
                 aria-hidden="true"
                 className="h-px min-w-4 flex-1 bg-linear-to-r from-transparent to-[#68d8ff]"
               />
-              <p className="text-[16px] tracking-[0.09em] whitespace-nowrap text-[#63d6fc] max-[420px]:text-[12px]">
-                AIDC Digital Twin Campus
-              </p>
+              <h2 className="text-[16px] font-medium tracking-[0.04em] whitespace-nowrap text-[#63d6fc] max-[420px]:text-[14px]">
+                캠퍼스 통합 로그인
+              </h2>
               <span
                 aria-hidden="true"
                 className="h-px min-w-4 flex-1 bg-linear-to-l from-transparent to-[#68d8ff]"
               />
             </div>
-            <form onSubmit={submit} noValidate aria-label="로그인 정보" className="flex flex-col">
+            <form
+              onSubmit={submit}
+              noValidate
+              aria-label="로그인 정보"
+              className="mt-7 flex flex-col max-[420px]:mt-6"
+            >
               <label htmlFor="login-username" className="sr-only">
                 아이디
               </label>

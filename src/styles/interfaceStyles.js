@@ -147,8 +147,6 @@ const styles = {
     'absolute right-[0] top-[calc(100%_+_7px)] z-[40] min-w-[176px] pt-[5px] pr-[5px] pb-[5px] pl-[5px] [border:1px_solid_#466b94] [background:#0d1b31f7] [box-shadow:0_12px_30px_#020817a6] [&[hidden]]:hidden',
   'control-menu-trigger':
     '[.breadcrumbs_&]:grid [.breadcrumbs_&]:grid-cols-[auto_auto_13px] [.breadcrumbs_&]:items-center [.breadcrumbs_&]:gap-[7px] [.breadcrumbs_&]:min-w-[112px] [.breadcrumbs_&]:h-[34px] [.breadcrumbs_&]:pt-[0] [.breadcrumbs_&]:pr-[9px] [.breadcrumbs_&]:pb-[0] [.breadcrumbs_&]:pl-[9px] [.breadcrumbs_&]:[border-color:#355477] [.breadcrumbs_&]:[background:#101f38] [.breadcrumbs_&]:text-[color:#bad0e8] [.breadcrumbs_&]:text-[length:12px] [.breadcrumbs_&]:font-semibold [.breadcrumbs_&]:text-left [.breadcrumbs_&]:[box-shadow:none] [.breadcrumbs_&_small]:text-[color:#7894b2] [.breadcrumbs_&_small]:text-[length:11px] [.breadcrumbs_&_small]:font-normal [.breadcrumbs_&_svg]:[transition:transform_.16s] [.breadcrumbs_&[aria-expanded="true"]_svg]:[transform:rotate(180deg)] [.breadcrumbs_&:hover]:[border-color:#577da6] [.breadcrumbs_&:hover]:[background:#172e4d] [.breadcrumbs_&:hover]:text-[color:#fff] max-[760px]:[.breadcrumbs_&]:min-w-[auto] max-[760px]:[.breadcrumbs_&]:grid-cols-[auto_13px] max-[760px]:[.breadcrumbs_&_small]:hidden [.breadcrumbs_&.active]:[border-color:#73a8dc] [.breadcrumbs_&.active]:[background:#21466d] [.breadcrumbs_&.active]:text-[color:#fff]',
-  corner:
-    'fixed z-[33] w-[28px] h-[28px] pointer-events-none opacity-[.8] [&::before]:[content:var(--ui-empty-content)] [&::before]:absolute [&::before]:[background:#85b9ff] [&::before]:[box-shadow:0_0_10px_#3c8dff] [&::before]:w-[28px] [&::before]:h-[1px] [&::after]:[content:var(--ui-empty-content)] [&::after]:absolute [&::after]:[background:#85b9ff] [&::after]:[box-shadow:0_0_10px_#3c8dff] [&::after]:w-[1px] [&::after]:h-[28px] [&.bl]:left-[18px] [&.bl]:bottom-[18px] [&.bl]:[transform:scaleY(-1)] [&.br]:right-[18px] [&.br]:bottom-[18px] [&.br]:[transform:scale(-1)] [&.tl]:left-[18px] [&.tl]:top-[18px] [&.tr]:right-[18px] [&.tr]:top-[18px] [&.tr]:[transform:scaleX(-1)]',
   critical:
     '[.selected-scenario-title_>_span&]:text-[color:#ff8f98] [.asset-scenario-heading_>_span&]:text-[color:#ff8f98]',
   'crumb-path':
@@ -267,8 +265,6 @@ const styles = {
     'grid gap-[6px] [.panel_&]:gap-[6px] [.left-panel_&]:gap-[4px] [.digital-twin-root_.panel_&]:gap-[7px]',
   'floor-no':
     'grid [place-items:center] min-h-[30px] [border:0] [background:#1c3352] text-[color:#c2dcff] [font:650_12px_var(--readout-font)] [.floor-button.active_&]:[border-color:#80b3e5] [.floor-button.active_&]:[background:linear-gradient(#3c6390,#24476d)] [.support-section_&]:text-[color:#b8d5f3] [.left-panel_&]:min-h-[27px] [.digital-twin-root_.floor-button_&]:[grid-column:1] [.digital-twin-root_.floor-button_&]:[grid-row:1] [.digital-twin-root_.left-panel_&]:text-[length:12px] [.digital-twin-root_.left-panel_&]:font-semibold [.digital-twin-root_.left-panel_&]:min-h-[30px]!',
-  frame:
-    'fixed top-[8px] right-[8px] bottom-[8px] left-[8px] z-[32] pointer-events-none [border:1px_solid_rgba(92,137,209,.22)] [clip-path:polygon(0_0,20%_0,20.8%_5px,79.2%_5px,80%_0,100%_0,100%_100%,65%_100%,64.3%_calc(100%_-_5px),35.7%_calc(100%_-_5px),35%_100%,0_100%)]',
   good: '[.env-table_td&]:text-[color:#edf5ff]',
   'header-tools':
     'h-[64px] flex justify-end items-center gap-[18px] pr-[28px] text-[color:#9dafc4] max-[1250px]:gap-[10px] max-[1250px]:pr-[16px] max-[700px]:hidden [.app-header_&]:pl-[88px] max-[1450px]:[.app-header_&]:pl-[28px] max-[1450px]:[.app-header_&]:pr-[16px] max-[1450px]:[.app-header_&]:gap-[10px] max-[700px]:[.app-header_&]:flex max-[700px]:[.app-header_&]:pl-[12px] max-[700px]:[.app-header_&]:pr-[12px]',
@@ -673,7 +669,6 @@ const hooks = new Set([
   'control-menu-item',
   'control-menu-trigger',
   'cooling',
-  'corner',
   'critical',
   'danger',
   'dashboard-grid',

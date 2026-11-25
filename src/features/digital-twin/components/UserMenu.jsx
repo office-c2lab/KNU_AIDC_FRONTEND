@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import { useUserPreferencesStore } from '../../../stores/userPreferencesStore.js';
+import { useDemoSessionStore } from '../../../stores/demoSessionStore.js';
 
 const itemClass =
   'flex min-h-10 w-full items-center gap-3 rounded-md px-3 text-left text-[14px] font-medium text-[#d6e4f3] transition-colors hover:bg-[#28415d80] hover:text-white focus-visible:bg-[#28415d80] focus-visible:outline-2 focus-visible:outline-[#80b5e5] disabled:text-[#788ca3] disabled:hover:bg-transparent disabled:hover:text-[#788ca3]';
@@ -34,6 +35,7 @@ function PreferenceToggle({ checked, onChange, children, description }) {
 
 export default function UserMenu() {
   const navigate = useNavigate();
+  const leaveSession = useDemoSessionStore(state => state.leave);
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState(null);
   const menuId = useId();
@@ -164,6 +166,7 @@ export default function UserMenu() {
               onClick={() => {
                 setOpen(false);
                 closeNotifications(false);
+                leaveSession();
                 navigate('/login', { replace: true });
               }}
             >
