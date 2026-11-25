@@ -17,7 +17,7 @@ export default function DigitalTwinPage() {
       <SceneViewport />
       <CompactPanelControls openPanel={openPanel} onPanelChange={setOpenPanel} />
       <FacilitySidebar
-        open={['efficiency', 'power'].includes(openPanel)}
+        open={openPanel === 'efficiency'}
         section={openPanel}
         onClose={() => setOpenPanel(null)}
       />
