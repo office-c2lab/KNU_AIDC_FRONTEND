@@ -5,7 +5,7 @@ import { useDigitalTwinStore } from '../../../stores/digitalTwinStore.js';
 import HeaderFrame from './HeaderFrame.jsx';
 import UserMenu from './UserMenu.jsx';
 import { useUserPreferencesStore } from '../../../stores/userPreferencesStore.js';
-import { panelSurface, panelTab } from './uiStyles.js';
+import { buttonSurface, panelTab } from './uiStyles.js';
 const clockFormatter = new Intl.DateTimeFormat('ko-KR', {
   timeZone: 'Asia/Seoul',
   hour: '2-digit',
@@ -114,7 +114,7 @@ export default function AppHeader() {
         <HeaderClock />
         <button
           type="button"
-          className={`${panelSurface} ${panelTab} relative grid size-9 shrink-0 place-items-center overflow-visible! rounded-[7px]${notificationsOpen ? ' active' : ''}`}
+          className={`${buttonSurface} ${panelTab} relative grid size-9 shrink-0 place-items-center overflow-visible! rounded-[7px] [&[aria-expanded=false]]:border-[#398eb2]${notificationsOpen ? ' active' : ''}`}
           id="header-alarm"
           aria-expanded={notificationsOpen}
           aria-controls="notifications-panel"
